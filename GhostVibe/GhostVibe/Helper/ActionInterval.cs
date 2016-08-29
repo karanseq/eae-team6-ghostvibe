@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using System.Diagnostics;
 
-namespace GhostVibe.SimpleGraphics
+namespace Helper
 {
     public class ActionInterval : FiniteTimeAction
     {
@@ -65,7 +65,7 @@ namespace GhostVibe.SimpleGraphics
         {
             get { return elapsed; }
         }
-    }
+    } // class ActionInterval
 
     public class RotateTo : ActionInterval
     {
@@ -76,8 +76,12 @@ namespace GhostVibe.SimpleGraphics
         public static RotateTo create(float duration, float destAngle)
         {
             RotateTo rotateTo = new RotateTo();
-            rotateTo.initWithDuration(duration, destAngle);
-            return rotateTo;
+            if (rotateTo.initWithDuration(duration, destAngle))
+            {
+                return rotateTo;
+            }
+            rotateTo = null;
+            return null;
         }
 
         protected bool initWithDuration(float duration, float destAngle)
@@ -114,7 +118,7 @@ namespace GhostVibe.SimpleGraphics
         {
             return null;
         }
-    }
+    } // class RotateTo
 
     public class RotateBy : ActionInterval
     {
@@ -125,8 +129,12 @@ namespace GhostVibe.SimpleGraphics
         public static RotateBy create(float duration, float deltaAngle)
         {
             RotateBy rotateBy = new RotateBy();
-            rotateBy.initWithDuration(duration, deltaAngle);
-            return rotateBy;
+            if (rotateBy.initWithDuration(duration, deltaAngle))
+            {
+                return rotateBy;
+            }
+            rotateBy = null;
+            return null;
         }
 
         protected bool initWithDuration(float duration, float deltaAngle)
@@ -162,7 +170,7 @@ namespace GhostVibe.SimpleGraphics
         {
             return RotateBy.create(duration, -deltaAngle);
         }
-    }
+    } // class RotateBy
 
     public class MoveBy : ActionInterval
     {
@@ -173,8 +181,12 @@ namespace GhostVibe.SimpleGraphics
         public static MoveBy create(float duration, Vector2 deltaPosition)
         {
             MoveBy moveBy = new MoveBy();
-            moveBy.initWithDuration(duration, deltaPosition);
-            return moveBy;
+            if (moveBy.initWithDuration(duration, deltaPosition))
+            {
+                return moveBy;
+            }
+            moveBy = null;
+            return null;
         }
 
         protected bool initWithDuration(float duration, Vector2 deltaPosition)
@@ -215,7 +227,7 @@ namespace GhostVibe.SimpleGraphics
         {
             return MoveBy.create(duration, -deltaPosition);
         }
-    }
+    } //  class MoveBy
 
     public class MoveTo : MoveBy
     {
@@ -226,8 +238,12 @@ namespace GhostVibe.SimpleGraphics
         public new static MoveTo create(float duration, Vector2 endPosition)
         {
             MoveTo moveTo = new MoveTo();
-            moveTo.initWithDuration(duration, endPosition);
-            return moveTo;
+            if (moveTo.initWithDuration(duration, endPosition))
+            {
+                return moveTo;
+            }
+            moveTo = null;
+            return null;
         }
 
         protected new bool initWithDuration(float duration, Vector2 endPosition)
@@ -255,5 +271,91 @@ namespace GhostVibe.SimpleGraphics
         {
             return null;
         }
+    } // class MoveTo
+
+    public class ScaleTo : ActionInterval
+    {
+        protected float scale, startScale, endScale, deltaScale;
+
+        protected ScaleTo() { }
+
+        public static ScaleTo create(float duration, float s)
+        {
+            ScaleTo scaleTo = new ScaleTo();
+            if (scaleTo.initWithDuration(duration, s))
+            {
+                return scaleTo;
+            }
+            scaleTo = null;
+            return null;
+        }
+
+        protected bool initWithDuration(float duration, float s)
+        {
+            if (base.initWithDuration(duration))
+            {
+                this.endScale = s;
+                return true;
+            }
+            return false;
+        }
+
+        public override void startWithTarget(Sprite t)
+        {
+            base.startWithTarget(t);
+            startScale = t.Scale;
+            deltaScale = endScale - startScale;
+        }
+
+        public override void update(float time)
+        {
+            if (target != null)
+            {
+                target.Scale = (startScale + deltaScale * time);
+            }
+        }
+
+        public new ScaleTo clone()
+        {
+            return ScaleTo.create(duration, endScale);
+        }
+
+        public new ScaleTo reverse()
+        {
+            return null;
+        }
+    } // class ScaleTo
+
+    public class ScaleBy : ScaleTo
+    {
+        protected ScaleBy() { }
+
+        public new static ScaleBy create(float duration, float s)
+        {
+            ScaleBy scaleBy = new ScaleBy();
+            if (scaleBy.initWithDuration(duration, s))
+            {
+                return scaleBy;
+            }
+            scaleBy = null;
+            return null;
+        }
+
+        public override void startWithTarget(Sprite t)
+        {
+            base.startWithTarget(t);
+            deltaScale = startScale * endScale - startScale;
+        }
+
+        public new ScaleBy clone()
+        {
+            return ScaleBy.create(duration, endScale);
+        }
+
+        public new ScaleBy reverse()
+        {
+            return ScaleBy.create(duration, 1 / endScale);
+        }
     }
-}
+
+} // namespace Helper

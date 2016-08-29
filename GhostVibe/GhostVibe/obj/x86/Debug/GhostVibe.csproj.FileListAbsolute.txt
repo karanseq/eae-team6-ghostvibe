@@ -25,3 +25,4 @@ C:\Users\u1087117\Documents\Visual Studio 2015\Projects\eae-team6-ghostvibe\Ghos
 C:\Users\u1087117\Documents\Visual Studio 2015\Projects\eae-team6-ghostvibe\GhostVibe\GhostVibe\obj\x86\Debug\GhostVibe.pdb
 C:\Users\u1087117\Documents\Visual Studio 2015\Projects\eae-team6-ghostvibe\GhostVibe\GhostVibe\bin\Windows\x86\Debug\Content\Graphics\walk.png
 C:\Users\u1087117\Documents\Visual Studio 2015\Projects\eae-team6-ghostvibe\GhostVibe\GhostVibe\bin\Windows\x86\Debug\Content\Graphics\walk_anim.png
+C:\Users\u1087117\Documents\Visual Studio 2015\Projects\eae-team6-ghostvibe\GhostVibe\GhostVibe\bin\Windows\x86\Debug\Content\Arial.xnb

@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace GhostVibe.SimpleGraphics
+namespace Helper
 {
     public class ActionManager
     {
@@ -33,14 +33,20 @@ namespace GhostVibe.SimpleGraphics
             Trace.Assert(action != null, "Null action sent to ActionManager.addAction!");
             Trace.Assert(target != null, "Null target sent to ActionManager.addAction!");
 
+            // check if this action is already running on some target
+            foreach (Sprite t in targetSet)
+            {
+                Trace.Assert(!t.ActionSet.Contains(action), "Action is already running!");
+            }
+
+            // check if we have an instance of the target
             if (!targetSet.Contains(target))
             {
                 targetSet.Add(target);
             }
 
-            Trace.Assert(!target.ActionSet.Contains(action), "");
+            // store the instance and start the animation
             target.ActionSet.Add(action);
-
             action.startWithTarget(target);
         }
 
@@ -200,5 +206,7 @@ namespace GhostVibe.SimpleGraphics
 
             targetSet.ExceptWith(targetsToRemove);
         }
-    }
-}
+
+    } // class ActionManager
+
+} // namespace Helper

@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace GhostVibe
+namespace Helper
 {
     public class Sprite
     {
@@ -27,7 +27,7 @@ namespace GhostVibe
 
         // action attributes
         protected bool isPaused;
-        protected HashSet<SimpleGraphics.Action> actionSet;
+        protected HashSet<Action> actionSet;
 
         public Sprite()
         {
@@ -47,12 +47,40 @@ namespace GhostVibe
             sourceRect = Rectangle.Empty;
 
             isPaused = false;
-            actionSet = new HashSet<SimpleGraphics.Action>();
+            actionSet = new HashSet<Action>();
         }
 
-        public void Initialize(Texture2D texture, Vector2 position = default(Vector2), Color color = default(Color), float rotation = 0.0f, float initialScale = 1.0f, SpriteEffects spriteEffects = SpriteEffects.None, float layerDepth = 0.0f)
+        public static Sprite Create(Texture2D texture, Vector2 position = default(Vector2), Color color = default(Color), float rotation = 0.0f, float initialScale = 1.0f, SpriteEffects spriteEffects = SpriteEffects.None, float layerDepth = 0.0f)
         {
-            Trace.Assert((texture != null), "Null texture passed to Sprite.Initialize!");
+            Sprite sprite = new Sprite();
+            if (sprite.Initialize(texture, position, color, rotation, initialScale, spriteEffects, layerDepth))
+            {
+                return sprite;
+            }
+            sprite = null;
+            return null;
+        }
+
+        public static Sprite Create(Texture2D texture, int frameWidth, int frameHeight, int frameCount, int frameTime = 60, bool isAnimationLooping = true, Vector2 position = default(Vector2), Color color = default(Color), float rotation = 0.0f, float initialScale = 1.0f, SpriteEffects spriteEffects = SpriteEffects.None, float layerDepth = 0.0f)
+        {
+            Sprite sprite = new Sprite();
+            if (sprite.Initialize(texture, frameWidth, frameHeight, frameCount, frameTime, isAnimationLooping, position, color, rotation, initialScale, spriteEffects, layerDepth))
+            {
+                return sprite;
+            }
+            sprite = null;
+            return null;
+        }
+
+        protected bool Initialize(Texture2D texture, Vector2 position = default(Vector2), Color color = default(Color), float rotation = 0.0f, float initialScale = 1.0f, SpriteEffects spriteEffects = SpriteEffects.None, float layerDepth = 0.0f)
+        {
+            // validate required inputs
+            if (texture == null)
+            {
+                Trace.TraceError("Null texture passed to Sprite.Initialize!");
+                return false;
+            }
+
             this.texture = texture;
             this.position = position == default(Vector2) ? this.position : position;
             this.color = color == default(Color) ? this.color : color;
@@ -61,11 +89,17 @@ namespace GhostVibe
             this.scale = initialScale;
             this.spriteEffects = spriteEffects;
             this.layerDepth = layerDepth;
+
+            return true;
         }
 
-        public void Initialize(Texture2D texture, int frameWidth, int frameHeight, int frameCount, int frameTime = 60, bool isAnimationLooping = true, Vector2 position = default(Vector2), Color color = default(Color), float rotation = 0.0f, float initialScale = 1.0f, SpriteEffects spriteEffects = SpriteEffects.None, float layerDepth = 0.0f)
+        protected bool Initialize(Texture2D texture, int frameWidth, int frameHeight, int frameCount, int frameTime = 60, bool isAnimationLooping = true, Vector2 position = default(Vector2), Color color = default(Color), float rotation = 0.0f, float initialScale = 1.0f, SpriteEffects spriteEffects = SpriteEffects.None, float layerDepth = 0.0f)
         {
-            Initialize(texture, position, color, rotation, initialScale, spriteEffects, layerDepth);
+            if (Initialize(texture, position, color, rotation, initialScale, spriteEffects, layerDepth) == false)
+            {
+                return false;
+            }
+
             this.origin.X = frameWidth / 2;
             this.origin.Y = frameHeight / 2;
             this.isAnimation = true;
@@ -97,6 +131,8 @@ namespace GhostVibe
 
             this.isAnimationLooping = isAnimationLooping;
             sourceRect = new Rectangle(0, 0, frameWidth, frameHeight);
+
+            return true;
         }
 
         public void Update(GameTime gameTime)
@@ -151,7 +187,7 @@ namespace GhostVibe
             }
         }
 
-        // accessors
+        // accessors & mutators
         public Texture2D Texture
         {
             get { return texture; }
@@ -241,11 +277,11 @@ namespace GhostVibe
             set { isPaused = value; }
         }
 
-        public HashSet<SimpleGraphics.Action> ActionSet
+        public HashSet<Action> ActionSet
         {
             get { return actionSet; }
         }
 
     } // class Sprite
 
-} // namespace GhostVibe
+} // namespace Helper

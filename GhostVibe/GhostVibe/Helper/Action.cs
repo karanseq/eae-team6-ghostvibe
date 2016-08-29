@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
-using GhostVibe;
 
-namespace GhostVibe.SimpleGraphics
+namespace Helper
 {
     public class Action
     {
@@ -56,7 +55,7 @@ namespace GhostVibe.SimpleGraphics
             get { return tag; }
             set { tag = value; }
         }
-    }
+    } // class Action
 
     public class FiniteTimeAction : Action
     {
@@ -82,5 +81,6 @@ namespace GhostVibe.SimpleGraphics
             get { return duration; }
             set { duration = value; }
         }
-    }
-}
+    } // class FiniteTimeAction
+
+} // namespace Helper

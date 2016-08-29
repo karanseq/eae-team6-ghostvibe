@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GhostVibe.SimpleGraphics
+namespace Helper
 {
     class Helper
     {
@@ -16,4 +16,5 @@ namespace GhostVibe.SimpleGraphics
             return ((float)Math.PI * degrees / 180.0f);
         }
     }
-}
+
+} // namespace Helper
