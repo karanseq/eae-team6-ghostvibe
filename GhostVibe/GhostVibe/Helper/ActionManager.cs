@@ -9,7 +9,7 @@ namespace Helper
     {
         private static ActionManager instance = null;
 
-        public HashSet<Sprite> targetSet;
+        protected HashSet<Sprite> targetSet;
 
         private ActionManager()
         {
