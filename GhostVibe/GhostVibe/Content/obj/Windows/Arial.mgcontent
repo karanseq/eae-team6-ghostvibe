@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PipelineBuildEvent xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <SourceFile>C:/Users/u1087117/Documents/Visual Studio 2015/Projects/eae-team6-ghostvibe/GhostVibe/GhostVibe/Content/Arial.spritefont</SourceFile>
-  <SourceTime>2016-03-30T00:36:08-06:00</SourceTime>
-  <DestFile>C:/Users/u1087117/Documents/Visual Studio 2015/Projects/eae-team6-ghostvibe/GhostVibe/GhostVibe/Content/bin/Windows/Arial.xnb</DestFile>
-  <DestTime>2016-08-29T13:17:26.2712528-06:00</DestTime>
+  <SourceFile>C:/Users/u1069212/Documents/Visual Studio 2015/Projects/eae-team6-ghostvibe/GhostVibe/GhostVibe/Content/Arial.spritefont</SourceFile>
+  <SourceTime>2016-08-30T09:05:12.982589-06:00</SourceTime>
+  <DestFile>C:/Users/u1069212/Documents/Visual Studio 2015/Projects/eae-team6-ghostvibe/GhostVibe/GhostVibe/Content/bin/Windows/Arial.xnb</DestFile>
+  <DestTime>2016-08-30T09:08:31.9059723-06:00</DestTime>
   <Importer>FontDescriptionImporter</Importer>
   <ImporterTime>2016-03-30T00:36:08-06:00</ImporterTime>
   <Processor>FontDescriptionProcessor</Processor>

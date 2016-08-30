@@ -20,6 +20,10 @@ namespace GhostVibe
         Scheduler scheduler;
         UpdateDelegate delegateUpdate01, delegateUpdate02, delegateUpdate03;
 
+        UpdateDelegate delegateStartVibration, delegateStopVibration;
+        bool forLeftMotor;
+        List<Ghost> ghostList;
+
         protected Texture2D animationTexture, spriteTexture;
         protected Sprite animation, sprite;
         protected SpriteFont debugFont;
@@ -36,6 +40,7 @@ namespace GhostVibe
             graphics = new GraphicsDeviceManager(this);
             graphics.PreferredBackBufferWidth = 1280;
             graphics.PreferredBackBufferHeight = 720;
+            this.IsMouseVisible = true;
             Content.RootDirectory = "Content";
         }
 
@@ -49,10 +54,13 @@ namespace GhostVibe
         {
             actionManager = ActionManager.Instance;
             scheduler = Scheduler.Instance;
+            Helper.Helper.ViewportWidth = GraphicsDevice.Viewport.Width;
+            Helper.Helper.ViewportHeight = GraphicsDevice.Viewport.Height;
 
             debugMessage = "Click to start test!";
             isLeftMouseDown = false;
             counter = 0;
+            
 
             base.Initialize();
         }
@@ -71,10 +79,16 @@ namespace GhostVibe
             spriteTexture = Content.Load<Texture2D>("Graphics\\walk");
             debugFont = Content.Load<SpriteFont>("Arial");
 
-            animation = Sprite.Create(animationTexture, 184, 325, 8, 60, true, new Vector2(GraphicsDevice.Viewport.Width * 0.33f, GraphicsDevice.Viewport.Height * 0.5f));
-            sprite = Sprite.Create(spriteTexture, new Vector2(GraphicsDevice.Viewport.Width * 0.66f, GraphicsDevice.Viewport.Height * 0.5f));
-
             HapticFeedback.startBeats(0.5f, 0.1f, 0.1f);
+
+            //animation = Sprite.Create(animationTexture, 184, 325, 8, 60, true, new Vector2(GraphicsDevice.Viewport.Width * 0.33f, GraphicsDevice.Viewport.Height * 0.5f));
+            //sprite = Sprite.Create(spriteTexture, new Vector2(GraphicsDevice.Viewport.Width * 0.66f, GraphicsDevice.Viewport.Height * 0.5f));
+
+            ghostList = new List<Ghost>();
+            ghostList.Add(new Ghost(animationTexture, new Vector2(GraphicsDevice.Viewport.Width * 0.50f, GraphicsDevice.Viewport.Height * 0.20f), 184, 325, 8, 0.20f, "Blue"));
+            //ghostList.Add(new Ghost(animationTexture, new Vector2(GraphicsDevice.Viewport.Width * 0.50f, GraphicsDevice.Viewport.Height * 0.60f), 184, 325, 8, 0.20f, "Blue"));
+            //ghostList.Add(new Ghost(animationTexture, new Vector2(GraphicsDevice.Viewport.Width * 0.50f, GraphicsDevice.Viewport.Height * 0.40f), 184, 325, 8, 0.20f, "Blue"));
+            //ghostList.Add(new Ghost(animationTexture, new Vector2(GraphicsDevice.Viewport.Width * 0.50f, GraphicsDevice.Viewport.Height * 0.20f), 184, 325, 8, 0.20f, "Blue"));
         }
 
         /// <summary>
@@ -97,12 +111,13 @@ namespace GhostVibe
                 Exit();
 
             UpdateMouse();
+            UpdateGhosts(gameTime);
 
             actionManager.update(gameTime.ElapsedGameTime.Milliseconds / 1000.0f);
             scheduler.update(gameTime.ElapsedGameTime.Milliseconds / 1000.0f);
 
-            animation.Update(gameTime);
-            sprite.Update(gameTime);
+            //animation.Update(gameTime);
+            //sprite.Update(gameTime);
 
             base.Update(gameTime);
         }
@@ -120,7 +135,16 @@ namespace GhostVibe
             {
                 isLeftMouseDown = false;
                 HapticFeedback.stopBeats();
-                RunTestAction();
+                //RunTestAction();
+            }
+        }
+
+        private void UpdateGhosts(GameTime gameTime)
+        {
+            foreach (Ghost ghost in ghostList)
+            {
+                ghost.Update(gameTime);
+                ghost.MoveForward(1.0f);
             }
         }
 
@@ -243,8 +267,13 @@ namespace GhostVibe
 
             spriteBatch.Begin();
 
-            animation.Draw(spriteBatch);
-            sprite.Draw(spriteBatch);
+            //animation.Draw(spriteBatch);
+            //sprite.Draw(spriteBatch);
+            for(int i = 0; i < ghostList.Count; i++)
+            {
+                ghostList[i].Activate();
+                ghostList[i].Draw(spriteBatch);
+            }
 
             spriteBatch.DrawString(debugFont, debugMessage, new Vector2(GraphicsDevice.Viewport.Width * 0.5f, GraphicsDevice.Viewport.Height * 0.1f), Color.LightGreen,
                 0, debugFont.MeasureString(debugMessage) / 2, 1.0f, SpriteEffects.None, 0.5f);
