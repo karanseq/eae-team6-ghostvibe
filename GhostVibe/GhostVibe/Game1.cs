@@ -15,6 +15,11 @@ namespace GhostVibe
         SpriteBatch spriteBatch;
 
         ActionManager actionManager;
+        Scheduler scheduler;
+        UpdateDelegate delegateUpdate01, delegateUpdate02, delegateUpdate03;
+
+        UpdateDelegate delegateStartVibration, delegateStopVibration;
+        bool forLeftMotor;
 
         protected Texture2D animationTexture, spriteTexture;
         protected Sprite animation, sprite;
@@ -44,10 +49,17 @@ namespace GhostVibe
         protected override void Initialize()
         {
             actionManager = ActionManager.Instance;
+            scheduler = Scheduler.Instance;
 
             debugMessage = "Click to start test!";
             isLeftMouseDown = false;
+            forLeftMotor = false;
             counter = 0;
+
+            delegateStartVibration = new UpdateDelegate(startVibration);
+            delegateStopVibration = new UpdateDelegate(stopVibration);
+            scheduler.scheduleDelegate(delegateStartVibration, 0.5f, Timer.RepeatForever, 0.5f);
+            scheduler.scheduleDelegate(delegateStopVibration, 0.5f, Timer.RepeatForever, 0.75f);
 
             base.Initialize();
         }
@@ -92,6 +104,7 @@ namespace GhostVibe
             UpdateMouse();
 
             actionManager.update(gameTime.ElapsedGameTime.Milliseconds / 1000.0f);
+            scheduler.update(gameTime.ElapsedGameTime.Milliseconds / 1000.0f);
 
             animation.Update(gameTime);
             sprite.Update(gameTime);
@@ -127,43 +140,102 @@ namespace GhostVibe
             animation.Scale = 1.0f;
             sprite.Scale = 1.0f;
 
-            switch (++ counter)
+            switch (++counter)
             {
                 case 1:
-                    debugMessage = "MoveBy";
-                    actionManager.addAction(MoveBy.create(1.0f, new Vector2(GraphicsDevice.Viewport.Width * -0.1f, GraphicsDevice.Viewport.Height * 0.1f)), sprite);
+                    debugMessage = "Scheduling testUpdate01...";
+                    delegateUpdate01 = new UpdateDelegate(testUpdate01);
+                    scheduler.scheduleDelegate(delegateUpdate01, 1.0f);
                     break;
 
                 case 2:
-                    debugMessage = "MoveTo";
-                    actionManager.addAction(MoveTo.create(1.0f, new Vector2(GraphicsDevice.Viewport.Width * 0.5f, GraphicsDevice.Viewport.Height * 0.75f)), animation);
+                    debugMessage = "Unscheduling testUpdate01";
+                    scheduler.unscheduleDelegate(delegateUpdate01);
                     break;
 
                 case 3:
-                    debugMessage = "RotateBy";
-                    actionManager.addAction(RotateBy.create(1.0f, Helper.Helper.DegreesToRadians(720.0f)), sprite);
+                    debugMessage = "Scheduling testUpdate02 to start right now and repeat thrice...";
+                    delegateUpdate02 = new UpdateDelegate(testUpdate02);
+                    scheduler.scheduleDelegate(delegateUpdate02, 0.1f, 3, 0.0f);
                     break;
 
                 case 4:
-                    debugMessage = "RotateTo";
-                    actionManager.addAction(RotateTo.create(1.0f, Helper.Helper.DegreesToRadians(360.0f)), animation);
+                    debugMessage = "Uncheduling testUpdate02";
+                    scheduler.unscheduleDelegate(delegateUpdate02);
                     break;
 
                 case 5:
-                    debugMessage = "ScaleBy";
-                    actionManager.addAction(ScaleBy.create(1.0f, 0.5f), sprite);
+                    debugMessage = "Scheduling testUpdate03 to start in two seconds and to repeat thrice...";
+                    delegateUpdate03 = new UpdateDelegate(testUpdate03);
+                    scheduler.scheduleDelegate(delegateUpdate03, 0.5f, 3, 2.0f);
                     break;
 
                 case 6:
-                    debugMessage = "ScaleTo";
-                    actionManager.addAction(ScaleTo.create(1.0f, 1.5f), animation);
+                    debugMessage = "Unscheduling testUpdate03";
+                    scheduler.unscheduleDelegate(delegateUpdate03);
                     break;
+
+                //case 1:
+                //    debugMessage = "MoveBy";
+                //    actionManager.addAction(MoveBy.create(1.0f, new Vector2(GraphicsDevice.Viewport.Width * -0.1f, GraphicsDevice.Viewport.Height * 0.1f)), sprite);
+                //    break;
+
+                //case 2:
+                //    debugMessage = "MoveTo";
+                //    actionManager.addAction(MoveTo.create(1.0f, new Vector2(GraphicsDevice.Viewport.Width * 0.5f, GraphicsDevice.Viewport.Height * 0.75f)), animation);
+                //    break;
+
+                //case 3:
+                //    debugMessage = "RotateBy";
+                //    actionManager.addAction(RotateBy.create(1.0f, Helper.Helper.DegreesToRadians(720.0f)), sprite);
+                //    break;
+
+                //case 4:
+                //    debugMessage = "RotateTo";
+                //    actionManager.addAction(RotateTo.create(1.0f, Helper.Helper.DegreesToRadians(360.0f)), animation);
+                //    break;
+
+                //case 5:
+                //    debugMessage = "ScaleBy";
+                //    actionManager.addAction(ScaleBy.create(1.0f, 0.5f), sprite);
+                //    break;
+
+                //case 6:
+                //    debugMessage = "ScaleTo";
+                //    actionManager.addAction(ScaleTo.create(1.0f, 1.5f), animation);
+                //    break;
 
                 default:
                     counter = 0;
                     debugMessage = "Click to start test!";
                     break;
             }
+        }
+
+        public void testUpdate01(float deltaTime)
+        {
+            Trace.WriteLine("In testUpdate01...");
+        }
+
+        public void testUpdate02(float deltaTime)
+        {
+            Trace.WriteLine("In testUpdate02...");
+        }
+
+        public void testUpdate03(float deltaTime)
+        {
+            Trace.WriteLine("In testUpdate03...");
+        }
+
+        public void startVibration(float deltaTime)
+        {
+            forLeftMotor = !forLeftMotor;
+            GamePad.SetVibration(PlayerIndex.One, forLeftMotor ? 0.2f : 0.0f, forLeftMotor ? 0.0f : 0.2f);
+        }
+
+        public void stopVibration(float deltaTime)
+        {
+            GamePad.SetVibration(PlayerIndex.One, 0.0f, 0.0f);
         }
 
         /// <summary>
