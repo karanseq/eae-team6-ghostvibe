@@ -277,6 +277,11 @@ namespace Helper
             set { isPaused = value; }
         }
 
+        public Rectangle SourceRect
+        {
+            get { return sourceRect; }
+        }
+
         public HashSet<Action> ActionSet
         {
             get { return actionSet; }
