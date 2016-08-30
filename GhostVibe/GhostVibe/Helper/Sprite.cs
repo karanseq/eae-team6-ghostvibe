@@ -12,6 +12,7 @@ namespace Helper
         protected Texture2D texture;
         protected Vector2 position;
         protected Color color;
+        protected float opacity;
         protected float rotation;
         protected Vector2 origin;
         protected float scale;
@@ -34,6 +35,7 @@ namespace Helper
             texture = null;
             position = Vector2.Zero;
             color = Color.White;
+            opacity = 1.0f;
             rotation = 0.0f;
             origin = Vector2.Zero;
             scale = 1.0f;
@@ -178,12 +180,12 @@ namespace Helper
                 // don't animate if inactive
                 if (active)
                 {
-                    spriteBatch.Draw(texture, position, sourceRect, color, rotation, origin, scale, spriteEffects, layerDepth);
+                    spriteBatch.Draw(texture, position, sourceRect, color * opacity, rotation, origin, scale, spriteEffects, layerDepth);
                 }
             }
             else
             {
-                spriteBatch.Draw(texture, position, null, color, rotation, origin, scale, spriteEffects, layerDepth);
+                spriteBatch.Draw(texture, position, null, color * opacity, rotation, origin, scale, spriteEffects, layerDepth);
             }
         }
 
@@ -204,6 +206,12 @@ namespace Helper
         {
             get { return color; }
             set { color = value; }
+        }
+
+        public float Opacity
+        {
+            get { return opacity; }
+            set { opacity = value; }
         }
 
         public float Rotation

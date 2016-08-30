@@ -15,6 +15,11 @@ namespace Helper
         {
             return ((float)Math.PI * degrees / 180.0f);
         }
+
+        public static float RadiansToDegrees(float radians)
+        {
+            return ((float)Math.PI * 180.0f / radians);
+        }
     }
 
 } // namespace Helper

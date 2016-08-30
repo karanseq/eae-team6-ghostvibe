@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using System.Diagnostics;
 
 namespace Helper
 {
@@ -20,6 +21,7 @@ namespace Helper
 
         public virtual void startWithTarget(Sprite target)
         {
+            Trace.Assert((target != null), "Null target passed to Action.startWithTarget!");
             this.target = target;
         }
 

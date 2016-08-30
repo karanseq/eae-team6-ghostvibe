@@ -147,15 +147,28 @@ namespace Helper
             }
         }
 
-        public void scheduleDelegate(UpdateDelegate updateDelegate, float interval, bool paused = true)
+        public void scheduleDelegateOnce(UpdateDelegate updateDelegate, float interval)
+        {
+            scheduleDelegate(updateDelegate, interval, 1);
+        }
+
+        public void scheduleDelegate(UpdateDelegate updateDelegate, float interval = 0.0f, bool paused = true)
         {
             scheduleDelegate(updateDelegate, interval, Timer.RepeatForever, 0.0f, paused);
         }
 
-        public void scheduleDelegate(UpdateDelegate updateDelegate, float interval, int repeat, float delay, bool paused = true)
+        public void scheduleDelegate(UpdateDelegate updateDelegate, float interval, int repeat, float delay = 0.0f, bool paused = true)
         {
-            Trace.Assert((updateDelegate != null), "");
+            Trace.Assert((updateDelegate != null), "Null delegate provided to function scheduleDelegate!");
 
+            // check if this delegate has already been scheduled
+            if (delegateDictionary.ContainsKey(updateDelegate))
+            {
+                Trace.TraceError("Delegate is already scheduled!");
+                return;
+            }
+
+            // add the delegate and timer
             Timer timer = new Timer();
             timer.initialize(this, updateDelegate, interval, repeat, delay, paused);
             delegateDictionary.Add(updateDelegate, timer);
@@ -167,7 +180,7 @@ namespace Helper
 
             if (delegateDictionary.ContainsKey(updateDelegate))
             {
-                delegateDictionary.Remove(updateDelegate);
+                delegateDictionary[updateDelegate].cancel();
             }
             else
             {
@@ -177,7 +190,10 @@ namespace Helper
 
         public void unscheduleAllDelegates()
         {
-            delegateDictionary.Clear();
+            foreach (var updateDelegate in delegateDictionary)
+            {
+                ((Timer)updateDelegate.Value).cancel();
+            }
         }
 
         public void pauseDelegate(UpdateDelegate updateDelegate)
