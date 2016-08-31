@@ -49,7 +49,6 @@ namespace Helper
 
         public virtual void cancel()
         {
-            //scheduler.unscheduleDelegate(updateDelegate);
             isCancelled = true;
         }
 
@@ -129,10 +128,12 @@ namespace Helper
         private static Scheduler instance = null;
 
         protected Dictionary<UpdateDelegate, Timer> delegateDictionary;
+        protected Dictionary<UpdateDelegate, Timer> delegatesToAdd;
 
         private Scheduler()
         {
             delegateDictionary = new Dictionary<UpdateDelegate, Timer>();
+            delegatesToAdd = new Dictionary<UpdateDelegate, Timer>();
         }
 
         public static Scheduler Instance
@@ -171,7 +172,7 @@ namespace Helper
             // add the delegate and timer
             Timer timer = new Timer();
             timer.initialize(this, updateDelegate, interval, repeat, delay, paused);
-            delegateDictionary.Add(updateDelegate, timer);
+            delegatesToAdd.Add(updateDelegate, timer);
         }
 
         public void unscheduleDelegate(UpdateDelegate updateDelegate)
@@ -244,9 +245,21 @@ namespace Helper
         {
             HashSet<UpdateDelegate> delegatesToRemove = new HashSet<UpdateDelegate>();
 
+            // add any new delegates that haven't been added to the main list
+            if (delegatesToAdd.Count > 0)
+            {
+                foreach (var item in delegatesToAdd)
+                {
+                    delegateDictionary.Add(item.Key, item.Value);
+                }
+                delegatesToAdd.Clear();
+            }
+
+            // update the timers for each delegate
             foreach (var item in delegateDictionary)
             {
                 Timer timer = (Timer)item.Value;
+                // save any delegates that must be cancelled
                 if (!timer.IsCancelled)
                 {
                     timer.update(deltaTime);
@@ -257,6 +270,7 @@ namespace Helper
                 }
             }
 
+            // remove any delegates that got cancelled
             foreach (var item in delegatesToRemove)
             {
                 if (delegateDictionary.ContainsKey(item))
