@@ -16,12 +16,10 @@ namespace GhostVibe
 
         ActionManager actionManager;
         Scheduler scheduler;
-        SongManager songManager;
-        
-        List<Ghost> ghostList;
-        bool mustRemoveGhost;
 
         protected Texture2D animationTexture, spriteTexture, dummyTexture;
+
+        HashSet<Ghost> ghostSet;
 
         // testing player-rhythm-keypress
         protected Sprite beatIndicatorSprite, resultIndicatorSprite;
@@ -37,6 +35,8 @@ namespace GhostVibe
         private bool isSpaceKeyPressed, isAKeyPressed;
 
         protected int counter;
+        protected int score;
+        protected int lifeRemaining;
 
         public Game1()
         {
@@ -51,16 +51,17 @@ namespace GhostVibe
         {
             actionManager = ActionManager.Instance;
             scheduler = Scheduler.Instance;
-            songManager = SongManager.Instance;
             Helper.Helper.ViewportWidth = GraphicsDevice.Viewport.Width;
             Helper.Helper.ViewportHeight = GraphicsDevice.Viewport.Height;
             
             isLeftMouseDown = false;
             isSpaceKeyPressed = false;
             isAKeyPressed = false;
-            delegateResultColorReset = new UpdateDelegate(ResetResultColor);
-            delegateSpawnGhosts = new UpdateDelegate(SpawnGhost);
 
+            counter = 0;
+            score = 0;
+            lifeRemaining = 3;
+			
             base.Initialize();
         }
         
@@ -69,9 +70,8 @@ namespace GhostVibe
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            // this.Content to load your game content here
-            animationTexture = Content.Load<Texture2D>("Graphics\\walk_anim");
-            spriteTexture = Content.Load<Texture2D>("Graphics\\walk");
+            //animationTexture = Content.Load<Texture2D>("ghost_02");
+            spriteTexture = Content.Load<Texture2D>("ghost_01");
 
             songManager.SoundEffect = Content.Load<SoundEffect>("Audio\\02");
             songManager.SoundEngine = songManager.SoundEffect.CreateInstance();
@@ -86,10 +86,12 @@ namespace GhostVibe
 
             ghostList = new List<Ghost>();
             mustRemoveGhost = false;
-            //ghostList.Add(new Ghost(animationTexture, new Vector2(GraphicsDevice.Viewport.Width * 0.50f, GraphicsDevice.Viewport.Height * 0.20f), 184, 325, 8, 0.20f, "Blue"));
-            //ghostList.Add(new Ghost(animationTexture, new Vector2(GraphicsDevice.Viewport.Width * 0.50f, GraphicsDevice.Viewport.Height * 0.60f), 184, 325, 8, 0.20f, "Blue"));
-            //ghostList.Add(new Ghost(animationTexture, new Vector2(GraphicsDevice.Viewport.Width * 0.50f, GraphicsDevice.Viewport.Height * 0.40f), 184, 325, 8, 0.20f, "Blue"));
-            //ghostList.Add(new Ghost(animationTexture, new Vector2(GraphicsDevice.Viewport.Width * 0.50f, GraphicsDevice.Viewport.Height * 0.20f), 184, 325, 8, 0.20f, "Blue"));
+
+            ghostSet = new HashSet<Ghost>();
+            ghostSet.Add(new Ghost(spriteTexture, 0.5f, "Blue"));
+            ghostSet.Add(new Ghost(spriteTexture, 0.5f, "Blue"));
+            ghostSet.Add(new Ghost(spriteTexture, 0.5f, "Blue"));
+            ghostSet.Add(new Ghost(spriteTexture, 0.5f, "Blue"));
         }
 
 
@@ -150,23 +152,36 @@ namespace GhostVibe
             if (isLeftMouseDown && currentMouseState.LeftButton == ButtonState.Released)
             {
                 isLeftMouseDown = false;
-                HapticFeedback.stopBeats();
+                // HapticFeedback.stopBeats();
+
+                HashSet<Ghost> toBeDeleted = new HashSet<Ghost>();
+
+                foreach (Ghost ghost in ghostSet)
+                {
+                    if (ghost.GetStage() == 1 || ghost.GetStage() == 2)
+                        ghost.MoveForward(1.0f);
+                    else
+                    {
+                        toBeDeleted.Add(ghost);
+                        ghost.Destroy();
+                    }
+                }
+                ghostSet.ExceptWith(toBeDeleted);
             }
         }
 
         private void UpdateGhosts(GameTime gameTime)
         {
-            if (mustRemoveGhost)
-            {
-                mustRemoveGhost = false;
-                ghostList.RemoveAt(0);
-            }
-
-            foreach (Ghost ghost in ghostList)
+            foreach (Ghost ghost in ghostSet)
             {
                 ghost.Update(gameTime);
-                ghost.MoveForward(1.0f);
             }
+        }
+
+        private void DrawUI()
+        {
+            spriteBatch.DrawString(debugFont, "Score: " + score, new Vector2(20, 20), Color.White, 0.0f, new Vector2(0, 0), 2.0f, SpriteEffects.None, 1.0f);
+            spriteBatch.DrawString(debugFont, "Life: " + lifeRemaining, new Vector2(20, GraphicsDevice.Viewport.Height - 50), Color.White, 0.0f, new Vector2(0, 0), 2.0f, SpriteEffects.None, 1.0f);
         }
 
         protected override void Draw(GameTime gameTime)
@@ -175,16 +190,18 @@ namespace GhostVibe
 
             spriteBatch.Begin();
 
-            for(int i = 0; i < ghostList.Count; i++)
+            foreach(Ghost ghost in ghostSet)
             {
-                ghostList[i].Activate();
-                ghostList[i].Draw(spriteBatch);
+                ghost.Activate();
+                ghost.Draw(spriteBatch);
             }
 
             beatIndicatorSprite.Opacity = (songManager.IsAcceptingKeys) ? 1.0f : 0.2f;
             //beatIndicatorSprite.Draw(spriteBatch);
             //resultIndicatorSprite.Draw(spriteBatch);
             
+            DrawUI();
+
             spriteBatch.End();
 
             base.Draw(gameTime);

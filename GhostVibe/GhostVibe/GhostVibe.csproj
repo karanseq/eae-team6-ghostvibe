@@ -38,6 +38,7 @@
     <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="GhostPosition.cs" />
     <Compile Include="Game1.cs" />
     <Compile Include="Helper\HapticFeedback.cs" />
     <Compile Include="Ghost.cs" />
@@ -49,7 +50,6 @@
     <Compile Include="Helper\ActionManager.cs" />
     <Compile Include="Helper\Helper.cs" />
     <Compile Include="Helper\Sprite.cs" />
-    <Compile Include="SongManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="MonoGame.Framework">
@@ -59,18 +59,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Content\Audio\01.wav">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\Audio\02.wav">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\Graphics\1.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\Graphics\2.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    <Content Include="Content\Graphics\ghost_01.png" />
+    <Content Include="Content\Graphics\ghost_02.png" />
+    <Content Include="Content\Graphics\ghost_03.png" />
+    <Content Include="Content\Graphics\ghost_04.png" />
+    <Content Include="Content\Graphics\ghost_05.png" />
     <Content Include="Content\Graphics\walk.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
