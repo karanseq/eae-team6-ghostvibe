@@ -15,14 +15,10 @@ namespace GhostVibe
 
         ActionManager actionManager;
         Scheduler scheduler;
-        UpdateDelegate delegateUpdate01, delegateUpdate02, delegateUpdate03;
         
         List<Ghost> ghostList;
 
         protected Texture2D animationTexture, spriteTexture;
-        protected Sprite animation, sprite;
-        protected SpriteFont debugFont;
-        protected string debugMessage;
 
         // mouse states
         protected MouseState currentMouseState, previousMouseState;
@@ -45,8 +41,7 @@ namespace GhostVibe
             scheduler = Scheduler.Instance;
             Helper.Helper.ViewportWidth = GraphicsDevice.Viewport.Width;
             Helper.Helper.ViewportHeight = GraphicsDevice.Viewport.Height;
-
-            debugMessage = "Click to start test!";
+            
             isLeftMouseDown = false;
             counter = 0;
             
@@ -62,7 +57,6 @@ namespace GhostVibe
             // this.Content to load your game content here
             animationTexture = Content.Load<Texture2D>("Graphics\\walk_anim");
             spriteTexture = Content.Load<Texture2D>("Graphics\\walk");
-            debugFont = Content.Load<SpriteFont>("Arial");
 
             HapticFeedback.startBeats(0.5f, 0.1f, 0.1f);
 
@@ -129,9 +123,6 @@ namespace GhostVibe
                 ghostList[i].Activate();
                 ghostList[i].Draw(spriteBatch);
             }
-
-            spriteBatch.DrawString(debugFont, debugMessage, new Vector2(GraphicsDevice.Viewport.Width * 0.5f, GraphicsDevice.Viewport.Height * 0.1f), Color.LightGreen,
-                0, debugFont.MeasureString(debugMessage) / 2, 1.0f, SpriteEffects.None, 0.5f);
 
             spriteBatch.End();
 
