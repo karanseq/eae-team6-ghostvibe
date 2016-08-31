@@ -19,19 +19,6 @@
 /processorParam:TextureFormat=Compressed
 /build:Arial.spritefont
 
-<<<<<<< HEAD
-#begin Audio/01.wav
-/importer:WavImporter
-/processor:SoundEffectProcessor
-/processorParam:Quality=Best
-/build:Audio/01.wav
-
-#begin Audio/02.wav
-/importer:WavImporter
-/processor:SoundEffectProcessor
-/processorParam:Quality=Best
-/build:Audio/02.wav
-=======
 #begin ghost_01.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -91,5 +78,4 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:ghost_05.png
->>>>>>> 6abce89add3edf2de8e2e43054801f5464e75b1d
 

@@ -17,7 +17,8 @@ namespace GhostVibe
         ActionManager actionManager;
         Scheduler scheduler;
 
-        protected Texture2D animationTexture, spriteTexture, dummyTexture;
+        protected Texture2D animationTexture, spriteTexture;
+        protected SpriteFont arialFont;
 
         HashSet<Ghost> ghostSet;
 
@@ -69,23 +70,11 @@ namespace GhostVibe
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
-
-            //animationTexture = Content.Load<Texture2D>("ghost_02");
+            
             spriteTexture = Content.Load<Texture2D>("ghost_01");
-
-            songManager.SoundEffect = Content.Load<SoundEffect>("Audio\\02");
-            songManager.SoundEngine = songManager.SoundEffect.CreateInstance();
-
-            beatIndicatorSprite = Sprite.Create(Content.Load<Texture2D>("Graphics\\1"), new Vector2(GraphicsDevice.Viewport.Width * 0.5f, GraphicsDevice.Viewport.Height * 0.5f));
-            beatIndicatorSprite.Scale = 0.25f;
-            resultIndicatorSprite = Sprite.Create(Content.Load<Texture2D>("Graphics\\2"), new Vector2(GraphicsDevice.Viewport.Width * 0.5f, GraphicsDevice.Viewport.Height * 0.5f));
-            resultIndicatorSprite.Opacity = 0.2f;
-            resultIndicatorSprite.Scale = 0.25f;
+            arialFont = Content.Load<SpriteFont>("Arial");
 
             //HapticFeedback.startBeats(0.5f, 0.1f, 0.1f);
-
-            ghostList = new List<Ghost>();
-            mustRemoveGhost = false;
 
             ghostSet = new HashSet<Ghost>();
             ghostSet.Add(new Ghost(spriteTexture, 0.5f, "Blue"));
@@ -93,7 +82,6 @@ namespace GhostVibe
             ghostSet.Add(new Ghost(spriteTexture, 0.5f, "Blue"));
             ghostSet.Add(new Ghost(spriteTexture, 0.5f, "Blue"));
         }
-
 
         protected override void UnloadContent()
         {
@@ -108,7 +96,7 @@ namespace GhostVibe
             }
 
             UpdateKeyboard();
-            //UpdateMouse();
+            UpdateMouse();
             UpdateGhosts(gameTime);
 
             actionManager.update(gameTime.ElapsedGameTime.Milliseconds / 1000.0f);
@@ -128,15 +116,11 @@ namespace GhostVibe
             if (isSpaceKeyPressed && currentKeyboardState.IsKeyUp(Keys.Space))
             {
                 isSpaceKeyPressed = false;
-                StartSongTest();
             }
 
             if (isAKeyPressed && currentKeyboardState.IsKeyUp(Keys.A))
             {
                 isAKeyPressed = false;
-                resultIndicatorSprite.Color = (songManager.acceptKey(Keys.A)) ? Color.Green : Color.Red;
-
-                mustRemoveGhost = true;
             }
         }
 
@@ -180,8 +164,8 @@ namespace GhostVibe
 
         private void DrawUI()
         {
-            spriteBatch.DrawString(debugFont, "Score: " + score, new Vector2(20, 20), Color.White, 0.0f, new Vector2(0, 0), 2.0f, SpriteEffects.None, 1.0f);
-            spriteBatch.DrawString(debugFont, "Life: " + lifeRemaining, new Vector2(20, GraphicsDevice.Viewport.Height - 50), Color.White, 0.0f, new Vector2(0, 0), 2.0f, SpriteEffects.None, 1.0f);
+            spriteBatch.DrawString(arialFont, "Score: " + score, new Vector2(20, 20), Color.White, 0.0f, new Vector2(0, 0), 2.0f, SpriteEffects.None, 1.0f);
+            spriteBatch.DrawString(arialFont, "Life: " + lifeRemaining, new Vector2(20, GraphicsDevice.Viewport.Height - 50), Color.White, 0.0f, new Vector2(0, 0), 2.0f, SpriteEffects.None, 1.0f);
         }
 
         protected override void Draw(GameTime gameTime)
@@ -195,29 +179,12 @@ namespace GhostVibe
                 ghost.Activate();
                 ghost.Draw(spriteBatch);
             }
-
-            beatIndicatorSprite.Opacity = (songManager.IsAcceptingKeys) ? 1.0f : 0.2f;
-            //beatIndicatorSprite.Draw(spriteBatch);
-            //resultIndicatorSprite.Draw(spriteBatch);
             
             DrawUI();
 
             spriteBatch.End();
 
             base.Draw(gameTime);
-        }
-
-        protected void StartSongTest()
-        {
-            songManager.playSong(0);
-            float spawnStartDelay = songManager.CurrentSong.StartDelayMilliseconds * 0.001f;
-            scheduler.scheduleDelegate(delegateSpawnGhosts, songManager.CurrentSong.BeatFrequencyMilliseconds * 0.001f, Timer.RepeatForever, spawnStartDelay);
-            //scheduler.scheduleDelegate(delegateResultColorReset, songManager.CurrentSong.BeatFrequencyMilliseconds * 0.001f);
-        }
-
-        protected void SpawnGhost(float deltaTime)
-        {
-            ghostList.Add(new Ghost(animationTexture, new Vector2(GraphicsDevice.Viewport.Width * 0.50f, GraphicsDevice.Viewport.Height * 0.20f), 184, 325, 8, 0.20f, "Blue"));
         }
 
         protected void ResetResultColor(float deltaTime)
