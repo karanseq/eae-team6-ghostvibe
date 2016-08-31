@@ -19,3 +19,15 @@
 /processorParam:TextureFormat=Compressed
 /build:Arial.spritefont
 
+#begin Audio/01.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Audio/01.wav
+
+#begin Audio/02.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Audio/02.wav
+
