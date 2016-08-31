@@ -22,7 +22,7 @@ namespace GhostVibe
 
         UpdateDelegate delegateStartVibration, delegateStopVibration;
         bool forLeftMotor;
-        List<Ghost> ghostList;
+        HashSet<Ghost> ghostSet;
 
         protected Texture2D animationTexture, spriteTexture;
         protected Sprite animation, sprite;
@@ -34,6 +34,8 @@ namespace GhostVibe
         protected bool isLeftMouseDown;
 
         protected int counter;
+        protected int score;
+        protected int lifeRemaining;
 
         public Game1()
         {
@@ -60,7 +62,8 @@ namespace GhostVibe
             debugMessage = "Click to start test!";
             isLeftMouseDown = false;
             counter = 0;
-            
+            score = 0;
+            lifeRemaining = 3;
 
             base.Initialize();
         }
@@ -75,8 +78,8 @@ namespace GhostVibe
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             // TODO: use this.Content to load your game content here
-            animationTexture = Content.Load<Texture2D>("Graphics\\walk_anim");
-            spriteTexture = Content.Load<Texture2D>("Graphics\\walk");
+            //animationTexture = Content.Load<Texture2D>("ghost_02");
+            spriteTexture = Content.Load<Texture2D>("ghost_01");
             debugFont = Content.Load<SpriteFont>("Arial");
 
             HapticFeedback.startBeats(0.5f, 0.1f, 0.1f);
@@ -84,8 +87,18 @@ namespace GhostVibe
             //animation = Sprite.Create(animationTexture, 184, 325, 8, 60, true, new Vector2(GraphicsDevice.Viewport.Width * 0.33f, GraphicsDevice.Viewport.Height * 0.5f));
             //sprite = Sprite.Create(spriteTexture, new Vector2(GraphicsDevice.Viewport.Width * 0.66f, GraphicsDevice.Viewport.Height * 0.5f));
 
-            ghostList = new List<Ghost>();
-            ghostList.Add(new Ghost(animationTexture, new Vector2(GraphicsDevice.Viewport.Width * 0.50f, GraphicsDevice.Viewport.Height * 0.20f), 184, 325, 8, 0.20f, "Blue"));
+            //ghostList = new List<Ghost>();
+            ghostSet = new HashSet<Ghost>();
+            ghostSet.Add(new Ghost(spriteTexture, 0.5f, "Blue"));
+            ghostSet.Add(new Ghost(spriteTexture, 0.5f, "Blue"));
+            ghostSet.Add(new Ghost(spriteTexture, 0.5f, "Blue"));
+            ghostSet.Add(new Ghost(spriteTexture, 0.5f, "Blue"));
+            //ghostList.Add(new Ghost(animationTexture, 184, 325, 8, 0.20f, "Blue"));
+            //ghostList.Add(new Ghost(spriteTexture, 0.20f, "Blue"));
+            //ghostList.Add(new Ghost(animationTexture, 184, 325, 8, 0.20f, "Blue"));
+            //ghostList.Add(new Ghost(spriteTexture, 0.20f, "Blue"));
+            //ghostList.Add(new Ghost(spriteTexture, 0.20f, "Blue"));
+            //ghostList.Add(new Ghost(spriteTexture, 0.20f, "Blue"));
             //ghostList.Add(new Ghost(animationTexture, new Vector2(GraphicsDevice.Viewport.Width * 0.50f, GraphicsDevice.Viewport.Height * 0.60f), 184, 325, 8, 0.20f, "Blue"));
             //ghostList.Add(new Ghost(animationTexture, new Vector2(GraphicsDevice.Viewport.Width * 0.50f, GraphicsDevice.Viewport.Height * 0.40f), 184, 325, 8, 0.20f, "Blue"));
             //ghostList.Add(new Ghost(animationTexture, new Vector2(GraphicsDevice.Viewport.Width * 0.50f, GraphicsDevice.Viewport.Height * 0.20f), 184, 325, 8, 0.20f, "Blue"));
@@ -136,15 +149,28 @@ namespace GhostVibe
                 isLeftMouseDown = false;
                 HapticFeedback.stopBeats();
                 //RunTestAction();
+
+                HashSet<Ghost> toBeDeleted = new HashSet<Ghost>();
+
+                foreach (Ghost ghost in ghostSet)
+                {
+                    if (ghost.GetStage() == 1 || ghost.GetStage() == 2)
+                        ghost.MoveForward(1.0f);
+                    else
+                    {
+                        toBeDeleted.Add(ghost);
+                        ghost.Destroy();
+                    }
+                }
+                ghostSet.ExceptWith(toBeDeleted);
             }
         }
 
         private void UpdateGhosts(GameTime gameTime)
         {
-            foreach (Ghost ghost in ghostList)
+            foreach (Ghost ghost in ghostSet)
             {
                 ghost.Update(gameTime);
-                ghost.MoveForward(1.0f);
             }
         }
 
@@ -261,6 +287,13 @@ namespace GhostVibe
         /// This is called when the game should draw itself.
         /// </summary>
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
+
+        private void DrawUI()
+        {
+            spriteBatch.DrawString(debugFont, "Score: " + score, new Vector2(20, 20), Color.White, 0.0f, new Vector2(0, 0), 2.0f, SpriteEffects.None, 1.0f);
+            spriteBatch.DrawString(debugFont, "Life: " + lifeRemaining, new Vector2(20, GraphicsDevice.Viewport.Height - 50), Color.White, 0.0f, new Vector2(0, 0), 2.0f, SpriteEffects.None, 1.0f);
+        }
+
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
@@ -269,11 +302,13 @@ namespace GhostVibe
 
             //animation.Draw(spriteBatch);
             //sprite.Draw(spriteBatch);
-            for(int i = 0; i < ghostList.Count; i++)
+            foreach(Ghost ghost in ghostSet)
             {
-                ghostList[i].Activate();
-                ghostList[i].Draw(spriteBatch);
+                ghost.Activate();
+                ghost.Draw(spriteBatch);
             }
+
+            DrawUI();
 
             spriteBatch.DrawString(debugFont, debugMessage, new Vector2(GraphicsDevice.Viewport.Width * 0.5f, GraphicsDevice.Viewport.Height * 0.1f), Color.LightGreen,
                 0, debugFont.MeasureString(debugMessage) / 2, 1.0f, SpriteEffects.None, 0.5f);

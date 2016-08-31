@@ -13,7 +13,6 @@ namespace GhostVibe
 {
     class Ghost
     {
-        private Vector2 initPosition;
         private Sprite ghostImg;
         private Sprite ghostAnim;
         private int frameWidth;
@@ -26,24 +25,26 @@ namespace GhostVibe
         Vector2 StageOnePosition;
         Vector2 StageTwoPosition;
         Vector2 StageThreePosition;
-        Vector2 StageOverPosition;
         private float scale;
         private string color;
         private int stage;
-        private Random random;
+        private int initPosNum;
 
 
-        public Ghost(Texture2D staticTexture, Vector2 pos, float scaleF, string gColor)
+        public Ghost(Texture2D staticTexture, float scaleF, string gColor)
         {
-            random = new Random();
-            StageOnePosition = new Vector2(Helper.Helper.ViewportWidth * 0.5f, Helper.Helper.ViewportHeight * 0.25f);
-            StageTwoPosition = new Vector2(Helper.Helper.ViewportWidth * 0.5f, Helper.Helper.ViewportHeight * 0.40f);
-            StageThreePosition = new Vector2(Helper.Helper.ViewportWidth * 0.5f, Helper.Helper.ViewportHeight * 0.60f);
-            StageOverPosition = new Vector2(Helper.Helper.ViewportWidth * 0.5f, Helper.Helper.ViewportHeight * 0.75f);
-            initPosition = pos;
-            currentPos = initPosition;
-            ghostImg = Sprite.Create(staticTexture, pos);
+            initPosNum = GhostPosition.GetIndex();
+            StageOnePosition = GhostPosition.GetInitialPosition(initPosNum);
+            StageTwoPosition = GhostPosition.GetSecondPosition(initPosNum);
+            StageThreePosition = GhostPosition.GetThirdPosition(initPosNum);
+            //StageOnePosition = new Vector2(Helper.Helper.ViewportWidth * 0.5f, Helper.Helper.ViewportHeight * 0.25f);
+            //StageTwoPosition = new Vector2(Helper.Helper.ViewportWidth * 0.5f, Helper.Helper.ViewportHeight * 0.40f);
+            //StageThreePosition = new Vector2(Helper.Helper.ViewportWidth * 0.5f, Helper.Helper.ViewportHeight * 0.60f);
+            //StageOverPosition = new Vector2(Helper.Helper.ViewportWidth * 0.5f, Helper.Helper.ViewportHeight * 0.75f);
+            currentPos = StageOnePosition;
+            ghostImg = Sprite.Create(staticTexture, currentPos);
             scale = scaleF;
+            ghostImg.Scale = scaleF;
             color = gColor;
             isAnimated = false;
             stage = 1;
@@ -51,21 +52,24 @@ namespace GhostVibe
             isActive = false;
         }
 
-        public Ghost(Texture2D dynamicTexture, Vector2 pos, int frameW, int frameH, int numFrame, float scaleF, string gColor)
+        public Ghost(Texture2D dynamicTexture, int frameW, int frameH, int numFrame, float scaleF, string gColor)
         {
-            random = new Random();
-            StageOnePosition = new Vector2(Helper.Helper.ViewportWidth * 0.5f, Helper.Helper.ViewportHeight * 0.75f);
-            StageTwoPosition = new Vector2(Helper.Helper.ViewportWidth * 0.5f, Helper.Helper.ViewportHeight * 0.60f);
-            StageThreePosition = new Vector2(Helper.Helper.ViewportWidth * 0.5f, Helper.Helper.ViewportHeight * 0.40f);
-            StageOverPosition = new Vector2(Helper.Helper.ViewportWidth * 0.5f, Helper.Helper.ViewportHeight * 0.25f);
-            initPosition = pos;
-            currentPos = initPosition;
+            initPosNum = GhostPosition.GetIndex();
+            //StageOnePosition = new Vector2(Helper.Helper.ViewportWidth * 0.5f, Helper.Helper.ViewportHeight * 0.75f);
+            //StageTwoPosition = new Vector2(Helper.Helper.ViewportWidth * 0.5f, Helper.Helper.ViewportHeight * 0.60f);
+            //StageThreePosition = new Vector2(Helper.Helper.ViewportWidth * 0.5f, Helper.Helper.ViewportHeight * 0.40f);
+            //StageOverPosition = new Vector2(Helper.Helper.ViewportWidth * 0.5f, Helper.Helper.ViewportHeight * 0.25f);
+            StageOnePosition = GhostPosition.GetInitialPosition(initPosNum);
+            StageTwoPosition = GhostPosition.GetSecondPosition(initPosNum);
+            StageThreePosition = GhostPosition.GetThirdPosition(initPosNum);
+            currentPos = StageOnePosition;
             ghostAnim = Sprite.Create(dynamicTexture, frameW, frameH, numFrame);
-            ghostAnim.Position = pos;
+            ghostAnim.Position = currentPos;
             frameWidth = frameW;
             frameHeight = frameH;
             frameCount = numFrame;
             scale = scaleF;
+            ghostAnim.Scale = scaleF;
             color = gColor;
             isAnimated = true;
             stage = 1;
@@ -82,12 +86,12 @@ namespace GhostVibe
                 if (isAnimated)
                 {
                     ActionManager.Instance.addAction(MoveTo.create(duration, StageTwoPosition), ghostAnim);
-                    ActionManager.Instance.addAction(ScaleTo.create(duration, scale * 1.2f), ghostAnim);
+                    ActionManager.Instance.addAction(ScaleTo.create(duration, scale * 1.5f), ghostAnim);
                 }
                 else
                 {
                     ActionManager.Instance.addAction(MoveTo.create(duration, StageTwoPosition), ghostImg);
-                    ActionManager.Instance.addAction(ScaleTo.create(duration, scale * 1.2f), ghostImg);
+                    ActionManager.Instance.addAction(ScaleTo.create(duration, scale * 1.5f), ghostImg);
                 }
                 stage++;
             }
@@ -97,32 +101,20 @@ namespace GhostVibe
                 if (isAnimated)
                 {
                     ActionManager.Instance.addAction(MoveTo.create(duration, StageThreePosition), ghostAnim);
-                    ActionManager.Instance.addAction(ScaleTo.create(duration, scale * 1.5f), ghostAnim);
-                }
-                else
-                {
-                    ActionManager.Instance.addAction(MoveTo.create(duration, StageThreePosition), ghostImg);
-                    ActionManager.Instance.addAction(ScaleTo.create(duration, scale * 1.5f), ghostImg);
-                }
-                stage++;
-            }
-            else if (stage == 3)
-            {
-                currentPos = StageOverPosition;
-                if (isAnimated)
-                {
-                    ActionManager.Instance.addAction(MoveTo.create(duration, StageOverPosition), ghostAnim);
                     ActionManager.Instance.addAction(ScaleTo.create(duration, scale * 1.8f), ghostAnim);
                 }
                 else
                 {
-                    ActionManager.Instance.addAction(MoveTo.create(duration, StageOverPosition), ghostImg);
+                    ActionManager.Instance.addAction(MoveTo.create(duration, StageThreePosition), ghostImg);
                     ActionManager.Instance.addAction(ScaleTo.create(duration, scale * 1.8f), ghostImg);
                 }
-                Destroy();
+                stage++;
             }
             else
+            {
+                Destroy();
                 return;
+            }
             isInvincible = false;
         }
 
@@ -139,9 +131,24 @@ namespace GhostVibe
             else
             {
                 isActive = false;
-                stage = 0;
+                stage = -1;
+                // first remove all running actions on the sprite
+                if (!isAnimated)
+                    ActionManager.Instance.removeAllActionsFromTarget(ghostImg);
+                else
+                    ActionManager.Instance.removeAllActionsFromTarget(ghostAnim);
             }
             isInvincible = true;
+        }
+
+        public int GetStage()
+        {
+            return stage;
+        }
+
+        public float GetScale()
+        {
+            return scale;
         }
 
         public void Activate()
