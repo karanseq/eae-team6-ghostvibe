@@ -25,6 +25,7 @@ namespace GhostVibe
         protected enum GameState { Spawning, Highlighting, Moving };
         protected GameState currentState;
 
+        protected readonly int maxColors = 4;
         protected string[] colorNames = { "plain", "blue", "green", "red", "yellow" };
         protected Dictionary<string, Keys> colorKeyMap = new Dictionary<string, Keys>(){ 
             { "blue", Keys.X },
@@ -33,6 +34,8 @@ namespace GhostVibe
             { "yellow", Keys.Y } };
 
         protected Dictionary<string, Texture2D> ghostTextures;
+        protected readonly int minGhosts = 2;
+        protected readonly int maxGhosts = 5;
         protected List<Ghost> ghostList;
         protected UpdateDelegate delegateTickGhosts;
         protected float beatFrequency;
@@ -239,7 +242,7 @@ namespace GhostVibe
         private void StartNewWave()
         {
             // initialize variables
-            totalGhostsInWave = remainingGhostsInWave = 4;
+            totalGhostsInWave = remainingGhostsInWave = 4; // random.Next(minGhosts, maxGhosts);
             numGhostsAlive = 0;
             prevGhostHoverIndex = ghostHoverIndex = 0;
             ghostList = new List<Ghost>();
@@ -288,13 +291,18 @@ namespace GhostVibe
                 --remainingGhostsInWave;
 
                 // randomly pick one from the available colors
-                int randomIndex = 1 + random.Next(0, 4);
+                int randomIndex = 1 + random.Next(0, maxColors);
                 string randomColor = colorNames[randomIndex];
 
                 // create a new ghost and add it to the list
                 Ghost ghost = new Ghost(ghostTextures["plain"], 0.3f, randomColor);
                 ghostList.Add(ghost);
                 ghostSpawn.Play();
+
+                // add a subtle float animation
+                MoveBy moveUp = MoveBy.create(0.5f, new Vector2(0.0f, 10.0f));
+                RepeatForever floating = RepeatForever.create(Sequence.createWithTwoActions(moveUp, moveUp.reverse()));
+                actionManager.addAction(floating, ghost.Image);
             }
 
             // check if all ghosts have spawned
@@ -394,15 +402,23 @@ namespace GhostVibe
 
         private void KillGhost()
         {
+            // reduce number of ghosts alive
             --numGhostsAlive;
+
+            // determine how much score the player gets
             score += 100;
 
+            // reduce opacity and play sounds
             ghostList[prevGhostHoverIndex].Image.Opacity = 0.2f;
             ghostPoof.Play();
 
             if (numGhostsAlive <= 0)
             {
                 // wave over...delete all ghosts
+                foreach (Ghost ghost in ghostList)
+                {
+                    actionManager.removeAllActionsFromTarget(ghost.Image);
+                }
                 ghostList.Clear();
 
                 // start a new wave!

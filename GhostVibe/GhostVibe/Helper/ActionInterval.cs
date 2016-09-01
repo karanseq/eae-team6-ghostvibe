@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
@@ -269,6 +270,191 @@ namespace Helper
         }
 
     } // class Sequence
+
+    public class Repeat : ActionInterval
+    {
+        protected int times, total;
+        float nextDeltaTime;
+        bool actionInstant;
+        FiniteTimeAction innerAction;
+
+        protected Repeat() { }
+
+        public static Repeat create(FiniteTimeAction action, int times)
+        {
+            Repeat repeat = new Repeat();
+            if (repeat.initWithAction(action, times))
+            {
+                return repeat;
+            }
+            repeat = null;
+            return null;
+        }
+
+        protected bool initWithAction(FiniteTimeAction action, int times)
+        {
+            float d = action.Duration * times;
+
+            if (action != null && base.initWithDuration(d))
+            {
+                this.times = times;
+                innerAction = action;
+
+                actionInstant = false;
+                total = 0;
+
+                return true;
+            }
+            return false;
+        }
+
+        public override void startWithTarget(Sprite t)
+        {
+            total = 0;
+            nextDeltaTime = innerAction.Duration / duration;
+            base.startWithTarget(t);
+            innerAction.startWithTarget(t);
+        }
+
+        public override void stop()
+        {
+            innerAction.stop();
+            base.stop();
+        }
+
+        public override void update(float time)
+        {
+            if (time >= nextDeltaTime)
+            {
+                while (time >= nextDeltaTime && total < times)
+                {
+                    innerAction.update(1.0f);
+                    total++;
+
+                    innerAction.stop();
+                    innerAction.startWithTarget(target);
+                    nextDeltaTime = innerAction.Duration / duration * (total + 1);
+                }
+
+                if (Math.Abs(time - 1.0f) < FLT_EPSILON && total < times)
+                {
+                    innerAction.update(1.0f);
+                    total++;
+                }
+
+                // don't set an instant action back or update it, it has no use because it has no duration
+                if (!actionInstant)
+                {
+                    if (total == times)
+                    {
+                        innerAction.stop();
+                    }
+                    else
+                    {
+                        innerAction.update(time - (nextDeltaTime - innerAction.Duration / duration));
+                    }
+                }
+            }
+            else
+            {
+                innerAction.update((time * times) % 1.0f);
+            }
+        }
+
+        public override bool isDone()
+        {
+            return total == times;
+        }
+
+        public FiniteTimeAction InnerAction
+        {
+            get { return innerAction; }
+            set { innerAction = value; }
+        }
+
+        public new Repeat clone()
+        {
+            return Repeat.create(innerAction.clone(), times);
+        }
+
+        public new Repeat reverse()
+        {
+            return null;
+        }
+    } // class Repeat
+
+    public class RepeatForever : ActionInterval
+    {
+        protected ActionInterval innerAction;
+
+        protected RepeatForever() { }
+
+        public static RepeatForever create(ActionInterval action)
+        {
+            RepeatForever repeatForever = new RepeatForever();
+            if (repeatForever.initWithAction(action))
+            {
+                return repeatForever;
+            }
+            repeatForever = null;
+            return null;
+        }
+
+        protected bool initWithAction(ActionInterval action)
+        {
+            if (action == null)
+            {
+                Trace.TraceError("Null action sent to RepeatForever!");
+                return false;
+            }
+            innerAction = action;
+            return true;
+        }
+
+        public override void startWithTarget(Sprite t)
+        {
+            base.startWithTarget(t);
+            innerAction.startWithTarget(t);
+        }
+
+        public override void step(float dt)
+        {
+            innerAction.step(dt);
+            if (innerAction.isDone())
+            {
+                float diff = innerAction.Elapsed - innerAction.Duration;
+                if (diff > innerAction.Duration)
+                {
+                    diff = diff % innerAction.Duration;
+                }
+                innerAction.startWithTarget(target);
+                innerAction.step(0.0f);
+                innerAction.step(diff);
+            }
+        }
+
+        public override bool isDone()
+        {
+            return false;
+        }
+
+        public ActionInterval InnerAction
+        {
+            get { return innerAction; }
+            set { innerAction = value; }
+        }
+
+        public new RepeatForever clone()
+        {
+            return RepeatForever.create(innerAction.clone());
+        }
+
+        public new RepeatForever reverse()
+        {
+            return null;
+        }
+
+    } // class RepeatForever
 
     public class RotateTo : ActionInterval
     {
