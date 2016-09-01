@@ -20,6 +20,9 @@ namespace GhostVibe
         protected Texture2D animationTexture, spriteTexture;
         protected SpriteFont arialFont;
 
+        protected enum GameState { Spawning, Highlighting, Moving };
+        protected GameState currentState;
+
         protected string[] colorNames = { "plain", "blue", "green", "red", "yellow" };
         protected Dictionary<string, Texture2D> ghostTextures;
         protected List<Ghost> ghostList;
@@ -27,6 +30,7 @@ namespace GhostVibe
         protected float beatFrequency;
         protected int totalGhostsInWave, remainingGhostsInWave, numGhostsAlive;
         protected int prevGhostHoverIndex, ghostHoverIndex;
+        protected int firstToggleCounter;
 
         // mouse states
         protected MouseState currentMouseState, previousMouseState;
@@ -105,6 +109,10 @@ namespace GhostVibe
             // start scheduled functions
             HapticFeedback.startBeats(beatFrequency, 0.1f, 0.1f);
             scheduler.scheduleDelegate(delegateTickGhosts, beatFrequency);
+
+            // set initial state
+            currentState = GameState.Spawning;
+            firstToggleCounter = totalGhostsInWave;
         }
 
         protected override void Update(GameTime gameTime)
@@ -210,6 +218,30 @@ namespace GhostVibe
 
         private void TickGhosts(float deltaTime)
         {
+            switch (currentState)
+            {
+                case GameState.Spawning:
+                    SpawnGhosts();
+                    break;
+
+                case GameState.Highlighting:
+                    ToggleGhostHighlights();
+                    break;
+
+                case GameState.Moving:
+                    ToggleGhostHighlights();
+                    MoveGhosts();
+                    break;
+            }
+        }
+
+        private void SpawnGhosts()
+        {
+            if (currentState != GameState.Spawning)
+            {
+                return;
+            }
+
             // check if there are any ghosts still to spawn
             if (remainingGhostsInWave > 0)
             {
@@ -227,11 +259,21 @@ namespace GhostVibe
                 //ghost.MoveForward(2.5f);
                 ghostList.Add(ghost);
             }
-            // all ghosts have spawned
-            else
+
+            // check if all ghosts have spawned
+            if (remainingGhostsInWave == 0)
             {
-                // now start flashing them
+                // now start highlighting them
                 numGhostsAlive = totalGhostsInWave;
+                currentState = GameState.Highlighting;
+            }
+        }
+
+        private void ToggleGhostHighlights()
+        {
+            if (currentState != GameState.Highlighting && currentState != GameState.Moving)
+            {
+                return;
             }
 
             // check if there are any ghosts alive
@@ -249,6 +291,16 @@ namespace GhostVibe
                 ++ghostHoverIndex;
                 ghostHoverIndex = (ghostHoverIndex >= totalGhostsInWave) ? 0 : ghostHoverIndex;                
             }
+            
+            if (firstToggleCounter > 0)
+            {
+                --firstToggleCounter;
+            }
+
+            if (firstToggleCounter == 0)
+            {
+                currentState = GameState.Moving;
+            }
         }
 
         private void UnhighlightGhost()
@@ -262,5 +314,20 @@ namespace GhostVibe
             Ghost ghost = ghostList[ghostHoverIndex];
             ghost.Image.Texture = ghostTextures[ghost.Color];
         }
+
+        private void MoveGhosts()
+        {
+            Trace.WriteLine("Moving ghost " + prevGhostHoverIndex + "...");
+        }
+
+        private void ShootGhost(Keys keyPressed)
+        {
+            // first get the currently highlighted ghost
+
+            // get the currently highlighted ghost's color
+
+            // check if the correct key has been hit
+        }
+
     }
 }
