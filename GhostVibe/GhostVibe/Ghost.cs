@@ -11,7 +11,7 @@ using System.Diagnostics;
 
 namespace GhostVibe
 {
-    class Ghost
+    public class Ghost
     {
         private Sprite ghostImg;
         private Sprite ghostAnim;
@@ -200,5 +200,22 @@ namespace GhostVibe
             }
         }
 
+        public Sprite Image
+        {
+            get { return ghostImg; }
+            set { ghostImg = value; }
+        }
+
+        public Sprite Animation
+        {
+            get { return ghostAnim; }
+            set { ghostAnim = value; }
+        }
+
+        public string Color
+        {
+            get { return color; }
+            set { color = value; }
+        }
     }
 }

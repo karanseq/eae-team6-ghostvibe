@@ -20,7 +20,10 @@ namespace GhostVibe
 
         public static int GetIndex()
         {
-            index = rand.Next(4);
+            //index = rand.Next(4);
+            //return index;
+            ++index;
+            index = (index > 3) ? 0 : index;
             return index;
         }
 

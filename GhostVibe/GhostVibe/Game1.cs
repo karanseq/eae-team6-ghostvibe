@@ -20,12 +20,13 @@ namespace GhostVibe
         protected Texture2D animationTexture, spriteTexture;
         protected SpriteFont arialFont;
 
-        HashSet<Ghost> ghostSet;
-
-        // testing player-rhythm-keypress
-        protected Sprite beatIndicatorSprite, resultIndicatorSprite;
-        protected UpdateDelegate delegateResultColorReset;
-        protected UpdateDelegate delegateSpawnGhosts;
+        protected string[] colorNames = { "plain", "blue", "green", "red", "yellow" };
+        protected Dictionary<string, Texture2D> ghostTextures;
+        protected List<Ghost> ghostList;
+        protected UpdateDelegate delegateTickGhosts;
+        protected float beatFrequency;
+        protected int totalGhostsInWave, remainingGhostsInWave, numGhostsAlive;
+        protected int prevGhostHoverIndex, ghostHoverIndex;
 
         // mouse states
         protected MouseState currentMouseState, previousMouseState;
@@ -38,6 +39,7 @@ namespace GhostVibe
         protected int counter;
         protected int score;
         protected int lifeRemaining;
+        protected Random random;
 
         public Game1()
         {
@@ -54,7 +56,10 @@ namespace GhostVibe
             scheduler = Scheduler.Instance;
             Helper.Helper.ViewportWidth = GraphicsDevice.Viewport.Width;
             Helper.Helper.ViewportHeight = GraphicsDevice.Viewport.Height;
-            
+
+            delegateTickGhosts = new UpdateDelegate(TickGhosts);
+            beatFrequency = 0.5f;
+
             isLeftMouseDown = false;
             isSpaceKeyPressed = false;
             isAKeyPressed = false;
@@ -62,7 +67,8 @@ namespace GhostVibe
             counter = 0;
             score = 0;
             lifeRemaining = 3;
-			
+            random = new Random();
+
             base.Initialize();
         }
         
@@ -70,22 +76,35 @@ namespace GhostVibe
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            
-            spriteTexture = Content.Load<Texture2D>("ghost_01");
             arialFont = Content.Load<SpriteFont>("Arial");
 
-            //HapticFeedback.startBeats(0.5f, 0.1f, 0.1f);
+            ghostTextures = new Dictionary<string, Texture2D>();
+            ghostTextures.Add("plain", Content.Load<Texture2D>("Graphics\\ghost_01"));
+            ghostTextures.Add("blue", Content.Load<Texture2D>("Graphics\\ghost_02"));
+            ghostTextures.Add("green", Content.Load<Texture2D>("Graphics\\ghost_03"));
+            ghostTextures.Add("red", Content.Load<Texture2D>("Graphics\\ghost_04"));
+            ghostTextures.Add("yellow", Content.Load<Texture2D>("Graphics\\ghost_05"));
 
-            ghostSet = new HashSet<Ghost>();
-            ghostSet.Add(new Ghost(spriteTexture, 0.5f, "Blue"));
-            ghostSet.Add(new Ghost(spriteTexture, 0.5f, "Blue"));
-            ghostSet.Add(new Ghost(spriteTexture, 0.5f, "Blue"));
-            ghostSet.Add(new Ghost(spriteTexture, 0.5f, "Blue"));
+            ghostList = new List<Ghost>();
+
+            StartGame();
         }
 
         protected override void UnloadContent()
         {
             // TODO: Unload any non ContentManager content here
+        }
+
+        protected void StartGame()
+        {
+            // initialize variables
+            totalGhostsInWave = remainingGhostsInWave = 4;
+            numGhostsAlive = 0;
+            prevGhostHoverIndex = ghostHoverIndex = 0;
+
+            // start scheduled functions
+            HapticFeedback.startBeats(beatFrequency, 0.1f, 0.1f);
+            scheduler.scheduleDelegate(delegateTickGhosts, beatFrequency);
         }
 
         protected override void Update(GameTime gameTime)
@@ -136,27 +155,29 @@ namespace GhostVibe
             if (isLeftMouseDown && currentMouseState.LeftButton == ButtonState.Released)
             {
                 isLeftMouseDown = false;
-                // HapticFeedback.stopBeats();
 
-                HashSet<Ghost> toBeDeleted = new HashSet<Ghost>();
+                //List<int> ghostsToBeDeleted = new List<int>();
 
-                foreach (Ghost ghost in ghostSet)
-                {
-                    if (ghost.GetStage() == 1 || ghost.GetStage() == 2)
-                        ghost.MoveForward(1.0f);
-                    else
-                    {
-                        toBeDeleted.Add(ghost);
-                        ghost.Destroy();
-                    }
-                }
-                ghostSet.ExceptWith(toBeDeleted);
+                //for (int i = 0; i < ghostList.Count; ++i)
+                //{
+                //    Ghost ghost = ghostList[i];
+
+                //    if (ghost.GetStage() == 1 || ghost.GetStage() == 2)
+                //    {
+                //        ghost.MoveForward(1.0f);
+                //    }
+                //    else
+                //    {
+                //        ghostsToBeDeleted.Add(i);
+                //        ghost.Destroy();
+                //    }
+                //}
             }
         }
 
         private void UpdateGhosts(GameTime gameTime)
         {
-            foreach (Ghost ghost in ghostSet)
+            foreach (Ghost ghost in ghostList)
             {
                 ghost.Update(gameTime);
             }
@@ -174,7 +195,7 @@ namespace GhostVibe
 
             spriteBatch.Begin();
 
-            foreach(Ghost ghost in ghostSet)
+            foreach(Ghost ghost in ghostList)
             {
                 ghost.Activate();
                 ghost.Draw(spriteBatch);
@@ -187,9 +208,59 @@ namespace GhostVibe
             base.Draw(gameTime);
         }
 
-        protected void ResetResultColor(float deltaTime)
+        private void TickGhosts(float deltaTime)
         {
-            resultIndicatorSprite.Color = Color.White;
+            // check if there are any ghosts still to spawn
+            if (remainingGhostsInWave > 0)
+            {
+                // reduce remaining ghosts
+                --remainingGhostsInWave;
+
+                // randomly pick one from the available colors
+                int randomIndex = 1 + random.Next(0, 4);
+                string randomColor = colorNames[randomIndex];
+
+                Trace.WriteLine("Spawning a " + randomColor + " ghost...");
+
+                // create a new ghost and add it to the list
+                Ghost ghost = new Ghost(ghostTextures["plain"], 0.35f, randomColor);
+                //ghost.MoveForward(2.5f);
+                ghostList.Add(ghost);
+            }
+            // all ghosts have spawned
+            else
+            {
+                // now start flashing them
+                numGhostsAlive = totalGhostsInWave;
+            }
+
+            // check if there are any ghosts alive
+            if (numGhostsAlive > 0)
+            {
+                // first unhighlight the previous ghost
+                if (prevGhostHoverIndex != ghostHoverIndex)
+                {
+                    UnhighlightGhost();
+                }
+
+                // now highlight the next ghost
+                HighlightGhost();
+                prevGhostHoverIndex = ghostHoverIndex;
+                ++ghostHoverIndex;
+                ghostHoverIndex = (ghostHoverIndex >= totalGhostsInWave) ? 0 : ghostHoverIndex;                
+            }
+        }
+
+        private void UnhighlightGhost()
+        {
+            Ghost ghost = ghostList[prevGhostHoverIndex];
+            ghost.Image.Texture = ghostTextures["plain"];
+        }
+
+        private void HighlightGhost()
+        {
+            Ghost ghost = ghostList[ghostHoverIndex];
+            ghost.Image.Texture = ghostTextures[ghost.Color];
         }
     }
 }
