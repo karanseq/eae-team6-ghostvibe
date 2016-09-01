@@ -55,6 +55,10 @@ namespace GhostVibe
         protected int lifeRemaining;
         protected Random random;
 
+        // audio objects
+        protected SoundEffect ghostPoof;
+        protected SoundEffect ghostSpawn;
+
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -89,6 +93,8 @@ namespace GhostVibe
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
             arialFont = Content.Load<SpriteFont>("Arial");
+            ghostPoof = Content.Load<SoundEffect>("ghost_poof");
+            ghostSpawn = Content.Load<SoundEffect>("ghost_spawn");
 
             ghostTextures = new Dictionary<string, Texture2D>();
             ghostTextures.Add("plain", Content.Load<Texture2D>("Graphics\\ghost_01"));
@@ -296,6 +302,7 @@ namespace GhostVibe
                 Ghost ghost = new Ghost(ghostTextures["plain"], 0.35f, randomColor);
                 //ghost.MoveForward(2.5f);
                 ghostList.Add(ghost);
+                ghostSpawn.Play();
             }
 
             // check if all ghosts have spawned
@@ -356,6 +363,7 @@ namespace GhostVibe
         private void MoveGhosts()
         {
             Trace.WriteLine("Moving ghost " + prevGhostHoverIndex + "...");
+            ghostList[prevGhostHoverIndex].MoveForward(0.5f);
         }
 
         private void ShootGhost(Keys keyPressed)
