@@ -163,3 +163,21 @@
 /processorParam:TextureFormat=Color
 /build:yellow.png
 
+#begin short_spawn.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:short_spawn.wav
+
+#begin newghostspawn.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:newghostspawn.wav
+
+#begin trainwhistle.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:trainwhistle.wav
+

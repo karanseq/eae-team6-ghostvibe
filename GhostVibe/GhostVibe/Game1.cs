@@ -60,6 +60,7 @@ namespace GhostVibe
         // audio objects
         protected SoundEffect ghostPoof;
         protected SoundEffect ghostSpawn;
+        protected SoundEffect whistle;
 
         public Game1()
         {
@@ -96,7 +97,8 @@ namespace GhostVibe
             spriteBatch = new SpriteBatch(GraphicsDevice);
             arialFont = Content.Load<SpriteFont>("Arial");
             ghostPoof = Content.Load<SoundEffect>("ghost_poof");
-            ghostSpawn = Content.Load<SoundEffect>("ghost_spawn");
+            ghostSpawn = Content.Load<SoundEffect>("newghostspawn");
+            whistle = Content.Load<SoundEffect>("trainwhistle");
             hallway = Content.Load<Texture2D>("hallway");
             blueGun = Content.Load<Texture2D>("blue");
             yellowGun = Content.Load<Texture2D>("yellow");
@@ -152,22 +154,22 @@ namespace GhostVibe
             previousGamepadState = currentGamepadState;
             currentGamepadState = GamePad.GetState(PlayerIndex.One);
 
-            if (acceptKeys && (currentKeyboardState.IsKeyDown(Keys.A) || currentGamepadState.IsButtonDown(Buttons.A)))
+            if (acceptKeys && (currentKeyboardState.IsKeyDown(Keys.D) || currentGamepadState.IsButtonDown(Buttons.A)))
             {
                 ShootGhost(Keys.A);
             }
 
-            if (acceptKeys && (currentKeyboardState.IsKeyDown(Keys.B) || currentGamepadState.IsButtonDown(Buttons.B)))
+            if (acceptKeys && (currentKeyboardState.IsKeyDown(Keys.F) || currentGamepadState.IsButtonDown(Buttons.B)))
             {
                 ShootGhost(Keys.B);
             }
 
-            if (acceptKeys && (currentKeyboardState.IsKeyDown(Keys.X) || currentGamepadState.IsButtonDown(Buttons.X)))
+            if (acceptKeys && (currentKeyboardState.IsKeyDown(Keys.J) || currentGamepadState.IsButtonDown(Buttons.X)))
             {
                 ShootGhost(Keys.X);
             }
 
-            if (acceptKeys && (currentKeyboardState.IsKeyDown(Keys.Y) || currentGamepadState.IsButtonDown(Buttons.Y)))
+            if (acceptKeys && (currentKeyboardState.IsKeyDown(Keys.K) || currentGamepadState.IsButtonDown(Buttons.Y)))
             {
                 ShootGhost(Keys.Y);
             }
@@ -198,8 +200,9 @@ namespace GhostVibe
 
         private void DrawUI()
         {
-            spriteBatch.DrawString(arialFont, "Score: " + score, new Vector2(20, 20), Color.White, 0.0f, new Vector2(0, 0), 2.0f, SpriteEffects.None, 1.0f);
-            spriteBatch.DrawString(arialFont, "Life: " + lifeRemaining, new Vector2(20, GraphicsDevice.Viewport.Height - 50), Color.White, 0.0f, new Vector2(0, 0), 2.0f, SpriteEffects.None, 1.0f);
+            spriteBatch.DrawString(arialFont, "Score: " + score, new Vector2(20, 20), Color.Black, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 1.0f);
+            spriteBatch.DrawString(arialFont, "Life: " + lifeRemaining, new Vector2(20, GraphicsDevice.Viewport.Height - 50), Color.Black, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 1.0f);
+            spriteBatch.DrawString(arialFont, "Green: D, Red: F, Blue: J, Yellow: K", new Vector2(GraphicsDevice.Viewport.Width / 2 - 200, 20), Color.Black, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 1.0f);
         }
 
         protected override void Draw(GameTime gameTime)
@@ -372,8 +375,8 @@ namespace GhostVibe
             --numGhostsAlive;
             ghostList[prevGhostHoverIndex].Image.Opacity = 0.2f;
             ghostPoof.Play();
+			whistle.Play();
 
-            Trace.WriteLine("Num ghosts alive:" + numGhostsAlive);
             if (numGhostsAlive <= 0)
             {
                 // wave over...delete all ghosts
