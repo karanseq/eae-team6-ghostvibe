@@ -110,11 +110,11 @@ namespace GhostVibe
             redGun = Content.Load<Texture2D>("red");
 
             ghostTextures = new Dictionary<string, Texture2D>();
-            ghostTextures.Add("plain", Content.Load<Texture2D>("Graphics\\ghost_01"));
-            ghostTextures.Add("blue", Content.Load<Texture2D>("Graphics\\ghost_02"));
-            ghostTextures.Add("green", Content.Load<Texture2D>("Graphics\\ghost_03"));
-            ghostTextures.Add("red", Content.Load<Texture2D>("Graphics\\ghost_04"));
-            ghostTextures.Add("yellow", Content.Load<Texture2D>("Graphics\\ghost_05"));
+            ghostTextures.Add("plain", Content.Load<Texture2D>("ghost_01"));
+            ghostTextures.Add("blue", Content.Load<Texture2D>("ghost_02"));
+            ghostTextures.Add("green", Content.Load<Texture2D>("ghost_03"));
+            ghostTextures.Add("red", Content.Load<Texture2D>("ghost_04"));
+            ghostTextures.Add("yellow", Content.Load<Texture2D>("ghost_05"));
 
             StartGame();
         }
@@ -206,9 +206,9 @@ namespace GhostVibe
 
         private void DrawUI()
         {
-            spriteBatch.DrawString(arialFont, "Score: " + score, new Vector2(GraphicsDevice.Viewport.Width / 2 - 400, 25), Color.Black, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 1.0f);
+            spriteBatch.DrawString(arialFont, "Score: " + score, new Vector2(GraphicsDevice.Viewport.Width / 2 - 400, 27), Color.Black, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 1.0f);
             //spriteBatch.DrawString(arialFont, "Life: " + lifeRemaining, new Vector2(20, GraphicsDevice.Viewport.Height - 50), Color.Black, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 1.0f);
-            spriteBatch.DrawString(arialFont, "Green: D, Red: F, Blue: J, Yellow: K", new Vector2(GraphicsDevice.Viewport.Width / 2 - 100, 25), Color.Black, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 1.0f);
+            spriteBatch.DrawString(arialFont, "Green: D, Red: F, Blue: J, Yellow: K", new Vector2(GraphicsDevice.Viewport.Width / 2 - 100, 27), Color.Black, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 1.0f);
         }
 
         protected override void Draw(GameTime gameTime)
