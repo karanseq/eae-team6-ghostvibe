@@ -24,8 +24,15 @@ namespace GhostVibe
         protected GameState currentState;
 
         protected string[] colorNames = { "plain", "blue", "green", "red", "yellow" };
+        protected Dictionary<string, Keys> colorKeyMap = new Dictionary<string, Keys>(){ 
+            { "blue", Keys.X },
+            { "green", Keys.A },
+            { "red", Keys.B },
+            { "yellow", Keys.Y } };
+
         protected Dictionary<string, Texture2D> ghostTextures;
         protected List<Ghost> ghostList;
+        protected int indexOfGhostToRemove;
         protected UpdateDelegate delegateTickGhosts;
         protected float beatFrequency;
         protected int totalGhostsInWave, remainingGhostsInWave, numGhostsAlive;
@@ -36,9 +43,12 @@ namespace GhostVibe
         protected MouseState currentMouseState, previousMouseState;
         protected bool isLeftMouseDown;
         
-        // keyboard states used to determine keyboard states
+        // keyboard states
         private KeyboardState currentKeyboardState, previousKeyboardState;
-        private bool isSpaceKeyPressed, isAKeyPressed;
+        private bool isAKeyPressed, isBKeyPressed, isXKeyPressed, isYKeyPressed;
+
+        // gamepad states
+        private GamePadState currentGamepadState, previousGamepadState;
 
         protected int counter;
         protected int score;
@@ -64,9 +74,7 @@ namespace GhostVibe
             delegateTickGhosts = new UpdateDelegate(TickGhosts);
             beatFrequency = 0.5f;
 
-            isLeftMouseDown = false;
-            isSpaceKeyPressed = false;
-            isAKeyPressed = false;
+            isLeftMouseDown = isAKeyPressed = isBKeyPressed = isXKeyPressed = isYKeyPressed = false;
 
             counter = 0;
             score = 0;
@@ -89,8 +97,6 @@ namespace GhostVibe
             ghostTextures.Add("red", Content.Load<Texture2D>("Graphics\\ghost_04"));
             ghostTextures.Add("yellow", Content.Load<Texture2D>("Graphics\\ghost_05"));
 
-            ghostList = new List<Ghost>();
-
             StartGame();
         }
 
@@ -105,6 +111,8 @@ namespace GhostVibe
             totalGhostsInWave = remainingGhostsInWave = 4;
             numGhostsAlive = 0;
             prevGhostHoverIndex = ghostHoverIndex = 0;
+            ghostList = new List<Ghost>();
+            indexOfGhostToRemove = -1;
 
             // start scheduled functions
             HapticFeedback.startBeats(beatFrequency, 0.1f, 0.1f);
@@ -122,7 +130,7 @@ namespace GhostVibe
                 Exit();
             }
 
-            UpdateKeyboard();
+            UpdateKeyboardGamepad();
             UpdateMouse();
             UpdateGhosts(gameTime);
 
@@ -132,23 +140,47 @@ namespace GhostVibe
             base.Update(gameTime);
         }
 
-        private void UpdateKeyboard()
+        private void UpdateKeyboardGamepad()
         {
             previousKeyboardState = currentKeyboardState;
             currentKeyboardState = Keyboard.GetState();
 
-            if (currentKeyboardState.IsKeyDown(Keys.Space)) isSpaceKeyPressed = true;
-            if (currentKeyboardState.IsKeyDown(Keys.A)) isAKeyPressed = true;
+            previousGamepadState = currentGamepadState;
+            currentGamepadState = GamePad.GetState(PlayerIndex.One);
 
-            if (isSpaceKeyPressed && currentKeyboardState.IsKeyUp(Keys.Space))
-            {
-                isSpaceKeyPressed = false;
-            }
+            // MAJOR TODO: change this logic to eliminate the disgusting number of 'if' conditions X-(
+            if (currentKeyboardState.IsKeyDown(Keys.A) || currentGamepadState.IsButtonDown(Buttons.A)) isAKeyPressed = true;
+            if (currentKeyboardState.IsKeyDown(Keys.B) || currentGamepadState.IsButtonDown(Buttons.B)) isBKeyPressed = true;
+            if (currentKeyboardState.IsKeyDown(Keys.X) || currentGamepadState.IsButtonDown(Buttons.X)) isXKeyPressed = true;
+            if (currentKeyboardState.IsKeyDown(Keys.Y) || currentGamepadState.IsButtonDown(Buttons.Y)) isYKeyPressed = true;
 
-            if (isAKeyPressed && currentKeyboardState.IsKeyUp(Keys.A))
+            if (isAKeyPressed && (currentKeyboardState.IsKeyUp(Keys.A) || currentGamepadState.IsButtonUp(Buttons.A)))
             {
                 isAKeyPressed = false;
+                ShootGhost(Keys.A);
             }
+
+            if (isBKeyPressed && (currentKeyboardState.IsKeyUp(Keys.B) || currentGamepadState.IsButtonUp(Buttons.B)))
+            {
+                isBKeyPressed = false;
+                ShootGhost(Keys.B);
+            }
+
+            if (isXKeyPressed && (currentKeyboardState.IsKeyUp(Keys.X) || currentGamepadState.IsButtonUp(Buttons.X)))
+            {
+                isXKeyPressed = false;
+                ShootGhost(Keys.X);
+            }
+
+            if (isYKeyPressed && (currentKeyboardState.IsKeyUp(Keys.Y) || currentGamepadState.IsButtonUp(Buttons.Y)))
+            {
+                isYKeyPressed = false;
+                ShootGhost(Keys.Y);
+            }
+        }
+
+        private void UpdateGamepad()
+        {
         }
 
         private void UpdateMouse()
@@ -185,6 +217,12 @@ namespace GhostVibe
 
         private void UpdateGhosts(GameTime gameTime)
         {
+            if (indexOfGhostToRemove != -1)
+            {
+                ghostList[indexOfGhostToRemove].Image.Opacity = 0.2f;
+                indexOfGhostToRemove = -1;
+            }
+
             foreach (Ghost ghost in ghostList)
             {
                 ghost.Update(gameTime);
@@ -289,7 +327,7 @@ namespace GhostVibe
                 HighlightGhost();
                 prevGhostHoverIndex = ghostHoverIndex;
                 ++ghostHoverIndex;
-                ghostHoverIndex = (ghostHoverIndex >= totalGhostsInWave) ? 0 : ghostHoverIndex;                
+                ghostHoverIndex = (ghostHoverIndex >= numGhostsAlive) ? 0 : ghostHoverIndex;                
             }
             
             if (firstToggleCounter > 0)
@@ -323,10 +361,16 @@ namespace GhostVibe
         private void ShootGhost(Keys keyPressed)
         {
             // first get the currently highlighted ghost
+            Ghost currentlyHighlightedGhost = ghostList[prevGhostHoverIndex];
 
-            // get the currently highlighted ghost's color
+            // get the key mapped to the current ghost's color
+            Keys colorKey = colorKeyMap[currentlyHighlightedGhost.Color];
 
             // check if the correct key has been hit
+            if (colorKey == keyPressed)
+            {
+                indexOfGhostToRemove = prevGhostHoverIndex;
+            }
         }
 
     }
