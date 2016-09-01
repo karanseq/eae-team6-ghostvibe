@@ -96,7 +96,7 @@ namespace GhostVibe
             spriteBatch = new SpriteBatch(GraphicsDevice);
             arialFont = Content.Load<SpriteFont>("Arial");
             ghostPoof = Content.Load<SoundEffect>("ghost_poof");
-            ghostSpawn = Content.Load<SoundEffect>("ghost_spawn");
+            ghostSpawn = Content.Load<SoundEffect>("short_spawn");
             hallway = Content.Load<Texture2D>("hallway");
             blueGun = Content.Load<Texture2D>("blue");
             yellowGun = Content.Load<Texture2D>("yellow");
@@ -162,30 +162,30 @@ namespace GhostVibe
             currentGamepadState = GamePad.GetState(PlayerIndex.One);
 
             // MAJOR TODO: change this logic to eliminate the disgusting number of 'if' conditions X-(
-            if (currentKeyboardState.IsKeyDown(Keys.A) || currentGamepadState.IsButtonDown(Buttons.A)) isAKeyPressed = true;
-            if (currentKeyboardState.IsKeyDown(Keys.B) || currentGamepadState.IsButtonDown(Buttons.B)) isBKeyPressed = true;
-            if (currentKeyboardState.IsKeyDown(Keys.X) || currentGamepadState.IsButtonDown(Buttons.X)) isXKeyPressed = true;
-            if (currentKeyboardState.IsKeyDown(Keys.Y) || currentGamepadState.IsButtonDown(Buttons.Y)) isYKeyPressed = true;
+            if (currentKeyboardState.IsKeyDown(Keys.D) || currentGamepadState.IsButtonDown(Buttons.A)) isAKeyPressed = true;
+            if (currentKeyboardState.IsKeyDown(Keys.F) || currentGamepadState.IsButtonDown(Buttons.B)) isBKeyPressed = true;
+            if (currentKeyboardState.IsKeyDown(Keys.J) || currentGamepadState.IsButtonDown(Buttons.X)) isXKeyPressed = true;
+            if (currentKeyboardState.IsKeyDown(Keys.K) || currentGamepadState.IsButtonDown(Buttons.Y)) isYKeyPressed = true;
 
-            if (isAKeyPressed && (currentKeyboardState.IsKeyUp(Keys.A) || currentGamepadState.IsButtonUp(Buttons.A)))
+            if (isAKeyPressed && (currentKeyboardState.IsKeyUp(Keys.D) || currentGamepadState.IsButtonUp(Buttons.A)))
             {
                 isAKeyPressed = false;
                 ShootGhost(Keys.A);
             }
 
-            if (isBKeyPressed && (currentKeyboardState.IsKeyUp(Keys.B) || currentGamepadState.IsButtonUp(Buttons.B)))
+            if (isBKeyPressed && (currentKeyboardState.IsKeyUp(Keys.F) || currentGamepadState.IsButtonUp(Buttons.B)))
             {
                 isBKeyPressed = false;
                 ShootGhost(Keys.B);
             }
 
-            if (isXKeyPressed && (currentKeyboardState.IsKeyUp(Keys.X) || currentGamepadState.IsButtonUp(Buttons.X)))
+            if (isXKeyPressed && (currentKeyboardState.IsKeyUp(Keys.J) || currentGamepadState.IsButtonUp(Buttons.X)))
             {
                 isXKeyPressed = false;
                 ShootGhost(Keys.X);
             }
 
-            if (isYKeyPressed && (currentKeyboardState.IsKeyUp(Keys.Y) || currentGamepadState.IsButtonUp(Buttons.Y)))
+            if (isYKeyPressed && (currentKeyboardState.IsKeyUp(Keys.K) || currentGamepadState.IsButtonUp(Buttons.Y)))
             {
                 isYKeyPressed = false;
                 ShootGhost(Keys.Y);
@@ -227,8 +227,8 @@ namespace GhostVibe
 
         private void DrawUI()
         {
-            spriteBatch.DrawString(arialFont, "Score: " + score, new Vector2(20, 20), Color.White, 0.0f, new Vector2(0, 0), 2.0f, SpriteEffects.None, 1.0f);
-            spriteBatch.DrawString(arialFont, "Life: " + lifeRemaining, new Vector2(20, GraphicsDevice.Viewport.Height - 50), Color.White, 0.0f, new Vector2(0, 0), 2.0f, SpriteEffects.None, 1.0f);
+            spriteBatch.DrawString(arialFont, "Score: " + score, new Vector2(20, 20), Color.Black, 0.0f, new Vector2(0, 0), 2.0f, SpriteEffects.None, 1.0f);
+            spriteBatch.DrawString(arialFont, "Life: " + lifeRemaining, new Vector2(20, GraphicsDevice.Viewport.Height - 50), Color.Black, 0.0f, new Vector2(0, 0), 2.0f, SpriteEffects.None, 1.0f);
         }
 
         protected override void Draw(GameTime gameTime)
