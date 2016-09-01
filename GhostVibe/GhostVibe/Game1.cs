@@ -201,23 +201,6 @@ namespace GhostVibe
             if (isLeftMouseDown && currentMouseState.LeftButton == ButtonState.Released)
             {
                 isLeftMouseDown = false;
-
-                //List<int> ghostsToBeDeleted = new List<int>();
-
-                //for (int i = 0; i < ghostList.Count; ++i)
-                //{
-                //    Ghost ghost = ghostList[i];
-
-                //    if (ghost.GetStage() == 1 || ghost.GetStage() == 2)
-                //    {
-                //        ghost.MoveForward(1.0f);
-                //    }
-                //    else
-                //    {
-                //        ghostsToBeDeleted.Add(i);
-                //        ghost.Destroy();
-                //    }
-                //}
             }
         }
 
@@ -296,11 +279,8 @@ namespace GhostVibe
                 int randomIndex = 1 + random.Next(0, 4);
                 string randomColor = colorNames[randomIndex];
 
-                Trace.WriteLine("Spawning a " + randomColor + " ghost...");
-
                 // create a new ghost and add it to the list
                 Ghost ghost = new Ghost(ghostTextures["plain"], 0.35f, randomColor);
-                //ghost.MoveForward(2.5f);
                 ghostList.Add(ghost);
                 ghostSpawn.Play();
             }
@@ -362,7 +342,6 @@ namespace GhostVibe
 
         private void MoveGhosts()
         {
-            Trace.WriteLine("Moving ghost " + prevGhostHoverIndex + "...");
             ghostList[prevGhostHoverIndex].MoveForward(0.5f);
         }
 
@@ -371,6 +350,12 @@ namespace GhostVibe
             // first get the currently highlighted ghost
             Ghost currentlyHighlightedGhost = ghostList[prevGhostHoverIndex];
 
+            // check if this ghost is alive
+            if (currentlyHighlightedGhost.Image.Opacity < 1.0f)
+            {
+                return;
+            }
+
             // get the key mapped to the current ghost's color
             Keys colorKey = colorKeyMap[currentlyHighlightedGhost.Color];
 
@@ -378,6 +363,7 @@ namespace GhostVibe
             if (colorKey == keyPressed)
             {
                 indexOfGhostToRemove = prevGhostHoverIndex;
+                ghostPoof.Play();
             }
         }
 
