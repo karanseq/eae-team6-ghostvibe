@@ -18,6 +18,8 @@ namespace GhostVibe
         Scheduler scheduler;
 
         protected Texture2D animationTexture, spriteTexture;
+        protected Texture2D hallway;
+        protected Texture2D blueGun, greenGun, redGun, yellowGun;
         protected SpriteFont arialFont;
 
         protected enum GameState { Spawning, Highlighting, Moving };
@@ -95,6 +97,11 @@ namespace GhostVibe
             arialFont = Content.Load<SpriteFont>("Arial");
             ghostPoof = Content.Load<SoundEffect>("ghost_poof");
             ghostSpawn = Content.Load<SoundEffect>("ghost_spawn");
+            hallway = Content.Load<Texture2D>("hallway");
+            blueGun = Content.Load<Texture2D>("blue");
+            yellowGun = Content.Load<Texture2D>("yellow");
+            greenGun = Content.Load<Texture2D>("green");
+            redGun = Content.Load<Texture2D>("red");
 
             ghostTextures = new Dictionary<string, Texture2D>();
             ghostTextures.Add("plain", Content.Load<Texture2D>("Graphics\\ghost_01"));
@@ -230,7 +237,13 @@ namespace GhostVibe
 
             spriteBatch.Begin();
 
-            foreach(Ghost ghost in ghostList)
+            spriteBatch.Draw(hallway, Vector2.Zero, null, Color.White, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.0f);
+            spriteBatch.Draw(blueGun, new Vector2(GraphicsDevice.Viewport.Width * 0.1f, GraphicsDevice.Viewport.Height * 0.97f), null, Color.White, Helper.Helper.DegreesToRadians(45.0f), new Vector2(blueGun.Width / 2, blueGun.Height / 2), 0.65f, SpriteEffects.None, 0.0f);
+            spriteBatch.Draw(yellowGun, new Vector2(GraphicsDevice.Viewport.Width * 0.9f, GraphicsDevice.Viewport.Height * 0.97f), null, Color.White, Helper.Helper.DegreesToRadians(-45.0f), new Vector2(blueGun.Width / 2, blueGun.Height / 2), 0.65f, SpriteEffects.None, 0.0f);
+            spriteBatch.Draw(redGun, new Vector2(GraphicsDevice.Viewport.Width * 0.35f, GraphicsDevice.Viewport.Height), null, Color.White, Helper.Helper.DegreesToRadians(25.0f), new Vector2(blueGun.Width / 2, blueGun.Height / 2), 0.65f, SpriteEffects.None, 0.0f);
+            spriteBatch.Draw(greenGun, new Vector2(GraphicsDevice.Viewport.Width * 0.65f, GraphicsDevice.Viewport.Height), null, Color.White, Helper.Helper.DegreesToRadians(-25.0f), new Vector2(blueGun.Width / 2, blueGun.Height / 2), 0.65f, SpriteEffects.None, 0.0f);
+
+            foreach (Ghost ghost in ghostList)
             {
                 ghost.Activate();
                 ghost.Draw(spriteBatch);
@@ -280,7 +293,7 @@ namespace GhostVibe
                 string randomColor = colorNames[randomIndex];
 
                 // create a new ghost and add it to the list
-                Ghost ghost = new Ghost(ghostTextures["plain"], 0.35f, randomColor);
+                Ghost ghost = new Ghost(ghostTextures["plain"], 0.3f, randomColor);
                 ghostList.Add(ghost);
                 ghostSpawn.Play();
             }
