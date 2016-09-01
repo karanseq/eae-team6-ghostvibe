@@ -22,6 +22,12 @@ namespace Helper
             GamePad.SetVibration(PlayerIndex.One, 0.0f, 0.0f);
         }
 
+        public static void playBeat(float beatIntensity, float beatDuration)
+        {
+            startVibration(0.0f);
+            Scheduler.Instance.scheduleDelegateOnce(delegateStopVibration, beatDuration);
+        }
+
         public static void startBeats(float beatFrequency, float beatDuration, float beatIntensity)
         {
             HapticFeedback.beatIntensity = beatIntensity;
@@ -34,6 +40,40 @@ namespace Helper
             Scheduler.Instance.unscheduleDelegate(delegateStartVibration);
             Scheduler.Instance.unscheduleDelegate(delegateStopVibration);
             stopVibration(0.0f);
+        }
+
+        public static float GetBeatIntensity(Keys keyPressed)
+        {
+            switch (keyPressed)
+            {
+                case Keys.A:
+                    return 0.1f;
+                case Keys.B:
+                    return 0.5f;
+                case Keys.X:
+                    return 0.1f;
+                case Keys.Y:
+                    return 0.5f;
+                default:
+                    return 0.3f;
+            }
+        }
+
+        public static float GetBeatDuration(Keys keyPressed)
+        {
+            switch (keyPressed)
+            {
+                case Keys.A:
+                    return 0.1f;
+                case Keys.B:
+                    return 0.5f;
+                case Keys.X:
+                    return 0.1f;
+                case Keys.Y:
+                    return 0.5f;
+                default:
+                    return 0.3f;
+            }
         }
     }
 }

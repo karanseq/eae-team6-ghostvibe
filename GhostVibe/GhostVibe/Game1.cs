@@ -130,7 +130,7 @@ namespace GhostVibe
         protected void StartGame()
         {
             // start scheduled functions
-            HapticFeedback.startBeats(beatFrequency, 0.1f, 0.1f);
+            //HapticFeedback.startBeats(beatFrequency, 0.1f, 0.1f);
             scheduler.scheduleDelegate(delegateTickGhosts, beatFrequency);
             bgmInst.Volume = 0.3f;
             bgmInst.IsLooped = true;
@@ -342,11 +342,6 @@ namespace GhostVibe
             {
                 --firstToggleCounter;
             }
-
-            //if (firstToggleCounter == 0)
-            //{
-            //    currentState = GameState.Moving;
-            //}
         }
 
         private void UnhighlightGhost()
@@ -390,6 +385,9 @@ namespace GhostVibe
             // check if the correct key has been hit
             if (colorKey == keyPressed)
             {
+                // play a beat
+                HapticFeedback.playBeat(HapticFeedback.GetBeatIntensity(colorKey), HapticFeedback.GetBeatDuration(colorKey));
+
                 KillGhost();
             }
         }
