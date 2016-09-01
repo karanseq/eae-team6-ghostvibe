@@ -60,6 +60,7 @@ namespace GhostVibe
         // audio objects
         protected SoundEffect ghostPoof;
         protected SoundEffect ghostSpawn;
+        protected SoundEffect whistle;
 
         public Game1()
         {
@@ -97,6 +98,7 @@ namespace GhostVibe
             arialFont = Content.Load<SpriteFont>("Arial");
             ghostPoof = Content.Load<SoundEffect>("ghost_poof");
             ghostSpawn = Content.Load<SoundEffect>("newghostspawn");
+            whistle = Content.Load<SoundEffect>("trainwhistle");
             hallway = Content.Load<Texture2D>("hallway");
             blueGun = Content.Load<Texture2D>("blue");
             yellowGun = Content.Load<Texture2D>("yellow");
@@ -377,7 +379,8 @@ namespace GhostVibe
             if (colorKey == keyPressed)
             {
                 indexOfGhostToRemove = prevGhostHoverIndex;
-                ghostPoof.Play();
+                whistle.Play();
+                //ghostPoof.Play();
             }
         }
 

@@ -175,3 +175,9 @@
 /processorParam:Quality=Best
 /build:newghostspawn.wav
 
+#begin trainwhistle.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:trainwhistle.wav
+
