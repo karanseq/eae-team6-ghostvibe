@@ -355,7 +355,13 @@ namespace GhostVibe
 
         private void MoveGhosts()
         {
-            ghostList[prevGhostHoverIndex].MoveForward(0.5f);
+            ghostList[prevGhostHoverIndex].MoveForward(2.0f);
+            /*
+            foreach (Ghost ghost in ghostList)
+            {
+                ghost.MoveForward(2.0f);
+            }
+            */
         }
 
         private void ShootGhost(Keys keyPressed)
