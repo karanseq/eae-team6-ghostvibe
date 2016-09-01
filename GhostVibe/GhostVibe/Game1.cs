@@ -46,7 +46,6 @@ namespace GhostVibe
         
         // keyboard states
         private KeyboardState currentKeyboardState, previousKeyboardState;
-        private bool isAKeyPressed, isBKeyPressed, isXKeyPressed, isYKeyPressed;
         private bool acceptKeys;
 
         // gamepad states
@@ -79,9 +78,9 @@ namespace GhostVibe
             Helper.Helper.ViewportHeight = GraphicsDevice.Viewport.Height;
 
             delegateTickGhosts = new UpdateDelegate(TickGhosts);
-            beatFrequency = 0.5f;
+            beatFrequency = 0.75f;
 
-            isLeftMouseDown = isAKeyPressed = isBKeyPressed = isXKeyPressed = isYKeyPressed = false;
+            isLeftMouseDown = acceptKeys = false;
 
             counter = 0;
             score = 0;
@@ -212,10 +211,10 @@ namespace GhostVibe
             spriteBatch.Begin();
 
             spriteBatch.Draw(hallway, Vector2.Zero, null, Color.White, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.0f);
-            spriteBatch.Draw(blueGun, new Vector2(GraphicsDevice.Viewport.Width * 0.1f, GraphicsDevice.Viewport.Height * 0.97f), null, Color.White, Helper.Helper.DegreesToRadians(45.0f), new Vector2(blueGun.Width / 2, blueGun.Height / 2), 0.65f, SpriteEffects.None, 0.0f);
-            spriteBatch.Draw(yellowGun, new Vector2(GraphicsDevice.Viewport.Width * 0.9f, GraphicsDevice.Viewport.Height * 0.97f), null, Color.White, Helper.Helper.DegreesToRadians(-45.0f), new Vector2(blueGun.Width / 2, blueGun.Height / 2), 0.65f, SpriteEffects.None, 0.0f);
-            spriteBatch.Draw(redGun, new Vector2(GraphicsDevice.Viewport.Width * 0.35f, GraphicsDevice.Viewport.Height), null, Color.White, Helper.Helper.DegreesToRadians(25.0f), new Vector2(blueGun.Width / 2, blueGun.Height / 2), 0.65f, SpriteEffects.None, 0.0f);
-            spriteBatch.Draw(greenGun, new Vector2(GraphicsDevice.Viewport.Width * 0.65f, GraphicsDevice.Viewport.Height), null, Color.White, Helper.Helper.DegreesToRadians(-25.0f), new Vector2(blueGun.Width / 2, blueGun.Height / 2), 0.65f, SpriteEffects.None, 0.0f);
+            //spriteBatch.Draw(blueGun, new Vector2(GraphicsDevice.Viewport.Width * 0.1f, GraphicsDevice.Viewport.Height * 0.97f), null, Color.White, Helper.Helper.DegreesToRadians(45.0f), new Vector2(blueGun.Width / 2, blueGun.Height / 2), 0.65f, SpriteEffects.None, 0.0f);
+            //spriteBatch.Draw(yellowGun, new Vector2(GraphicsDevice.Viewport.Width * 0.9f, GraphicsDevice.Viewport.Height * 0.97f), null, Color.White, Helper.Helper.DegreesToRadians(-45.0f), new Vector2(blueGun.Width / 2, blueGun.Height / 2), 0.65f, SpriteEffects.None, 0.0f);
+            //spriteBatch.Draw(redGun, new Vector2(GraphicsDevice.Viewport.Width * 0.35f, GraphicsDevice.Viewport.Height), null, Color.White, Helper.Helper.DegreesToRadians(25.0f), new Vector2(blueGun.Width / 2, blueGun.Height / 2), 0.65f, SpriteEffects.None, 0.0f);
+            //spriteBatch.Draw(greenGun, new Vector2(GraphicsDevice.Viewport.Width * 0.65f, GraphicsDevice.Viewport.Height), null, Color.White, Helper.Helper.DegreesToRadians(-25.0f), new Vector2(blueGun.Width / 2, blueGun.Height / 2), 0.65f, SpriteEffects.None, 0.0f);
 
             foreach (Ghost ghost in ghostList)
             {
@@ -373,6 +372,8 @@ namespace GhostVibe
         private void KillGhost()
         {
             --numGhostsAlive;
+            score += 100;
+
             ghostList[prevGhostHoverIndex].Image.Opacity = 0.2f;
             ghostPoof.Play();
 			whistle.Play();
