@@ -245,6 +245,9 @@ namespace GhostVibe
             totalGhostsInWave = remainingGhostsInWave = 4; // random.Next(minGhosts, maxGhosts);
             numGhostsAlive = 0;
             prevGhostHoverIndex = ghostHoverIndex = 0;
+
+            GhostPosition.ResetIndexList();
+            GhostPosition.Shuffle();
             ghostList = new List<Ghost>();
 
             // set initial state
