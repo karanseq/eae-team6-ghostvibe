@@ -96,7 +96,7 @@ namespace GhostVibe
             spriteBatch = new SpriteBatch(GraphicsDevice);
             arialFont = Content.Load<SpriteFont>("Arial");
             ghostPoof = Content.Load<SoundEffect>("ghost_poof");
-            ghostSpawn = Content.Load<SoundEffect>("short_spawn");
+            ghostSpawn = Content.Load<SoundEffect>("newghostspawn");
             hallway = Content.Load<Texture2D>("hallway");
             blueGun = Content.Load<Texture2D>("blue");
             yellowGun = Content.Load<Texture2D>("yellow");
@@ -227,8 +227,9 @@ namespace GhostVibe
 
         private void DrawUI()
         {
-            spriteBatch.DrawString(arialFont, "Score: " + score, new Vector2(20, 20), Color.Black, 0.0f, new Vector2(0, 0), 2.0f, SpriteEffects.None, 1.0f);
-            spriteBatch.DrawString(arialFont, "Life: " + lifeRemaining, new Vector2(20, GraphicsDevice.Viewport.Height - 50), Color.Black, 0.0f, new Vector2(0, 0), 2.0f, SpriteEffects.None, 1.0f);
+            spriteBatch.DrawString(arialFont, "Score: " + score, new Vector2(20, 20), Color.Black, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 1.0f);
+            spriteBatch.DrawString(arialFont, "Life: " + lifeRemaining, new Vector2(20, GraphicsDevice.Viewport.Height - 50), Color.Black, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 1.0f);
+            spriteBatch.DrawString(arialFont, "Green: D, Red: F, Blue: J, Yellow: K", new Vector2(GraphicsDevice.Viewport.Width / 2 - 200, 20), Color.Black, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 1.0f);
         }
 
         protected override void Draw(GameTime gameTime)
