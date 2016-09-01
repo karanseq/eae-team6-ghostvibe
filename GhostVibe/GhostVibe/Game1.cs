@@ -318,6 +318,7 @@ namespace GhostVibe
         private void MoveGhosts()
         {
             Trace.WriteLine("Moving ghost " + prevGhostHoverIndex + "...");
+            ghostList[prevGhostHoverIndex].MoveForward(0.5f);
         }
 
         private void ShootGhost(Keys keyPressed)

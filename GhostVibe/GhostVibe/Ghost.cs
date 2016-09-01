@@ -37,10 +37,6 @@ namespace GhostVibe
             StageOnePosition = GhostPosition.GetInitialPosition(initPosNum);
             StageTwoPosition = GhostPosition.GetSecondPosition(initPosNum);
             StageThreePosition = GhostPosition.GetThirdPosition(initPosNum);
-            //StageOnePosition = new Vector2(Helper.Helper.ViewportWidth * 0.5f, Helper.Helper.ViewportHeight * 0.25f);
-            //StageTwoPosition = new Vector2(Helper.Helper.ViewportWidth * 0.5f, Helper.Helper.ViewportHeight * 0.40f);
-            //StageThreePosition = new Vector2(Helper.Helper.ViewportWidth * 0.5f, Helper.Helper.ViewportHeight * 0.60f);
-            //StageOverPosition = new Vector2(Helper.Helper.ViewportWidth * 0.5f, Helper.Helper.ViewportHeight * 0.75f);
             currentPos = StageOnePosition;
             ghostImg = Sprite.Create(staticTexture, currentPos);
             scale = scaleF;
@@ -55,10 +51,6 @@ namespace GhostVibe
         public Ghost(Texture2D dynamicTexture, int frameW, int frameH, int numFrame, float scaleF, string gColor)
         {
             initPosNum = GhostPosition.GetIndex();
-            //StageOnePosition = new Vector2(Helper.Helper.ViewportWidth * 0.5f, Helper.Helper.ViewportHeight * 0.75f);
-            //StageTwoPosition = new Vector2(Helper.Helper.ViewportWidth * 0.5f, Helper.Helper.ViewportHeight * 0.60f);
-            //StageThreePosition = new Vector2(Helper.Helper.ViewportWidth * 0.5f, Helper.Helper.ViewportHeight * 0.40f);
-            //StageOverPosition = new Vector2(Helper.Helper.ViewportWidth * 0.5f, Helper.Helper.ViewportHeight * 0.25f);
             StageOnePosition = GhostPosition.GetInitialPosition(initPosNum);
             StageTwoPosition = GhostPosition.GetSecondPosition(initPosNum);
             StageThreePosition = GhostPosition.GetThirdPosition(initPosNum);
@@ -86,12 +78,12 @@ namespace GhostVibe
                 if (isAnimated)
                 {
                     ActionManager.Instance.addAction(MoveTo.create(duration, StageTwoPosition), ghostAnim);
-                    ActionManager.Instance.addAction(ScaleTo.create(duration, scale * 1.5f), ghostAnim);
+                    ActionManager.Instance.addAction(ScaleTo.create(duration, scale * 1.4f), ghostAnim);
                 }
                 else
                 {
                     ActionManager.Instance.addAction(MoveTo.create(duration, StageTwoPosition), ghostImg);
-                    ActionManager.Instance.addAction(ScaleTo.create(duration, scale * 1.5f), ghostImg);
+                    ActionManager.Instance.addAction(ScaleTo.create(duration, scale * 1.4f), ghostImg);
                 }
                 stage++;
             }
@@ -101,12 +93,12 @@ namespace GhostVibe
                 if (isAnimated)
                 {
                     ActionManager.Instance.addAction(MoveTo.create(duration, StageThreePosition), ghostAnim);
-                    ActionManager.Instance.addAction(ScaleTo.create(duration, scale * 1.8f), ghostAnim);
+                    ActionManager.Instance.addAction(ScaleTo.create(duration, scale * 1.7f), ghostAnim);
                 }
                 else
                 {
                     ActionManager.Instance.addAction(MoveTo.create(duration, StageThreePosition), ghostImg);
-                    ActionManager.Instance.addAction(ScaleTo.create(duration, scale * 1.8f), ghostImg);
+                    ActionManager.Instance.addAction(ScaleTo.create(duration, scale * 1.7f), ghostImg);
                 }
                 stage++;
             }
@@ -132,7 +124,7 @@ namespace GhostVibe
             {
                 isActive = false;
                 stage = -1;
-                // first remove all running actions on the sprite
+                // remove all running actions on the sprite
                 if (!isAnimated)
                     ActionManager.Instance.removeAllActionsFromTarget(ghostImg);
                 else
@@ -173,21 +165,6 @@ namespace GhostVibe
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            //if (isAnimated)
-            //{
-            //    if (isActive)
-            //    {
-            //        spriteBatch.Draw(ghostAnim.Texture, currentPos, ghostAnim.SourceRect, ghostAnim.Color, ghostAnim.Rotation, ghostAnim.Origin, ghostAnim.Scale, ghostAnim.SpriteEffects, ghostAnim.LayerDepth);
-            //    }
-            //}
-            //else
-            //{
-            //    if (isActive)
-            //    {
-            //        spriteBatch.Draw(ghostImg.Texture, currentPos, null, ghostImg.Color, ghostImg.Rotation, ghostImg.Origin, ghostImg.Scale, ghostImg.SpriteEffects, ghostImg.LayerDepth);
-            //    }
-            //}
-
             if (isAnimated)
             {
                 if(isActive)

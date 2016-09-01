@@ -30,37 +30,37 @@ namespace GhostVibe
         public static Vector2 GetInitialPosition(int ind)
         {
             if (ind == 0)
-                return new Vector2(Helper.Helper.ViewportWidth * 0.3f, Helper.Helper.ViewportHeight * 0.25f);
+                return new Vector2(Helper.Helper.ViewportWidth * 0.3f, Helper.Helper.ViewportHeight * 0.2f);
             else if (ind == 1)
-                return new Vector2(Helper.Helper.ViewportWidth * 0.4f, Helper.Helper.ViewportHeight * 0.25f);
+                return new Vector2(Helper.Helper.ViewportWidth * 0.4f, Helper.Helper.ViewportHeight * 0.2f);
             else if (ind == 2)
-                return new Vector2(Helper.Helper.ViewportWidth * 0.6f, Helper.Helper.ViewportHeight * 0.25f);
+                return new Vector2(Helper.Helper.ViewportWidth * 0.6f, Helper.Helper.ViewportHeight * 0.2f);
             else
-                return new Vector2(Helper.Helper.ViewportWidth * 0.7f, Helper.Helper.ViewportHeight * 0.25f);
+                return new Vector2(Helper.Helper.ViewportWidth * 0.7f, Helper.Helper.ViewportHeight * 0.2f);
         }
 
         public static Vector2 GetSecondPosition(int ind)
         {
             if (ind == 0)
-                return new Vector2(Helper.Helper.ViewportWidth * 0.25f, Helper.Helper.ViewportHeight * 0.5f);
+                return new Vector2(Helper.Helper.ViewportWidth * 0.25f, Helper.Helper.ViewportHeight * 0.4f);
             else if (ind == 1)
-                return new Vector2(Helper.Helper.ViewportWidth * 0.35f, Helper.Helper.ViewportHeight * 0.5f);
+                return new Vector2(Helper.Helper.ViewportWidth * 0.35f, Helper.Helper.ViewportHeight * 0.4f);
             else if (ind == 2)
-                return new Vector2(Helper.Helper.ViewportWidth * 0.65f, Helper.Helper.ViewportHeight * 0.5f);
+                return new Vector2(Helper.Helper.ViewportWidth * 0.65f, Helper.Helper.ViewportHeight * 0.4f);
             else
-                return new Vector2(Helper.Helper.ViewportWidth * 0.75f, Helper.Helper.ViewportHeight * 0.5f);
+                return new Vector2(Helper.Helper.ViewportWidth * 0.75f, Helper.Helper.ViewportHeight * 0.4f);
         }
 
         public static Vector2 GetThirdPosition(int ind)
         {
             if (ind == 0)
-                return new Vector2(Helper.Helper.ViewportWidth * 0.2f, Helper.Helper.ViewportHeight * 0.75f);
+                return new Vector2(Helper.Helper.ViewportWidth * 0.2f, Helper.Helper.ViewportHeight * 0.6f);
             else if (ind == 1)
-                return new Vector2(Helper.Helper.ViewportWidth * 0.3f, Helper.Helper.ViewportHeight * 0.75f);
+                return new Vector2(Helper.Helper.ViewportWidth * 0.3f, Helper.Helper.ViewportHeight * 0.6f);
             else if (ind == 2)
-                return new Vector2(Helper.Helper.ViewportWidth * 0.7f, Helper.Helper.ViewportHeight * 0.75f);
+                return new Vector2(Helper.Helper.ViewportWidth * 0.7f, Helper.Helper.ViewportHeight * 0.6f);
             else
-                return new Vector2(Helper.Helper.ViewportWidth * 0.8f, Helper.Helper.ViewportHeight * 0.75f);
+                return new Vector2(Helper.Helper.ViewportWidth * 0.8f, Helper.Helper.ViewportHeight * 0.6f);
         }
     }
 }
