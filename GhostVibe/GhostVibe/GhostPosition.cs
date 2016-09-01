@@ -30,13 +30,13 @@ namespace GhostVibe
         public static Vector2 GetInitialPosition(int ind)
         {
             if (ind == 0)
-                return new Vector2(Helper.Helper.ViewportWidth * 0.425f, Helper.Helper.ViewportHeight * 0.5f);
+                return new Vector2(Helper.Helper.ViewportWidth * 0.35f, Helper.Helper.ViewportHeight * 0.5f);
             else if (ind == 1)
-                return new Vector2(Helper.Helper.ViewportWidth * 0.475f, Helper.Helper.ViewportHeight * 0.5f);
+                return new Vector2(Helper.Helper.ViewportWidth * 0.45f, Helper.Helper.ViewportHeight * 0.5f);
             else if (ind == 2)
-                return new Vector2(Helper.Helper.ViewportWidth * 0.525f, Helper.Helper.ViewportHeight * 0.5f);
+                return new Vector2(Helper.Helper.ViewportWidth * 0.55f, Helper.Helper.ViewportHeight * 0.5f);
             else
-                return new Vector2(Helper.Helper.ViewportWidth * 0.575f, Helper.Helper.ViewportHeight * 0.5f);
+                return new Vector2(Helper.Helper.ViewportWidth * 0.65f, Helper.Helper.ViewportHeight * 0.5f);
         }
 
         public static Vector2 GetSecondPosition(int ind)

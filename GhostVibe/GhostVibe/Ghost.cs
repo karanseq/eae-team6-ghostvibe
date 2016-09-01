@@ -72,6 +72,7 @@ namespace GhostVibe
         public void MoveForward(float duration)
         {
             isInvincible = true;
+            /*
             if (stage == 1)
             {
                 currentPos = StageTwoPosition;
@@ -106,6 +107,18 @@ namespace GhostVibe
             {
                 Destroy();
                 return;
+            }
+            */
+            currentPos = StageThreePosition;
+            if (isAnimated)
+            {
+                ActionManager.Instance.addAction(MoveTo.create(duration, currentPos), ghostAnim);
+                ActionManager.Instance.addAction(ScaleTo.create(duration, scale * 1.4f), ghostAnim);
+            }
+            else
+            {
+                ActionManager.Instance.addAction(MoveTo.create(duration, currentPos), ghostImg);
+                ActionManager.Instance.addAction(ScaleTo.create(duration, scale * 1.7f), ghostImg);
             }
             isInvincible = false;
         }
