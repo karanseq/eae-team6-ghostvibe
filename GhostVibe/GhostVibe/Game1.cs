@@ -63,12 +63,15 @@ namespace GhostVibe
         protected SoundEffect ghostPoof;
         protected SoundEffect ghostSpawn;
         protected SoundEffect whistle;
+        protected SoundEffect bgm;
+        protected SoundEffectInstance bgmInst;
 
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
             graphics.PreferredBackBufferWidth = 1280;
             graphics.PreferredBackBufferHeight = 720;
+            this.graphics.IsFullScreen = true;
             this.IsMouseVisible = true;
             Content.RootDirectory = "Content";
         }
@@ -98,21 +101,23 @@ namespace GhostVibe
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
             arialFont = Content.Load<SpriteFont>("Arial");
-            ghostPoof = Content.Load<SoundEffect>("ghost_poof");
+            ghostPoof = Content.Load<SoundEffect>("ghostpoof");
             ghostSpawn = Content.Load<SoundEffect>("newghostspawn");
             whistle = Content.Load<SoundEffect>("trainwhistle");
-            hallway = Content.Load<Texture2D>("hallway");
+            bgm = Content.Load<SoundEffect>("newbgmsize");
+            bgmInst = bgm.CreateInstance();
+            hallway = Content.Load<Texture2D>("newhallway");
             blueGun = Content.Load<Texture2D>("blue");
             yellowGun = Content.Load<Texture2D>("yellow");
             greenGun = Content.Load<Texture2D>("green");
             redGun = Content.Load<Texture2D>("red");
 
             ghostTextures = new Dictionary<string, Texture2D>();
-            ghostTextures.Add("plain", Content.Load<Texture2D>("Graphics\\ghost_01"));
-            ghostTextures.Add("blue", Content.Load<Texture2D>("Graphics\\ghost_02"));
-            ghostTextures.Add("green", Content.Load<Texture2D>("Graphics\\ghost_03"));
-            ghostTextures.Add("red", Content.Load<Texture2D>("Graphics\\ghost_04"));
-            ghostTextures.Add("yellow", Content.Load<Texture2D>("Graphics\\ghost_05"));
+            ghostTextures.Add("plain", Content.Load<Texture2D>("ghost_01"));
+            ghostTextures.Add("blue", Content.Load<Texture2D>("ghost_02"));
+            ghostTextures.Add("green", Content.Load<Texture2D>("ghost_03"));
+            ghostTextures.Add("red", Content.Load<Texture2D>("ghost_04"));
+            ghostTextures.Add("yellow", Content.Load<Texture2D>("ghost_05"));
 
             StartGame();
         }
@@ -127,7 +132,9 @@ namespace GhostVibe
             // start scheduled functions
             HapticFeedback.startBeats(beatFrequency, 0.1f, 0.1f);
             scheduler.scheduleDelegate(delegateTickGhosts, beatFrequency);
-            
+            bgmInst.Volume = 0.3f;
+            bgmInst.IsLooped = true;
+            bgmInst.Play();
             StartNewWave();
         }
 
@@ -202,9 +209,9 @@ namespace GhostVibe
 
         private void DrawUI()
         {
-            spriteBatch.DrawString(arialFont, "Score: " + score, new Vector2(20, 20), Color.Black, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 1.0f);
-            spriteBatch.DrawString(arialFont, "Life: " + lifeRemaining, new Vector2(20, GraphicsDevice.Viewport.Height - 50), Color.Black, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 1.0f);
-            spriteBatch.DrawString(arialFont, "Green: D, Red: F, Blue: J, Yellow: K", new Vector2(GraphicsDevice.Viewport.Width / 2 - 200, 20), Color.Black, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 1.0f);
+            spriteBatch.DrawString(arialFont, "Score: " + score, new Vector2(GraphicsDevice.Viewport.Width / 2 - 400, 27), Color.Black, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 1.0f);
+            //spriteBatch.DrawString(arialFont, "Life: " + lifeRemaining, new Vector2(20, GraphicsDevice.Viewport.Height - 50), Color.Black, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 1.0f);
+            spriteBatch.DrawString(arialFont, "Green: D, Red: F, Blue: J, Yellow: K", new Vector2(GraphicsDevice.Viewport.Width / 2 - 100, 27), Color.Black, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 1.0f);
         }
 
         protected override void Draw(GameTime gameTime)
@@ -247,6 +254,12 @@ namespace GhostVibe
 
         private void TickGhosts(float deltaTime)
         {
+            // check here if the ghosts have finished spawning AND highlighting for the first time
+            if (currentState == GameState.Highlighting && firstToggleCounter == 0)
+            {
+                currentState = GameState.Moving;
+            }
+
             switch (currentState)
             {
                 case GameState.Spawning:
@@ -330,10 +343,10 @@ namespace GhostVibe
                 --firstToggleCounter;
             }
 
-            if (firstToggleCounter == 0)
-            {
-                currentState = GameState.Moving;
-            }
+            //if (firstToggleCounter == 0)
+            //{
+            //    currentState = GameState.Moving;
+            //}
         }
 
         private void UnhighlightGhost()
@@ -357,6 +370,10 @@ namespace GhostVibe
         {
             // once the player presses one of the keys, accept no more...
             acceptKeys = false;
+
+            // only allow shooting when ghosts have finished spawning & highlighting
+            if (currentState != GameState.Moving)
+                return;
 
             // first get the currently highlighted ghost
             Ghost currentlyHighlightedGhost = ghostList[prevGhostHoverIndex];
@@ -388,7 +405,6 @@ namespace GhostVibe
             // reduce opacity and play sounds
             ghostList[prevGhostHoverIndex].Image.Opacity = 0.2f;
             ghostPoof.Play();
-			whistle.Play();
 
             if (numGhostsAlive <= 0)
             {
