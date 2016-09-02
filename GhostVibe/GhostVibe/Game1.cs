@@ -22,9 +22,6 @@ namespace GhostVibe
         protected Texture2D blueGun, greenGun, redGun, yellowGun;
         protected SpriteFont arialFont;
 
-        protected enum GameState { Spawning, Highlighting, Moving };
-        protected GameState currentState;
-
         protected readonly int maxColors = 4;
         protected string[] colorNames = { "plain", "blue", "green", "red", "yellow" };
         protected Dictionary<string, Keys> colorKeyMap = new Dictionary<string, Keys>(){ 
@@ -34,14 +31,9 @@ namespace GhostVibe
             { "yellow", Keys.Y } };
 
         protected Dictionary<string, Texture2D> ghostTextures;
-        protected readonly int minGhosts = 2;
-        protected readonly int maxGhosts = 5;
         protected List<Ghost> ghostList;
         protected UpdateDelegate delegateTickGhosts;
         protected float beatFrequency;
-        protected int totalGhostsInWave, remainingGhostsInWave, numGhostsAlive;
-        protected int prevGhostHoverIndex, ghostHoverIndex;
-        protected int firstToggleCounter;
 
         // mouse states
         protected MouseState currentMouseState, previousMouseState;
@@ -54,7 +46,6 @@ namespace GhostVibe
         // gamepad states
         private GamePadState currentGamepadState, previousGamepadState;
 
-        protected int counter;
         protected int score;
         protected int lifeRemaining;
         protected Random random;
@@ -72,13 +63,26 @@ namespace GhostVibe
         protected SoundEffect snare;
         protected SoundEffect hihat;
 
+        // rhythms
+        protected int index = -1;
+        protected int rhythm01Count = 24;
+        protected int[] rhythm01 = { 1, 0, 1, 0,
+            1, 0, 1, 0,
+            2, 2, 3, 3,
+            4, 4, 1, 0,
+            2, 0, 3, 0,
+            4, 0, 4, 0 };
+
+
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
             graphics.PreferredBackBufferWidth = 1280;
             graphics.PreferredBackBufferHeight = 720;
-            //this.graphics.IsFullScreen = true;
-            this.IsMouseVisible = true;
+
+            //graphics.IsFullScreen = true;
+            //IsMouseVisible = true;
+
             Content.RootDirectory = "Content";
         }
         
@@ -90,11 +94,10 @@ namespace GhostVibe
             Helper.Helper.ViewportHeight = GraphicsDevice.Viewport.Height;
 
             delegateTickGhosts = new UpdateDelegate(TickGhosts);
-            beatFrequency = 0.75f;
+            beatFrequency = 0.375f;
 
             isLeftMouseDown = acceptKeys = false;
-
-            counter = 0;
+            
             score = 0;
             lifeRemaining = 3;
             random = new Random();
@@ -141,12 +144,14 @@ namespace GhostVibe
         protected void StartGame()
         {
             // start scheduled functions
-            //HapticFeedback.startBeats(beatFrequency, 0.1f, 0.1f);
+            HapticFeedback.startBeats(beatFrequency, 0.1f, 0.1f);
             scheduler.scheduleDelegate(delegateTickGhosts, beatFrequency);
-            //bgmInst.Volume = 0.3f;
-            //bgmInst.IsLooped = true;
-            //bgmInst.Play();
-            StartNewWave();
+
+            bgmInst.Volume = 0.3f;
+            bgmInst.IsLooped = true;
+            bgmInst.Play();
+
+            ghostList = new List<Ghost>();
         }
 
         protected override void Update(GameTime gameTime)
@@ -160,8 +165,8 @@ namespace GhostVibe
             UpdateMouse();
             UpdateGhosts(gameTime);
 
-            actionManager.update(gameTime.ElapsedGameTime.Milliseconds / 1000.0f);
-            scheduler.update(gameTime.ElapsedGameTime.Milliseconds / 1000.0f);
+            actionManager.update(gameTime.ElapsedGameTime.Milliseconds * 0.001f);
+            scheduler.update(gameTime.ElapsedGameTime.Milliseconds * 0.001f);
 
             base.Update(gameTime);
         }
@@ -216,9 +221,22 @@ namespace GhostVibe
 
         private void UpdateGhosts(GameTime gameTime)
         {
+            if (ghostList.Count == 0) return;
+
+            List<Ghost> ghostsToBeDeleted = new List<Ghost>();
             foreach (Ghost ghost in ghostList)
             {
                 ghost.Update(gameTime);
+                if (ghost.MustBeDeleted)
+                {
+                    ghost.Destroy();
+                    ghostsToBeDeleted.Add(ghost);
+                }
+            }
+
+            foreach (Ghost ghost in ghostsToBeDeleted)
+            {                
+                ghostList.Remove(ghost);
             }
         }
 
@@ -241,12 +259,15 @@ namespace GhostVibe
             //spriteBatch.Draw(redGun, new Vector2(GraphicsDevice.Viewport.Width * 0.35f, GraphicsDevice.Viewport.Height), null, Color.White, Helper.Helper.DegreesToRadians(25.0f), new Vector2(blueGun.Width / 2, blueGun.Height / 2), 0.65f, SpriteEffects.None, 0.0f);
             //spriteBatch.Draw(greenGun, new Vector2(GraphicsDevice.Viewport.Width * 0.65f, GraphicsDevice.Viewport.Height), null, Color.White, Helper.Helper.DegreesToRadians(-25.0f), new Vector2(blueGun.Width / 2, blueGun.Height / 2), 0.65f, SpriteEffects.None, 0.0f);
 
-            foreach (Ghost ghost in ghostList)
+            if (ghostList.Count != 0)
             {
-                ghost.Activate();
-                ghost.Draw(spriteBatch);
+                foreach (Ghost ghost in ghostList)
+                {
+                    ghost.Activate();
+                    ghost.Draw(spriteBatch);
+                }
             }
-            
+
             DrawUI();
 
             spriteBatch.End();
@@ -254,177 +275,63 @@ namespace GhostVibe
             base.Draw(gameTime);
         }
 
-        private void StartNewWave()
-        {
-            // initialize variables
-            totalGhostsInWave = remainingGhostsInWave = 4; // random.Next(minGhosts, maxGhosts);
-            numGhostsAlive = 0;
-            prevGhostHoverIndex = ghostHoverIndex = 0;
-
-            GhostPosition.ResetIndexList();
-            GhostPosition.Shuffle();
-            ghostList = new List<Ghost>();
-
-            // set initial state
-            currentState = GameState.Spawning;
-            firstToggleCounter = totalGhostsInWave;
-        }
-
         private void TickGhosts(float deltaTime)
         {
-            // check here if the ghosts have finished spawning AND highlighting for the first time
-            if (currentState == GameState.Highlighting && firstToggleCounter == 0)
+            ++index;
+            index = (index >= rhythm01Count) ? 0 : index;
+
+            if (rhythm01[index] != 0)
             {
-                currentState = GameState.Moving;
-            }
-            
-            switch (currentState)
-            {
-                case GameState.Spawning:
-                    SpawnGhosts();
-                    break;
-
-                case GameState.Highlighting:
-                    ToggleGhostHighlights();
-                    break;
-
-                case GameState.Moving:
-                    ToggleGhostHighlights();
-                    MoveGhosts();
-                    break;
-            }
-
-        }
-
-        private void SpawnGhosts()
-        {
-            
-            if (currentState != GameState.Spawning)
-            {
-                return;
-            }
-            
-
-            // check if there are any ghosts still to spawn
-            if (remainingGhostsInWave > 0)
-            {
-                // reduce remaining ghosts
-                --remainingGhostsInWave;
-
-                // randomly pick one from the available colors
-                int randomIndex = 1 + random.Next(0, maxColors);
-                string randomColor = colorNames[randomIndex];
-
-                // create a new ghost and add it to the list
-                Ghost ghost = new Ghost(ghostTextures["plain"], 0.3f, randomColor);
-                ghostList.Add(ghost);
-                ghostSpawn.Play();
-
-                // add a subtle float animation
-                MoveBy moveUp = MoveBy.create(0.5f, new Vector2(0.0f, 10.0f));
-                RepeatForever floating = RepeatForever.create(Sequence.createWithTwoActions(moveUp, moveUp.reverse()));
-                actionManager.addAction(floating, ghost.Image);
-            }
-
-            // check if all ghosts have spawned
-            if (remainingGhostsInWave == 0)
-            {
-                // now start highlighting them
-                numGhostsAlive = totalGhostsInWave;
-                currentState = GameState.Highlighting;
-            }
-        }
-
-        private void ToggleGhostHighlights()
-        {
-            
-            if (currentState != GameState.Highlighting && currentState != GameState.Moving)
-            {
-                return;
-            }
-            
+                SpawnGhost(rhythm01[index] - 1);
+            }            
 
             acceptKeys = true;
-            // check if there are any ghosts alive
-            if (numGhostsAlive > 0)
-            {
-                // first unhighlight the previous ghost
-                if (prevGhostHoverIndex != ghostHoverIndex)
-                {
-                    UnhighlightGhost();
-                }
-
-                // now highlight the next ghost
-                HighlightGhost();
-                prevGhostHoverIndex = ghostHoverIndex;
-                ++ghostHoverIndex;
-                ghostHoverIndex = (ghostHoverIndex >= totalGhostsInWave) ? 0 : ghostHoverIndex;                
-            }
-            
-            if (firstToggleCounter > 0)
-            {
-                --firstToggleCounter;
-            }
         }
 
-        private void UnhighlightGhost()
+        private void SpawnGhost(int laneNumber)
         {
-            Ghost ghost = ghostList[prevGhostHoverIndex];
-            ghost.Image.Texture = ghostTextures["plain"];
-        }
-
-        private void HighlightGhost()
-        {
-            Ghost ghost = ghostList[ghostHoverIndex];
-            ghost.Image.Texture = ghostTextures[ghost.Color];
-        }
-
-        private void MoveGhosts()
-        {
-            ghostList[prevGhostHoverIndex].MoveForward(8.0f);
-            /*
-            foreach (Ghost ghost in ghostList)
-            {
-                ghost.MoveForward(2.0f);
-            }
-            */
+            Ghost ghost = new Ghost(ghostTextures["plain"], laneNumber, 0.3f, "");
+            ghostList.Add(ghost);
+            ghost.MoveForward(beatFrequency * 2);
         }
 
         private void ShootGhost(Keys keyPressed)
         {
-            // once the player presses one of the keys, accept no more...
-            acceptKeys = false;
-
-            // only allow shooting when ghosts have finished spawning & highlighting
-            if (currentState != GameState.Moving)
-                return;
-
-            // first get the currently highlighted ghost
-            Ghost currentlyHighlightedGhost = ghostList[prevGhostHoverIndex];
-
-            // check if this ghost is alive
-            if (currentlyHighlightedGhost.Image.Opacity < 1.0f)
+            // first get the lane number based on the key pressed
+            int laneNumber = 0;
+            switch (keyPressed)
             {
-                return;
+                case Keys.A:
+                    laneNumber = 0;
+                    break;
+                case Keys.B:
+                    laneNumber = 1;
+                    break;
+                case Keys.X:
+                    laneNumber = 2;
+                    break;
+                case Keys.Y:
+                    laneNumber = 3;
+                    break;
             }
 
-            // get the key mapped to the current ghost's color
-            Keys colorKey = colorKeyMap[currentlyHighlightedGhost.Color];
-
-            // check if the correct key has been hit
-            if (colorKey == keyPressed)
+            // loop all current ghosts to see if there is a ghost in the shooting range for this lane
+            foreach (Ghost ghost in ghostList)
             {
-                // play a beat
-                HapticFeedback.playBeat(HapticFeedback.GetBeatIntensity(colorKey), HapticFeedback.GetBeatDuration(colorKey));
-
-                KillGhost();
+                // the ghost needs to be in the right lane AND in the shooting range
+                if (ghost.LaneNumber == laneNumber && ghost.IsInShootingRange)
+                {
+                    // kill the ghost
+                    ghost.MustBeDeleted = true;
+                    Trace.WriteLine("You killed ghost-" + ghost.LaneNumber);
+                }
             }
         }
 
         private void KillGhost()
         {
             // reduce number of ghosts alive
-            --numGhostsAlive;
+            /*--numGhostsAlive;
 
             // determine how much score the player gets
             score += 100;
@@ -444,7 +351,7 @@ namespace GhostVibe
 
                 // start a new wave!
                 StartNewWave();
-            }
+            }*/
         }
 
     }

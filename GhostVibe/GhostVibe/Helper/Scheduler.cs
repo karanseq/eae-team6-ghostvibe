@@ -4,8 +4,6 @@ using System.Diagnostics;
 
 namespace Helper
 {
-    public delegate void UpdateDelegate(float deltaTime);
-
     public class Timer
     {
         public static readonly int RepeatForever = -1;

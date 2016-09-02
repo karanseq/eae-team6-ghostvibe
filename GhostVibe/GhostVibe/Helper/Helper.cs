@@ -6,6 +6,10 @@ using System.Threading.Tasks;
 
 namespace Helper
 {
+    // define callback delegates here
+    public delegate void UpdateDelegate(float deltaTime);
+    public delegate void CallbackDelegate();
+
     class Helper
     {
         private static float viewportWidth = 0.0f, viewportHeight = 0.0f;
