@@ -13,18 +13,43 @@ namespace GhostVibe
     {
         private static Random rand = new Random();
         private static int index = -1;
+        private static List<int> indexList = new List<int>() { 0, 1, 2, 3 };
 
         private GhostPosition()
         {
         }
 
+        public static void ResetIndexList()
+        {
+            index = -1;
+            indexList = new List<int>() { 0, 1, 2, 3 };
+        }
+
+        public static void Shuffle()
+        {
+            int count = indexList.Count;
+            while (count > 1)
+            {
+                count--;
+                int k = rand.Next(count + 1);
+                int value = indexList[k];
+                indexList[k] = indexList[count];
+                indexList[count] = value;
+            }
+        }
+
         public static int GetIndex()
         {
             //index = rand.Next(4);
-            //return index;
+            //if (!indexList.Contains(index))
+            //{
+            //    indexList.Add(index);
+            //    return index;
+            //}
+
             ++index;
-            index = (index > 3) ? 0 : index;
-            return index;
+            //index = (index > 3) ? 0 : index;
+            return indexList[index];
         }
 
         public static Vector2 GetInitialPosition(int ind)
