@@ -7,6 +7,8 @@ using Microsoft.Xna.Framework;
 
 namespace GhostVibe
 {
+    // For more information about Particle Engine, please visit
+    // http://rbwhitaker.wikidot.com/2d-particle-engine-1
     public class Particle
     {
         public Texture2D Texture { get; set; }
