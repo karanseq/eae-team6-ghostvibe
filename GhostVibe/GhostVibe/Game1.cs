@@ -57,6 +57,12 @@ namespace GhostVibe
         protected SoundEffect bgm;
         protected SoundEffectInstance bgmInst;
 
+        protected SoundEffect bass;
+        protected SoundEffect tom;
+        protected SoundEffect cymbal;
+        protected SoundEffect snare;
+        protected SoundEffect hihat;
+
         // rhythms
         protected int index = -1;
         protected int rhythm01Count = 20;
@@ -66,13 +72,16 @@ namespace GhostVibe
             2, 2, 2, 2,
             2, 2, 2, 2 };
 
+
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
             graphics.PreferredBackBufferWidth = 1280;
             graphics.PreferredBackBufferHeight = 720;
+
             //graphics.IsFullScreen = true;
             //IsMouseVisible = true;
+
             Content.RootDirectory = "Content";
         }
         
@@ -105,6 +114,11 @@ namespace GhostVibe
             whistle = Content.Load<SoundEffect>("trainwhistle");
             bgm = Content.Load<SoundEffect>("newbgmsize");
             bgmInst = bgm.CreateInstance();
+            bass = Content.Load<SoundEffect>("Bass");
+            tom = Content.Load<SoundEffect>("tom");
+            cymbal = Content.Load<SoundEffect>("cymbal");
+            snare = Content.Load<SoundEffect>("snaredrum");
+            hihat = Content.Load<SoundEffect>("hi-hat_2");
             hallway = Content.Load<Texture2D>("newhallway");
             blueGun = Content.Load<Texture2D>("blue");
             yellowGun = Content.Load<Texture2D>("yellow");
@@ -167,21 +181,25 @@ namespace GhostVibe
             if (acceptKeys && (currentKeyboardState.IsKeyDown(Keys.D) || currentGamepadState.IsButtonDown(Buttons.A)))
             {
                 ShootGhost(Keys.A);
+                snare.Play();
             }
 
             if (acceptKeys && (currentKeyboardState.IsKeyDown(Keys.F) || currentGamepadState.IsButtonDown(Buttons.B)))
             {
                 ShootGhost(Keys.B);
+                hihat.Play();
             }
 
             if (acceptKeys && (currentKeyboardState.IsKeyDown(Keys.J) || currentGamepadState.IsButtonDown(Buttons.X)))
             {
                 ShootGhost(Keys.X);
+                tom.Play();
             }
 
             if (acceptKeys && (currentKeyboardState.IsKeyDown(Keys.K) || currentGamepadState.IsButtonDown(Buttons.Y)))
             {
                 ShootGhost(Keys.Y);
+                cymbal.Play();
             }
         }
 
@@ -265,7 +283,7 @@ namespace GhostVibe
             if (rhythm01[index] != 0)
             {
                 SpawnGhost(rhythm01[index] - 1);
-            }
+            }            
 
             acceptKeys = true;
         }

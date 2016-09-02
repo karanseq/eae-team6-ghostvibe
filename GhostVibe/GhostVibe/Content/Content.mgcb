@@ -205,3 +205,33 @@
 /processorParam:TextureFormat=Color
 /build:ghost_05.png
 
+#begin cymbal.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:cymbal.wav
+
+#begin snaredrum.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:snaredrum.wav
+
+#begin tom.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:tom.wav
+
+#begin Bass.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Bass.wav
+
+#begin hi-hat_2.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:hi-hat_2.wav
+
