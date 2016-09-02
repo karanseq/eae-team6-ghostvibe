@@ -66,12 +66,18 @@ namespace GhostVibe
         protected SoundEffect bgm;
         protected SoundEffectInstance bgmInst;
 
+        protected SoundEffect bass;
+        protected SoundEffect tom;
+        protected SoundEffect cymbal;
+        protected SoundEffect snare;
+        protected SoundEffect hihat;
+
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
             graphics.PreferredBackBufferWidth = 1280;
             graphics.PreferredBackBufferHeight = 720;
-            this.graphics.IsFullScreen = true;
+            //this.graphics.IsFullScreen = true;
             this.IsMouseVisible = true;
             Content.RootDirectory = "Content";
         }
@@ -106,6 +112,11 @@ namespace GhostVibe
             whistle = Content.Load<SoundEffect>("trainwhistle");
             bgm = Content.Load<SoundEffect>("newbgmsize");
             bgmInst = bgm.CreateInstance();
+            bass = Content.Load<SoundEffect>("Bass");
+            tom = Content.Load<SoundEffect>("tom");
+            cymbal = Content.Load<SoundEffect>("cymbal");
+            snare = Content.Load<SoundEffect>("snaredrum");
+            hihat = Content.Load<SoundEffect>("hi-hat_2");
             hallway = Content.Load<Texture2D>("newhallway");
             blueGun = Content.Load<Texture2D>("blue");
             yellowGun = Content.Load<Texture2D>("yellow");
@@ -132,9 +143,9 @@ namespace GhostVibe
             // start scheduled functions
             //HapticFeedback.startBeats(beatFrequency, 0.1f, 0.1f);
             scheduler.scheduleDelegate(delegateTickGhosts, beatFrequency);
-            bgmInst.Volume = 0.3f;
-            bgmInst.IsLooped = true;
-            bgmInst.Play();
+            //bgmInst.Volume = 0.3f;
+            //bgmInst.IsLooped = true;
+            //bgmInst.Play();
             StartNewWave();
         }
 
@@ -166,21 +177,25 @@ namespace GhostVibe
             if (acceptKeys && (currentKeyboardState.IsKeyDown(Keys.D) || currentGamepadState.IsButtonDown(Buttons.A)))
             {
                 ShootGhost(Keys.A);
+                snare.Play();
             }
 
             if (acceptKeys && (currentKeyboardState.IsKeyDown(Keys.F) || currentGamepadState.IsButtonDown(Buttons.B)))
             {
                 ShootGhost(Keys.B);
+                hihat.Play();
             }
 
             if (acceptKeys && (currentKeyboardState.IsKeyDown(Keys.J) || currentGamepadState.IsButtonDown(Buttons.X)))
             {
                 ShootGhost(Keys.X);
+                tom.Play();
             }
 
             if (acceptKeys && (currentKeyboardState.IsKeyDown(Keys.K) || currentGamepadState.IsButtonDown(Buttons.Y)))
             {
                 ShootGhost(Keys.Y);
+                cymbal.Play();
             }
         }
 
@@ -262,7 +277,7 @@ namespace GhostVibe
             {
                 currentState = GameState.Moving;
             }
-
+            
             switch (currentState)
             {
                 case GameState.Spawning:
@@ -278,14 +293,17 @@ namespace GhostVibe
                     MoveGhosts();
                     break;
             }
+
         }
 
         private void SpawnGhosts()
         {
+            
             if (currentState != GameState.Spawning)
             {
                 return;
             }
+            
 
             // check if there are any ghosts still to spawn
             if (remainingGhostsInWave > 0)
@@ -319,10 +337,12 @@ namespace GhostVibe
 
         private void ToggleGhostHighlights()
         {
+            
             if (currentState != GameState.Highlighting && currentState != GameState.Moving)
             {
                 return;
             }
+            
 
             acceptKeys = true;
             // check if there are any ghosts alive
@@ -361,7 +381,7 @@ namespace GhostVibe
 
         private void MoveGhosts()
         {
-            ghostList[prevGhostHoverIndex].MoveForward(2.0f);
+            ghostList[prevGhostHoverIndex].MoveForward(8.0f);
             /*
             foreach (Ghost ghost in ghostList)
             {
