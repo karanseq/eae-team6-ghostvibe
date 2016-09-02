@@ -28,15 +28,17 @@ namespace GhostVibe
         private float scale;
         private string color;
         private int stage;
-        private int initPosNum;
+        private int laneNumber;
 
+        private bool isInShootingRange;
+        private bool mustBeDeleted;
 
-        public Ghost(Texture2D staticTexture, float scaleF, string gColor)
+        public Ghost(Texture2D staticTexture, int positionIndex, float scaleF, string gColor)
         {
-            initPosNum = GhostPosition.GetIndex();
-            StageOnePosition = GhostPosition.GetInitialPosition(initPosNum);
-            StageTwoPosition = GhostPosition.GetSecondPosition(initPosNum);
-            StageThreePosition = GhostPosition.GetThirdPosition(initPosNum);
+            laneNumber = positionIndex; //GhostPosition.GetIndex();
+            StageOnePosition = GhostPosition.GetInitialPosition(laneNumber);
+            StageTwoPosition = GhostPosition.GetSecondPosition(laneNumber);
+            StageThreePosition = GhostPosition.GetThirdPosition(laneNumber);
             currentPos = StageOnePosition;
             ghostImg = Sprite.Create(staticTexture, currentPos);
             scale = scaleF;
@@ -46,14 +48,16 @@ namespace GhostVibe
             stage = 1;
             isInvincible = true;
             isActive = false;
+            isInShootingRange = false;
+            mustBeDeleted = false;
         }
 
-        public Ghost(Texture2D dynamicTexture, int frameW, int frameH, int numFrame, float scaleF, string gColor)
+        public Ghost(Texture2D dynamicTexture, int positionIndex, int frameW, int frameH, int numFrame, float scaleF, string gColor)
         {
-            initPosNum = GhostPosition.GetIndex();
-            StageOnePosition = GhostPosition.GetInitialPosition(initPosNum);
-            StageTwoPosition = GhostPosition.GetSecondPosition(initPosNum);
-            StageThreePosition = GhostPosition.GetThirdPosition(initPosNum);
+            laneNumber = positionIndex; //GhostPosition.GetIndex();
+            StageOnePosition = GhostPosition.GetInitialPosition(laneNumber);
+            StageTwoPosition = GhostPosition.GetSecondPosition(laneNumber);
+            StageThreePosition = GhostPosition.GetThirdPosition(laneNumber);
             currentPos = StageOnePosition;
             ghostAnim = Sprite.Create(dynamicTexture, frameW, frameH, numFrame);
             ghostAnim.Position = currentPos;
@@ -67,6 +71,8 @@ namespace GhostVibe
             stage = 1;
             isInvincible = true;
             isActive = false;
+            isInShootingRange = false;
+            mustBeDeleted = false;
         }
 
         public void MoveForward(float duration)
@@ -114,13 +120,31 @@ namespace GhostVibe
             {
                 ActionManager.Instance.addAction(MoveTo.create(duration, currentPos), ghostAnim);
                 ActionManager.Instance.addAction(ScaleTo.create(duration, scale * 1.4f), ghostAnim);
+
+                Sequence callbackSequence = Sequence.createWithTwoActions(DelayTime.create(duration * 0.8f), CallFunc.create(new CallbackDelegate(EnableInShootingRange)));
+                ActionManager.Instance.addAction(callbackSequence, ghostAnim);
             }
             else
             {
                 ActionManager.Instance.addAction(MoveTo.create(duration, currentPos), ghostImg);
                 ActionManager.Instance.addAction(ScaleTo.create(duration, scale * 1.7f), ghostImg);
+
+                Sequence callbackSequence = Sequence.createWithTwoActions(DelayTime.create(duration * 0.8f), CallFunc.create(new CallbackDelegate(EnableInShootingRange)));
+                ActionManager.Instance.addAction(callbackSequence, ghostImg);
             }
             isInvincible = false;
+        }
+
+        public void EnableInShootingRange()
+        {
+            isInShootingRange = true;
+            ActionManager.Instance.addAction(FadeOut.create(0.1f), ghostImg);
+        }
+
+        public void KilledPlayer()
+        {
+            mustBeDeleted = true;
+            Trace.WriteLine("Ghost-" + laneNumber + " killed you...");
         }
 
         public void GotHitTurnWhite()
@@ -206,6 +230,24 @@ namespace GhostVibe
         {
             get { return color; }
             set { color = value; }
+        }
+
+        public bool IsInShootingRange
+        {
+            get { return isInShootingRange; }
+            set { isInShootingRange = value; }
+        }
+
+        public int LaneNumber
+        {
+            get { return laneNumber; }
+            set { laneNumber = value; }
+        }
+
+        public bool MustBeDeleted
+        {
+            get { return mustBeDeleted; }
+            set { mustBeDeleted = value; }
         }
     }
 }
