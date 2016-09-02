@@ -33,7 +33,7 @@ namespace GhostVibe
         protected Dictionary<string, Texture2D> ghostTextures;
         protected List<Ghost> ghostList;
         protected UpdateDelegate delegateTickGhosts;
-        protected float beatFrequency;
+        protected static float beatFrequency;
 
         // mouse states
         protected MouseState currentMouseState, previousMouseState;
@@ -59,13 +59,12 @@ namespace GhostVibe
 
         // rhythms
         protected int index = -1;
-        protected int rhythm01Count = 24;
-        protected int[] rhythm01 = { 1, 0, 1, 0,
-            1, 0, 1, 0,
-            2, 2, 3, 3,
-            4, 4, 1, 0,
-            2, 0, 3, 0,
-            4, 0, 4, 0 };
+        protected int rhythm01Count = 20;
+        protected int[] rhythm01 = { 2, 2, 2, 2,
+            2, 2, 2, 2,
+            2, 2, 2, 2,
+            2, 2, 2, 2,
+            2, 2, 2, 2 };
 
         public Game1()
         {
@@ -85,7 +84,7 @@ namespace GhostVibe
             Helper.Helper.ViewportHeight = GraphicsDevice.Viewport.Height;
 
             delegateTickGhosts = new UpdateDelegate(TickGhosts);
-            beatFrequency = 0.375f;
+            beatFrequency = 0.5f;
 
             isLeftMouseDown = acceptKeys = false;
             
@@ -209,7 +208,7 @@ namespace GhostVibe
             foreach (Ghost ghost in ghostList)
             {
                 ghost.Update(gameTime);
-                if (ghost.MustBeDeleted)
+                if (ghost.HasFinishedDying)
                 {
                     ghost.Destroy();
                     ghostsToBeDeleted.Add(ghost);
@@ -243,10 +242,11 @@ namespace GhostVibe
 
             if (ghostList.Count != 0)
             {
-                foreach (Ghost ghost in ghostList)
+                //foreach (Ghost ghost in ghostList)
+                for (int i = ghostList.Count - 1; i >= 0; --i)
                 {
-                    ghost.Activate();
-                    ghost.Draw(spriteBatch);
+                    ghostList[i].Activate();
+                    ghostList[i].Draw(spriteBatch);
                 }
             }
 
@@ -298,42 +298,22 @@ namespace GhostVibe
             }
 
             // loop all current ghosts to see if there is a ghost in the shooting range for this lane
-            foreach (Ghost ghost in ghostList)
+            for (int i = 0; i < ghostList.Count; ++i)
             {
+                Ghost ghost = ghostList[i];
+
                 // the ghost needs to be in the right lane AND in the shooting range
                 if (ghost.LaneNumber == laneNumber && ghost.IsInShootingRange)
                 {
                     // kill the ghost
-                    ghost.MustBeDeleted = true;
-                    Trace.WriteLine("You killed ghost-" + ghost.LaneNumber);
+                    ghost.Die(true);
                 }
             }
         }
 
-        private void KillGhost()
+        public static float BeatFrequency
         {
-            // reduce number of ghosts alive
-            /*--numGhostsAlive;
-
-            // determine how much score the player gets
-            score += 100;
-
-            // reduce opacity and play sounds
-            ghostList[prevGhostHoverIndex].Image.Opacity = 0.2f;
-            ghostPoof.Play();
-
-            if (numGhostsAlive <= 0)
-            {
-                // wave over...delete all ghosts
-                foreach (Ghost ghost in ghostList)
-                {
-                    actionManager.removeAllActionsFromTarget(ghost.Image);
-                }
-                ghostList.Clear();
-
-                // start a new wave!
-                StartNewWave();
-            }*/
+            get { return Game1.beatFrequency; }
         }
 
     }

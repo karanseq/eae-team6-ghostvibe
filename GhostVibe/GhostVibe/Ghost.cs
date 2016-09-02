@@ -31,7 +31,8 @@ namespace GhostVibe
         private int laneNumber;
 
         private bool isInShootingRange;
-        private bool mustBeDeleted;
+        private bool isDying;
+        private bool hasFinishedDying;
 
         public Ghost(Texture2D staticTexture, int positionIndex, float scaleF, string gColor)
         {
@@ -49,7 +50,8 @@ namespace GhostVibe
             isInvincible = true;
             isActive = false;
             isInShootingRange = false;
-            mustBeDeleted = false;
+            isDying = false;
+            hasFinishedDying = false;
         }
 
         public Ghost(Texture2D dynamicTexture, int positionIndex, int frameW, int frameH, int numFrame, float scaleF, string gColor)
@@ -72,79 +74,70 @@ namespace GhostVibe
             isInvincible = true;
             isActive = false;
             isInShootingRange = false;
-            mustBeDeleted = false;
+            isDying = false;
+            hasFinishedDying = false;
         }
 
         public void MoveForward(float duration)
         {
             isInvincible = true;
-            /*
-            if (stage == 1)
-            {
-                currentPos = StageTwoPosition;
-                if (isAnimated)
-                {
-                    ActionManager.Instance.addAction(MoveTo.create(duration, StageTwoPosition), ghostAnim);
-                    ActionManager.Instance.addAction(ScaleTo.create(duration, scale * 1.4f), ghostAnim);
-                }
-                else
-                {
-                    ActionManager.Instance.addAction(MoveTo.create(duration, StageTwoPosition), ghostImg);
-                    ActionManager.Instance.addAction(ScaleTo.create(duration, scale * 1.4f), ghostImg);
-                }
-                stage++;
-            }
-            else if (stage == 2)
-            {
-                currentPos = StageThreePosition;
-                if (isAnimated)
-                {
-                    ActionManager.Instance.addAction(MoveTo.create(duration, StageThreePosition), ghostAnim);
-                    ActionManager.Instance.addAction(ScaleTo.create(duration, scale * 1.7f), ghostAnim);
-                }
-                else
-                {
-                    ActionManager.Instance.addAction(MoveTo.create(duration, StageThreePosition), ghostImg);
-                    ActionManager.Instance.addAction(ScaleTo.create(duration, scale * 1.7f), ghostImg);
-                }
-                stage++;
-            }
-            else
-            {
-                Destroy();
-                return;
-            }
-            */
+            
             currentPos = StageThreePosition;
-            if (isAnimated)
-            {
-                ActionManager.Instance.addAction(MoveTo.create(duration, currentPos), ghostAnim);
-                ActionManager.Instance.addAction(ScaleTo.create(duration, scale * 1.4f), ghostAnim);
+            Sprite sprite = isAnimated ? ghostAnim : ghostImg;
+            
+            // animate the movement and scaling
+            ActionManager.Instance.addAction(MoveTo.create(duration, currentPos), sprite);
+            ActionManager.Instance.addAction(ScaleTo.create(duration, scale * 1.4f), sprite);
 
-                Sequence callbackSequence = Sequence.createWithTwoActions(DelayTime.create(duration * 0.8f), CallFunc.create(new CallbackDelegate(EnableInShootingRange)));
-                ActionManager.Instance.addAction(callbackSequence, ghostAnim);
-            }
-            else
-            {
-                ActionManager.Instance.addAction(MoveTo.create(duration, currentPos), ghostImg);
-                ActionManager.Instance.addAction(ScaleTo.create(duration, scale * 1.7f), ghostImg);
+            // callback to notify that the ghost has reached the shooting range
+            Scheduler.Instance.scheduleDelegateOnce(new UpdateDelegate(EnableInShootingRange), duration * 0.75f);
+            // callback to notify that the ghost has finished moving
+            Scheduler.Instance.scheduleDelegateOnce(new UpdateDelegate(FinishedMoving), duration);
 
-                Sequence callbackSequence = Sequence.createWithTwoActions(DelayTime.create(duration * 0.8f), CallFunc.create(new CallbackDelegate(EnableInShootingRange)));
-                ActionManager.Instance.addAction(callbackSequence, ghostImg);
-            }
             isInvincible = false;
         }
 
-        public void EnableInShootingRange()
+        public void EnableInShootingRange(float dt)
         {
             isInShootingRange = true;
-            ActionManager.Instance.addAction(FadeOut.create(0.1f), ghostImg);
         }
 
-        public void KilledPlayer()
+        public void FinishedMoving(float dt)
         {
-            mustBeDeleted = true;
-            Trace.WriteLine("Ghost-" + laneNumber + " killed you...");
+            Die(false);
+        }
+
+        public void Die(bool killedByPlayer)
+        {
+            // even a ghost can die only once...
+            if (isDying) return;
+
+            isDying = true;
+
+            // find which sprite is being used
+            Sprite sprite = isAnimated ? ghostAnim : ghostImg;
+
+            // if not killed by player, play the slicing animation
+            if (!killedByPlayer)
+            {
+                sprite.Color = Microsoft.Xna.Framework.Color.RosyBrown;
+                Trace.WriteLine("Ghost-" + laneNumber + " killed you...");
+            }
+            else
+            {
+                sprite.Color = Microsoft.Xna.Framework.Color.Green;
+                Trace.WriteLine("You killed Ghost-" + laneNumber + "...");
+            }
+
+            // callback a function when the death animation is finished
+            Sequence deathSequence = Sequence.createWithTwoActions(ScaleTo.create(Game1.BeatFrequency, 1.0f), CallFunc.create(new CallbackDelegate(FinishedDying)));
+            ActionManager.Instance.addAction(deathSequence, sprite);
+            ActionManager.Instance.addAction(FadeOut.create(Game1.BeatFrequency), sprite);
+        }
+
+        public void FinishedDying()
+        {
+            hasFinishedDying = true;
         }
 
         public void GotHitTurnWhite()
@@ -238,16 +231,17 @@ namespace GhostVibe
             set { isInShootingRange = value; }
         }
 
+        public bool HasFinishedDying
+        {
+            get { return hasFinishedDying; }
+            set { hasFinishedDying = value; }
+        }
+
         public int LaneNumber
         {
             get { return laneNumber; }
             set { laneNumber = value; }
         }
-
-        public bool MustBeDeleted
-        {
-            get { return mustBeDeleted; }
-            set { mustBeDeleted = value; }
-        }
+        
     }
 }
