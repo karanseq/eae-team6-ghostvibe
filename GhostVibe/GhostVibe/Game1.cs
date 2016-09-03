@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Collections.Generic;
 using System;
 using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework.Media;
 
 namespace GhostVibe
 {
@@ -20,7 +21,7 @@ namespace GhostVibe
         protected Texture2D animationTexture, spriteTexture;
         protected Texture2D hallway;
         protected Texture2D blueGun, greenGun, redGun, yellowGun;
-        protected SpriteFont arialFont;
+        protected SpriteFont UIFont;
 
         protected readonly int maxColors = 4;
         protected string[] colorNames = { "plain", "blue", "green", "red", "yellow" };
@@ -58,19 +59,21 @@ namespace GhostVibe
         protected SoundEffectInstance bgmInst;
 
         protected SoundEffect bass;
-        protected SoundEffect tom;
-        protected SoundEffect cymbal;
-        protected SoundEffect snare;
-        protected SoundEffect hihat;
+        protected SoundEffect A;
+        protected SoundEffect C;
+        protected SoundEffect E;
+        protected SoundEffect highA;
+        protected SoundEffect positive;
+        protected SoundEffect negative;
 
         // rhythms
         protected int index = -1;
         protected int rhythm01Count = 20;
-        protected int[] rhythm01 = { 2, 2, 2, 2,
-            2, 2, 2, 2,
-            2, 2, 2, 2,
-            2, 2, 2, 2,
-            2, 2, 2, 2 };
+        protected int[] rhythm01 = { 1, 2, 3, 4,
+            1, 2, 1, 2,
+            2, 4, 2, 4,
+            4, 3, 2, 1,
+            3, 1, 3, 1 };
 
 
         public Game1()
@@ -108,17 +111,19 @@ namespace GhostVibe
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            arialFont = Content.Load<SpriteFont>("Arial");
+            UIFont = Content.Load<SpriteFont>("interface");
             ghostPoof = Content.Load<SoundEffect>("ghostpoof");
             ghostSpawn = Content.Load<SoundEffect>("newghostspawn");
-            whistle = Content.Load<SoundEffect>("trainwhistle");
+            //whistle = Content.Load<SoundEffect>("trainwhistle");
             bgm = Content.Load<SoundEffect>("newbgmsize");
             bgmInst = bgm.CreateInstance();
             bass = Content.Load<SoundEffect>("Bass");
-            tom = Content.Load<SoundEffect>("tom");
-            cymbal = Content.Load<SoundEffect>("cymbal");
-            snare = Content.Load<SoundEffect>("snaredrum");
-            hihat = Content.Load<SoundEffect>("hi-hat_2");
+            A = Content.Load<SoundEffect>("A2");
+            C = Content.Load<SoundEffect>("C2");
+            E = Content.Load<SoundEffect>("E2");
+            highA = Content.Load<SoundEffect>("highA2");
+            positive = Content.Load<SoundEffect>("happysound");
+            negative = Content.Load<SoundEffect>("badsound");
             hallway = Content.Load<Texture2D>("newhallway");
             blueGun = Content.Load<Texture2D>("blue");
             yellowGun = Content.Load<Texture2D>("yellow");
@@ -148,7 +153,7 @@ namespace GhostVibe
 
             bgmInst.Volume = 0.3f;
             bgmInst.IsLooped = true;
-            bgmInst.Play();
+            //bgmInst.Play();
 
             ghostList = new List<Ghost>();
         }
@@ -181,25 +186,25 @@ namespace GhostVibe
             if (acceptKeys && (currentKeyboardState.IsKeyDown(Keys.D) || currentGamepadState.IsButtonDown(Buttons.A)))
             {
                 ShootGhost(Keys.A);
-                snare.Play();
+                A.Play();
             }
 
             if (acceptKeys && (currentKeyboardState.IsKeyDown(Keys.F) || currentGamepadState.IsButtonDown(Buttons.B)))
             {
                 ShootGhost(Keys.B);
-                hihat.Play();
+                C.Play();
             }
 
             if (acceptKeys && (currentKeyboardState.IsKeyDown(Keys.J) || currentGamepadState.IsButtonDown(Buttons.X)))
             {
                 ShootGhost(Keys.X);
-                tom.Play();
+                E.Play();
             }
 
             if (acceptKeys && (currentKeyboardState.IsKeyDown(Keys.K) || currentGamepadState.IsButtonDown(Buttons.Y)))
             {
                 ShootGhost(Keys.Y);
-                cymbal.Play();
+                highA.Play();
             }
         }
 
@@ -241,9 +246,9 @@ namespace GhostVibe
 
         private void DrawUI()
         {
-            spriteBatch.DrawString(arialFont, "Score: " + score, new Vector2(GraphicsDevice.Viewport.Width / 2 - 400, 27), Color.Black, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 1.0f);
-            //spriteBatch.DrawString(arialFont, "Life: " + lifeRemaining, new Vector2(20, GraphicsDevice.Viewport.Height - 50), Color.Black, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 1.0f);
-            spriteBatch.DrawString(arialFont, "Green: D, Red: F, Blue: J, Yellow: K", new Vector2(GraphicsDevice.Viewport.Width / 2 - 100, 27), Color.Black, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 1.0f);
+            spriteBatch.DrawString(UIFont, "Score: " + score, new Vector2(GraphicsDevice.Viewport.Width / 2 - 400, 30), Color.Black, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 1.0f);
+            //spriteBatch.DrawString(UIFont, "Life: " + lifeRemaining, new Vector2(20, GraphicsDevice.Viewport.Height - 50), Color.Black, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 1.0f);
+            spriteBatch.DrawString(UIFont, "Green: D, Red: F, Blue: J, Yellow: K", new Vector2(GraphicsDevice.Viewport.Width / 2 - 100, 30), Color.Black, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 1.0f);
         }
 
         protected override void Draw(GameTime gameTime)
@@ -297,6 +302,9 @@ namespace GhostVibe
 
         private void ShootGhost(Keys keyPressed)
         {
+            // stop listening for keys
+            acceptKeys = false;
+
             // first get the lane number based on the key pressed
             int laneNumber = 0;
             switch (keyPressed)
@@ -325,8 +333,33 @@ namespace GhostVibe
                 {
                     // kill the ghost
                     ghost.Die(true);
+
+                    // play positive sound here
+                    switch(keyPressed)
+                    {
+                        case Keys.A:
+                            A.Play();
+                            break;
+                        case Keys.B:
+                            C.Play();
+                            break;
+                        case Keys.X:
+                            E.Play();
+                            break;
+                        case Keys.Y:
+                            highA.Play();
+                            break;
+                    }
+
+                    Trace.WriteLine("Happy...");
+
+                    return;
                 }
             }
+
+            // play sound when player misses ghost
+            negative.Play();
+            Trace.WriteLine("Not happy...");
         }
 
         public static float BeatFrequency

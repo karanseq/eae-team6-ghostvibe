@@ -121,12 +121,10 @@ namespace GhostVibe
             if (!killedByPlayer)
             {
                 sprite.Color = Microsoft.Xna.Framework.Color.RosyBrown;
-                Trace.WriteLine("Ghost-" + laneNumber + " killed you...");
             }
             else
             {
                 sprite.Color = Microsoft.Xna.Framework.Color.Green;
-                Trace.WriteLine("You killed Ghost-" + laneNumber + "...");
             }
 
             // callback a function when the death animation is finished
