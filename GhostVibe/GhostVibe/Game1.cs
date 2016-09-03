@@ -135,7 +135,7 @@ namespace GhostVibe
             scheduler.scheduleDelegate(delegateTickClock, 1.0f);
 
             // generate first rhythm
-            currentDifficultyIndex = 9;
+            currentDifficultyIndex = 0;
             beatFrequency = 0.4f;
             rhythm = Helper.Helper.GenerateRhythm(currentDifficultyIndex, beatFrequency, random);
 
