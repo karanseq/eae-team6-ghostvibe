@@ -31,6 +31,7 @@ namespace GhostVibe
         private int laneNumber;
 
         private bool isInShootingRange;
+        private bool wasKilledByPlayer;
         private bool isDying;
         private bool hasFinishedDying;
 
@@ -50,6 +51,7 @@ namespace GhostVibe
             isInvincible = true;
             isActive = false;
             isInShootingRange = false;
+            wasKilledByPlayer = false;
             isDying = false;
             hasFinishedDying = false;
         }
@@ -74,6 +76,7 @@ namespace GhostVibe
             isInvincible = true;
             isActive = false;
             isInShootingRange = false;
+            wasKilledByPlayer = false;
             isDying = false;
             hasFinishedDying = false;
         }
@@ -90,7 +93,7 @@ namespace GhostVibe
             ActionManager.Instance.addAction(ScaleTo.create(duration, scale * 1.4f), sprite);
 
             // callback to notify that the ghost has reached the shooting range
-            Scheduler.Instance.scheduleDelegateOnce(new UpdateDelegate(EnableInShootingRange), duration * 0.75f);
+            Scheduler.Instance.scheduleDelegateOnce(new UpdateDelegate(EnableInShootingRange), duration * 0.5f);
             // callback to notify that the ghost has finished moving
             Scheduler.Instance.scheduleDelegateOnce(new UpdateDelegate(FinishedMoving), duration);
 
@@ -113,6 +116,7 @@ namespace GhostVibe
             if (isDying) return;
 
             isDying = true;
+            wasKilledByPlayer = killedByPlayer;
 
             // find which sprite is being used
             Sprite sprite = isAnimated ? ghostAnim : ghostImg;
@@ -121,12 +125,10 @@ namespace GhostVibe
             if (!killedByPlayer)
             {
                 sprite.Color = Microsoft.Xna.Framework.Color.RosyBrown;
-                Trace.WriteLine("Ghost-" + laneNumber + " killed you...");
             }
             else
             {
                 sprite.Color = Microsoft.Xna.Framework.Color.Green;
-                Trace.WriteLine("You killed Ghost-" + laneNumber + "...");
             }
 
             // callback a function when the death animation is finished
@@ -228,13 +230,21 @@ namespace GhostVibe
         public bool IsInShootingRange
         {
             get { return isInShootingRange; }
-            set { isInShootingRange = value; }
+        }
+
+        public bool WasKilledByPlayer
+        {
+            get { return wasKilledByPlayer; }
+        }
+
+        public bool IsDying
+        {
+            get { return isDying; }
         }
 
         public bool HasFinishedDying
         {
             get { return hasFinishedDying; }
-            set { hasFinishedDying = value; }
         }
 
         public int LaneNumber

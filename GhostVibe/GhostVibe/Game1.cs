@@ -46,7 +46,7 @@ namespace GhostVibe
         // gamepad states
         private GamePadState currentGamepadState, previousGamepadState;
 
-        protected int score;
+        protected int score, streak, multiplier;
         protected int lifeRemaining;
         public Random random;
 
@@ -138,12 +138,14 @@ namespace GhostVibe
             scheduler.scheduleDelegate(delegateTickClock, 1.0f);
 
             // generate first rhythm
-            currentDifficultyIndex = 8;
-            beatFrequency = 0.35f;
+            currentDifficultyIndex = 0;
+            beatFrequency = 0.4f;
             rhythm = Helper.Helper.GenerateRhythm(currentDifficultyIndex, beatFrequency, random);
 
             // initialize score and health
             score = 0;
+            streak = 0;
+            multiplier = 1;
             lifeRemaining = 3;
 
             isLeftMouseDown = acceptKeys = false;
@@ -207,6 +209,14 @@ namespace GhostVibe
                 ShootGhost(Keys.Y);
                 cymbal.Play();
             }
+
+            if (!acceptKeys)
+            {
+                acceptKeys = (currentKeyboardState.IsKeyUp(Keys.D) && currentGamepadState.IsButtonUp(Buttons.A) &&
+                    currentKeyboardState.IsKeyUp(Keys.F) && currentGamepadState.IsButtonUp(Buttons.B) &&
+                    currentKeyboardState.IsKeyUp(Keys.J) && currentGamepadState.IsButtonUp(Buttons.X) &&
+                    currentKeyboardState.IsKeyUp(Keys.K) && currentGamepadState.IsButtonUp(Buttons.Y));
+            }
         }
 
         private void UpdateMouse()
@@ -240,7 +250,14 @@ namespace GhostVibe
             }
 
             foreach (Ghost ghost in ghostsToBeDeleted)
-            {                
+            {
+                // if ghost was not killed by the player, reset the streak and multiplier
+                if (!ghost.WasKilledByPlayer)
+                {
+                    streak = 0;
+                    multiplier = 1;
+                }
+
                 ghostList.Remove(ghost);
             }
         }
@@ -284,10 +301,13 @@ namespace GhostVibe
         private void TickClock(float deltaTime)
         {
             ++seconds;
-            if (seconds >= Helper.Helper.DifficultyMatrix[currentDifficultyIndex])
+            if (seconds >= Helper.Helper.difficultyTimeMatrix[currentDifficultyIndex])
             {
                 ++currentDifficultyIndex;
                 currentDifficultyIndex = currentDifficultyIndex > Helper.Helper.maxDifficulty ? currentDifficultyIndex - 1 : currentDifficultyIndex;
+                rhythm.Clear();
+                rhythm = Helper.Helper.GenerateRhythm(currentDifficultyIndex, beatFrequency, random);
+                Trace.WriteLine("Difficulty upgraded to " + currentDifficultyIndex + "...");
             }
         }
 
@@ -308,9 +328,6 @@ namespace GhostVibe
             {
                 SpawnGhost(rhythm[index] - 1);
             }
-
-            // start accepting keys every tick
-            acceptKeys = true;
         }
 
         private void SpawnGhost(int laneNumber)
@@ -322,6 +339,8 @@ namespace GhostVibe
 
         private void ShootGhost(Keys keyPressed)
         {
+            acceptKeys = false;
+
             // first get the lane number based on the key pressed
             int laneNumber = 0;
             switch (keyPressed)
@@ -345,13 +364,38 @@ namespace GhostVibe
             {
                 Ghost ghost = ghostList[i];
 
-                // the ghost needs to be in the right lane AND in the shooting range
-                if (ghost.LaneNumber == laneNumber && ghost.IsInShootingRange)
+                // the ghost needs to be in the right lane AND in the shooting range AND not already killed
+                if (ghost.LaneNumber == laneNumber && ghost.IsInShootingRange && !ghost.IsDying)
                 {
                     // kill the ghost
                     ghost.Die(true);
+
+                    // update streak
+                    ++streak;
+
+                    // check if the multiplier needs to be upgraded
+                    for (int j = Helper.Helper.numMultipliers - 1; j >= multiplier - 1; --j)
+                    {
+                        // check if streak has exceeded the required value
+                        if (streak >= Helper.Helper.multiplier[j])
+                        {
+                            // increase multiplier
+                            multiplier = j + 2;
+                            // reset streak
+                            streak = 0;
+                            Trace.WriteLine("Multiplier upgraded to " + multiplier + "...");
+                            break;
+                        }
+                    }
+
+                    // update score
+                    score += 10 * multiplier;
+                    return;
                 }
             }
+
+            streak = 0;
+            multiplier = 1;
         }
 
         public static float BeatFrequency

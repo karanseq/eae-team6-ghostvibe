@@ -17,7 +17,8 @@ namespace Helper
 
         public static readonly int maxNotesInBar = 8;
         public static readonly int maxDifficulty = 9;
-        public static readonly Dictionary<int, int> DifficultyMatrix = new Dictionary<int, int> { {0, 15},
+        public static readonly Dictionary<int, int> difficultyTimeMatrix = new Dictionary<int, int> {
+            {0, 5},
             {1, 10},
             {2, 25},
             {3, 45},
@@ -28,6 +29,22 @@ namespace Helper
             {8, 310},
             {9, 400}
         };
+        public static readonly Dictionary<int, int> difficultyRhythmMatrix = new Dictionary<int, int>
+        {
+            {0, 2},
+            {1, 3},
+            {2, 4},
+            {3, 4},
+            {4, 5},
+            {5, 5},
+            {6, 6},
+            {7, 6},
+            {8, 7},
+            {9, 8}
+        };
+
+        public static readonly int numMultipliers = 4;
+        public static readonly List<int> multiplier = new List<int> { 10, 20, 50, 100 };
 
         private Helper()
         { }
@@ -57,81 +74,14 @@ namespace Helper
         public static List<int> GenerateRhythm(int currentDifficulty, float beatFrequency, Random random)
         {
             // first calculate how many notes we need in this rhythm
-            int numNotes = (int)(DifficultyMatrix[currentDifficulty] / beatFrequency);
+            int numNotes = (int)(difficultyTimeMatrix[currentDifficulty] / beatFrequency);
             
             // initialize the rhythm
             List<int> rhythm = new List<int>(new int[numNotes]);
 
             // initialize variables to be used for the note generation
-            int numTypes = 0, numNotesPerBar = 0;
-            List<int> noteTypes;
-
-            switch (currentDifficulty)
-            {
-                case 0:
-                    numTypes = 2;
-                    numNotesPerBar = 1;
-                    break;
-                case 1:
-                    numTypes = 2;
-                    numNotesPerBar = 2;
-                    break;
-                case 2:
-                    numTypes = 3;
-                    numNotesPerBar = 2;
-                    break;
-                case 3:
-                    numTypes = 4;
-                    numNotesPerBar = 4;
-                    break;
-                case 4:
-                    numTypes = 2;
-                    numNotesPerBar = 4;
-                    break;
-                case 5:
-                    numTypes = 3;
-                    numNotesPerBar = 4;
-                    break;
-                case 6:
-                    numTypes = 4;
-                    numNotesPerBar = 4;
-                    break;
-                case 7:
-                    numTypes = 2;
-                    numNotesPerBar = 8;
-                    break;
-                case 8:
-                    numTypes = 3;
-                    numNotesPerBar = 8;
-                    break;
-                case 9:
-                    numTypes = 4;
-                    numNotesPerBar = 8;
-                    break;
-            }
-
-            noteTypes = new List<int>(new int[numTypes]);
-            // pick <numTypes> notes from the 4
-            for (int i = 0; i < numTypes; ++i)
-            {
-                // randomly pick a note
-                noteTypes[i] = 1 + random.Next(4);
-
-                // ensure it is not repeated
-                for (int j = 0; j < numTypes; ++j)
-                {
-                    // check other notes
-                    if (i == j) continue;
-
-                    // if same note, search again
-                    if (noteTypes[i] == noteTypes[j])
-                    {
-                        --i;
-                        break;
-                    }
-                }
-            }
-
+            int numNotesPerBar = difficultyRhythmMatrix[currentDifficulty];
+            
             // feed in the notes
             for (int i = 0; i < numNotes; ++i)
             {
