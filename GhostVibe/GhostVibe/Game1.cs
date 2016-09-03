@@ -74,7 +74,7 @@ namespace GhostVibe
             graphics.PreferredBackBufferHeight = 720;
 
             //graphics.IsFullScreen = true;
-            //IsMouseVisible = true;
+            //this.IsMouseVisible = true;
 
             Content.RootDirectory = "Content";
         }
@@ -151,9 +151,9 @@ namespace GhostVibe
             HapticFeedback.startBeats(beatFrequency, 0.1f, 0.1f);
             scheduler.scheduleDelegate(delegateTickGhosts, beatFrequency);
 
-            bgmInst.Volume = 0.3f;
+            bgmInst.Volume = 0.5f;
             bgmInst.IsLooped = true;
-            //bgmInst.Play();
+            bgmInst.Play();
 
             ghostList = new List<Ghost>();
         }
@@ -183,25 +183,25 @@ namespace GhostVibe
             previousGamepadState = currentGamepadState;
             currentGamepadState = GamePad.GetState(PlayerIndex.One);
 
-            if (acceptKeys && (currentKeyboardState.IsKeyDown(Keys.D) || currentGamepadState.IsButtonDown(Buttons.A)))
+            if (acceptKeys && (currentKeyboardState.IsKeyDown(Keys.D) || currentGamepadState.IsButtonDown(Buttons.LeftTrigger)))
             {
                 ShootGhost(Keys.A);
                 A.Play();
             }
 
-            if (acceptKeys && (currentKeyboardState.IsKeyDown(Keys.F) || currentGamepadState.IsButtonDown(Buttons.B)))
+            if (acceptKeys && (currentKeyboardState.IsKeyDown(Keys.F) || currentGamepadState.IsButtonDown(Buttons.LeftShoulder)))
             {
                 ShootGhost(Keys.B);
                 C.Play();
             }
 
-            if (acceptKeys && (currentKeyboardState.IsKeyDown(Keys.J) || currentGamepadState.IsButtonDown(Buttons.X)))
+            if (acceptKeys && (currentKeyboardState.IsKeyDown(Keys.J) || currentGamepadState.IsButtonDown(Buttons.RightShoulder)))
             {
                 ShootGhost(Keys.X);
                 E.Play();
             }
 
-            if (acceptKeys && (currentKeyboardState.IsKeyDown(Keys.K) || currentGamepadState.IsButtonDown(Buttons.Y)))
+            if (acceptKeys && (currentKeyboardState.IsKeyDown(Keys.K) || currentGamepadState.IsButtonDown(Buttons.RightTrigger)))
             {
                 ShootGhost(Keys.Y);
                 highA.Play();
