@@ -74,7 +74,7 @@ namespace GhostVibe
             graphics.PreferredBackBufferHeight = 720;
 
             //graphics.IsFullScreen = true;
-            //IsMouseVisible = true;
+            //this.IsMouseVisible = true;
 
             Content.RootDirectory = "Content";
         }
@@ -151,9 +151,9 @@ namespace GhostVibe
             HapticFeedback.startBeats(beatFrequency, 0.1f, 0.1f);
             scheduler.scheduleDelegate(delegateTickGhosts, beatFrequency);
 
-            bgmInst.Volume = 0.3f;
+            bgmInst.Volume = 0.5f;
             bgmInst.IsLooped = true;
-            //bgmInst.Play();
+            bgmInst.Play();
 
             ghostList = new List<Ghost>();
         }
@@ -183,25 +183,25 @@ namespace GhostVibe
             previousGamepadState = currentGamepadState;
             currentGamepadState = GamePad.GetState(PlayerIndex.One);
 
-            if (acceptKeys && (currentKeyboardState.IsKeyDown(Keys.D) || currentGamepadState.IsButtonDown(Buttons.A)))
+            if (acceptKeys && (currentKeyboardState.IsKeyDown(Keys.D) || currentGamepadState.IsButtonDown(Buttons.LeftTrigger)))
             {
                 ShootGhost(Keys.A);
                 A.Play();
             }
 
-            if (acceptKeys && (currentKeyboardState.IsKeyDown(Keys.F) || currentGamepadState.IsButtonDown(Buttons.B)))
+            if (acceptKeys && (currentKeyboardState.IsKeyDown(Keys.F) || currentGamepadState.IsButtonDown(Buttons.LeftShoulder)))
             {
                 ShootGhost(Keys.B);
                 C.Play();
             }
 
-            if (acceptKeys && (currentKeyboardState.IsKeyDown(Keys.J) || currentGamepadState.IsButtonDown(Buttons.X)))
+            if (acceptKeys && (currentKeyboardState.IsKeyDown(Keys.J) || currentGamepadState.IsButtonDown(Buttons.RightShoulder)))
             {
                 ShootGhost(Keys.X);
                 E.Play();
             }
 
-            if (acceptKeys && (currentKeyboardState.IsKeyDown(Keys.K) || currentGamepadState.IsButtonDown(Buttons.Y)))
+            if (acceptKeys && (currentKeyboardState.IsKeyDown(Keys.K) || currentGamepadState.IsButtonDown(Buttons.RightTrigger)))
             {
                 ShootGhost(Keys.Y);
                 highA.Play();
@@ -209,10 +209,10 @@ namespace GhostVibe
 
             if (!acceptKeys)
             {
-                acceptKeys = (currentKeyboardState.IsKeyUp(Keys.D) && currentGamepadState.IsButtonUp(Buttons.A) &&
-                    currentKeyboardState.IsKeyUp(Keys.F) && currentGamepadState.IsButtonUp(Buttons.B) &&
-                    currentKeyboardState.IsKeyUp(Keys.J) && currentGamepadState.IsButtonUp(Buttons.X) &&
-                    currentKeyboardState.IsKeyUp(Keys.K) && currentGamepadState.IsButtonUp(Buttons.Y));
+                acceptKeys = (currentKeyboardState.IsKeyUp(Keys.D) && currentGamepadState.IsButtonUp(Buttons.LeftTrigger) &&
+                    currentKeyboardState.IsKeyUp(Keys.F) && currentGamepadState.IsButtonUp(Buttons.LeftShoulder) &&
+                    currentKeyboardState.IsKeyUp(Keys.J) && currentGamepadState.IsButtonUp(Buttons.RightShoulder) &&
+                    currentKeyboardState.IsKeyUp(Keys.K) && currentGamepadState.IsButtonUp(Buttons.RightTrigger));
             }
         }
 
@@ -263,7 +263,7 @@ namespace GhostVibe
         private void DrawUI()
         {
             spriteBatch.DrawString(UIFont, "Score: " + score, new Vector2(GraphicsDevice.Viewport.Width / 2 - 400, 30), Color.Blue, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 1.0f);
-            //spriteBatch.DrawString(UIFont, "Life: " + lifeRemaining, new Vector2(20, GraphicsDevice.Viewport.Height - 50), Color.Black, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 1.0f);
+            spriteBatch.DrawString(UIFont, "Life: " + lifeRemaining, new Vector2(20, GraphicsDevice.Viewport.Height - 50), Color.Purple, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 1.0f);
             spriteBatch.DrawString(UIFont, "Green: D, Red: F, Blue: J, Yellow: K", new Vector2(GraphicsDevice.Viewport.Width / 2 - 100, 30), Color.ForestGreen, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 1.0f);
         }
 
