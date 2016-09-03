@@ -251,7 +251,21 @@ namespace GhostVibe
                 // if ghost was not killed by the player, reset the streak and multiplier
                 if (!ghost.WasKilledByPlayer)
                 {
+                    // deduct life
                     --lifeRemaining;
+                    // TODO: remove the '<=' from below condition
+                    if (lifeRemaining <= 0)
+                    {
+                        // TODO: remove the following statement
+                        lifeRemaining = 0;
+
+                        // stop everything!
+                        scheduler.unscheduleDelegate(delegateTickClock);
+                        scheduler.unscheduleDelegate(delegateTickGhosts);
+                        HapticFeedback.stopBeats();
+                    }
+
+                    // reset streak and multiplier
                     streak = 0;
                     multiplier = 1;
                 }
