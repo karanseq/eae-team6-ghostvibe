@@ -20,7 +20,7 @@ namespace GhostVibe
 
         protected Texture2D animationTexture, spriteTexture;
         protected Texture2D hallway;
-        protected Texture2D blueGun, greenGun, redGun, yellowGun;
+        //protected Texture2D blueGun, greenGun, redGun, yellowGun;
         protected SpriteFont UIFont;
 
         protected readonly int maxColors = 4;
@@ -106,10 +106,10 @@ namespace GhostVibe
             positive = Content.Load<SoundEffect>("happysound");
             negative = Content.Load<SoundEffect>("badsound");
             hallway = Content.Load<Texture2D>("newhallway");
-            blueGun = Content.Load<Texture2D>("blue");
-            yellowGun = Content.Load<Texture2D>("yellow");
-            greenGun = Content.Load<Texture2D>("green");
-            redGun = Content.Load<Texture2D>("red");
+            //blueGun = Content.Load<Texture2D>("blue");
+            //yellowGun = Content.Load<Texture2D>("yellow");
+            //greenGun = Content.Load<Texture2D>("green");
+            //redGun = Content.Load<Texture2D>("red");
 
             ghostTextures = new Dictionary<string, Texture2D>();
             ghostTextures.Add("plain", Content.Load<Texture2D>("ghost_01"));
@@ -151,7 +151,7 @@ namespace GhostVibe
             HapticFeedback.startBeats(beatFrequency, 0.1f, 0.1f);
             scheduler.scheduleDelegate(delegateTickGhosts, beatFrequency);
 
-            bgmInst.Volume = 0.5f;
+            bgmInst.Volume = 1.0f;
             bgmInst.IsLooped = true;
             bgmInst.Play();
 
