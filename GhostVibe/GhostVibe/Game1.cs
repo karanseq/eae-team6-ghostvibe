@@ -135,7 +135,7 @@ namespace GhostVibe
             scheduler.scheduleDelegate(delegateTickClock, 1.0f);
 
             // generate first rhythm
-            currentDifficultyIndex = 0;
+            currentDifficultyIndex = 9;
             beatFrequency = 0.4f;
             rhythm = Helper.Helper.GenerateRhythm(currentDifficultyIndex, beatFrequency, random);
 
@@ -143,7 +143,7 @@ namespace GhostVibe
             score = 0;
             streak = 0;
             multiplier = 1;
-            lifeRemaining = 3;
+            lifeRemaining = 10;
 
             isLeftMouseDown = acceptKeys = false;
 
@@ -251,6 +251,7 @@ namespace GhostVibe
                 // if ghost was not killed by the player, reset the streak and multiplier
                 if (!ghost.WasKilledByPlayer)
                 {
+                    --lifeRemaining;
                     streak = 0;
                     multiplier = 1;
                 }
