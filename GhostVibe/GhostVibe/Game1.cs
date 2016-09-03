@@ -32,7 +32,7 @@ namespace GhostVibe
 
         protected Dictionary<string, Texture2D> ghostTextures;
         protected List<Ghost> ghostList;
-        protected UpdateDelegate delegateTickGhosts;
+        protected UpdateDelegate delegateTickGhosts, delegateTickClock;
         protected static float beatFrequency;
 
         // mouse states
@@ -48,7 +48,7 @@ namespace GhostVibe
 
         protected int score;
         protected int lifeRemaining;
-        protected Random random;
+        public Random random;
 
         // audio objects
         protected SoundEffect ghostPoof;
@@ -64,14 +64,9 @@ namespace GhostVibe
         protected SoundEffect hihat;
 
         // rhythms
+        int seconds, currentDifficultyIndex;
         protected int index = -1;
-        protected int rhythm01Count = 20;
-        protected int[] rhythm01 = { 2, 2, 2, 2,
-            2, 2, 2, 2,
-            2, 2, 2, 2,
-            2, 2, 2, 2,
-            2, 2, 2, 2 };
-
+        protected List<int> rhythm;
 
         public Game1()
         {
@@ -92,14 +87,8 @@ namespace GhostVibe
             Helper.Helper.ViewportWidth = GraphicsDevice.Viewport.Width;
             Helper.Helper.ViewportHeight = GraphicsDevice.Viewport.Height;
 
+            delegateTickClock = new UpdateDelegate(TickClock);
             delegateTickGhosts = new UpdateDelegate(TickGhosts);
-            beatFrequency = 0.5f;
-
-            isLeftMouseDown = acceptKeys = false;
-            
-            score = 0;
-            lifeRemaining = 3;
-            random = new Random();
 
             base.Initialize();
         }
@@ -142,6 +131,23 @@ namespace GhostVibe
 
         protected void StartGame()
         {
+            random = new Random();
+
+            // start the clock
+            seconds = 0;
+            scheduler.scheduleDelegate(delegateTickClock, 1.0f);
+
+            // generate first rhythm
+            currentDifficultyIndex = 8;
+            beatFrequency = 0.35f;
+            rhythm = Helper.Helper.GenerateRhythm(currentDifficultyIndex, beatFrequency, random);
+
+            // initialize score and health
+            score = 0;
+            lifeRemaining = 3;
+
+            isLeftMouseDown = acceptKeys = false;
+
             // start scheduled functions
             HapticFeedback.startBeats(beatFrequency, 0.1f, 0.1f);
             scheduler.scheduleDelegate(delegateTickGhosts, beatFrequency);
@@ -275,16 +281,35 @@ namespace GhostVibe
             base.Draw(gameTime);
         }
 
+        private void TickClock(float deltaTime)
+        {
+            ++seconds;
+            if (seconds >= Helper.Helper.DifficultyMatrix[currentDifficultyIndex])
+            {
+                ++currentDifficultyIndex;
+                currentDifficultyIndex = currentDifficultyIndex > Helper.Helper.maxDifficulty ? currentDifficultyIndex - 1 : currentDifficultyIndex;
+            }
+        }
+
         private void TickGhosts(float deltaTime)
         {
+            // move to the next note in the rhythm
             ++index;
-            index = (index >= rhythm01Count) ? 0 : index;
 
-            if (rhythm01[index] != 0)
+            // check if its time to get a new rhythm
+            if (index >= rhythm.Count)
             {
-                SpawnGhost(rhythm01[index] - 1);
+                index = 0;
+                rhythm = Helper.Helper.GenerateRhythm(currentDifficultyIndex, beatFrequency, random);
             }            
 
+            // check if there is indeed a note on this beat
+            if (rhythm[index] != 0)
+            {
+                SpawnGhost(rhythm[index] - 1);
+            }
+
+            // start accepting keys every tick
             acceptKeys = true;
         }
 
@@ -292,7 +317,7 @@ namespace GhostVibe
         {
             Ghost ghost = new Ghost(ghostTextures["plain"], laneNumber, 0.3f, "");
             ghostList.Add(ghost);
-            ghost.MoveForward(beatFrequency * 2);
+            ghost.MoveForward(beatFrequency * 2.5f);
         }
 
         private void ShootGhost(Keys keyPressed)
