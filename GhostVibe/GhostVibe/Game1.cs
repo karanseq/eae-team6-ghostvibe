@@ -52,13 +52,9 @@ namespace GhostVibe
         public Random random;
 
         // audio objects
-        protected SoundEffect ghostPoof;
-        protected SoundEffect ghostSpawn;
-        protected SoundEffect whistle;
         protected SoundEffect bgm;
         protected SoundEffectInstance bgmInst;
 
-        protected SoundEffect bass;
         protected SoundEffect A;
         protected SoundEffect C;
         protected SoundEffect E;
@@ -101,12 +97,8 @@ namespace GhostVibe
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
             UIFont = Content.Load<SpriteFont>("interface");
-            ghostPoof = Content.Load<SoundEffect>("ghostpoof");
-            ghostSpawn = Content.Load<SoundEffect>("newghostspawn");
-            //whistle = Content.Load<SoundEffect>("trainwhistle");
             bgm = Content.Load<SoundEffect>("newbgmsize");
             bgmInst = bgm.CreateInstance();
-            bass = Content.Load<SoundEffect>("Bass");
             A = Content.Load<SoundEffect>("A2");
             C = Content.Load<SoundEffect>("C2");
             E = Content.Load<SoundEffect>("E2");

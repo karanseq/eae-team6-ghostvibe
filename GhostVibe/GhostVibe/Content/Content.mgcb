@@ -55,30 +55,6 @@
 /processorParam:TextureFormat=Color
 /build:ghost_03.png
 
-#begin ghost_poof.wav
-/importer:WavImporter
-/processor:SoundEffectProcessor
-/processorParam:Quality=Best
-/build:ghost_poof.wav
-
-#begin ghost_spawn.wav
-/importer:WavImporter
-/processor:SoundEffectProcessor
-/processorParam:Quality=Best
-/build:ghost_spawn.wav
-
-#begin hallway.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:hallway.png
-
 #begin blue.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -139,24 +115,6 @@
 /processorParam:TextureFormat=Color
 /build:yellow.png
 
-#begin short_spawn.wav
-/importer:WavImporter
-/processor:SoundEffectProcessor
-/processorParam:Quality=Best
-/build:short_spawn.wav
-
-#begin newghostspawn.wav
-/importer:WavImporter
-/processor:SoundEffectProcessor
-/processorParam:Quality=Best
-/build:newghostspawn.wav
-
-#begin ghostpoof.wav
-/importer:WavImporter
-/processor:SoundEffectProcessor
-/processorParam:Quality=Best
-/build:ghostpoof.wav
-
 #begin newhallway.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -198,18 +156,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:ghost_05.png
-
-#begin Bass.wav
-/importer:WavImporter
-/processor:SoundEffectProcessor
-/processorParam:Quality=Best
-/build:Bass.wav
-
-#begin NewA.wav
-/importer:WavImporter
-/processor:SoundEffectProcessor
-/processorParam:Quality=Best
-/build:NewA.wav
 
 #begin Rockwell.spritefont
 /importer:FontDescriptionImporter
