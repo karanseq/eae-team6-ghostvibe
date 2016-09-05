@@ -15,8 +15,9 @@ namespace GhostVibe
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
-        ActionManager actionManager;
-        Scheduler scheduler;
+        protected ActionManager actionManager;
+        protected Scheduler scheduler;
+        protected bool isPaused;
 
         protected Texture2D animationTexture, spriteTexture;
         protected Texture2D hallway;
@@ -74,7 +75,7 @@ namespace GhostVibe
             graphics.PreferredBackBufferHeight = 720;
 
             //graphics.IsFullScreen = true;
-            //this.IsMouseVisible = true;
+            IsMouseVisible = true;
 
             Content.RootDirectory = "Content";
         }
@@ -88,6 +89,8 @@ namespace GhostVibe
 
             delegateTickClock = new UpdateDelegate(TickClock);
             delegateTickGhosts = new UpdateDelegate(TickGhosts);
+
+            isPaused = true;
 
             base.Initialize();
         }
@@ -135,8 +138,8 @@ namespace GhostVibe
             scheduler.scheduleDelegate(delegateTickClock, 1.0f);
 
             // generate first rhythm
-            currentDifficultyIndex = 9;
-            beatFrequency = 0.4f;
+            currentDifficultyIndex = 0;
+            beatFrequency = 0.3f;
             rhythm = Helper.Helper.GenerateRhythm(currentDifficultyIndex, beatFrequency, random);
 
             // initialize score and health
@@ -156,21 +159,23 @@ namespace GhostVibe
             bgmInst.Play();
 
             ghostList = new List<Ghost>();
-        }
+
+            isPaused = false;
+    }
 
         protected override void Update(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-            {
-                Exit();
-            }
-
+            // always listen for events
             UpdateKeyboardGamepad();
-            UpdateMouse();
-            UpdateGhosts(gameTime);
 
-            actionManager.update(gameTime.ElapsedGameTime.Milliseconds * 0.001f);
-            scheduler.update(gameTime.ElapsedGameTime.Milliseconds * 0.001f);
+            if (!isPaused)
+            {
+                UpdateMouse();
+                UpdateGhosts(gameTime);
+
+                actionManager.update(gameTime.ElapsedGameTime.Milliseconds * 0.001f);
+                scheduler.update(gameTime.ElapsedGameTime.Milliseconds * 0.001f);
+            }
 
             base.Update(gameTime);
         }
@@ -183,33 +188,40 @@ namespace GhostVibe
             previousGamepadState = currentGamepadState;
             currentGamepadState = GamePad.GetState(PlayerIndex.One);
 
+            if (acceptKeys && (currentKeyboardState.IsKeyDown(Keys.Escape) || currentGamepadState.IsButtonDown(Buttons.Back)))
+            {
+                acceptKeys = false;
+                isPaused = !isPaused;
+            }
+
+            Keys keyPressed = Keys.None;
             if (acceptKeys && (currentKeyboardState.IsKeyDown(Keys.D) || currentGamepadState.IsButtonDown(Buttons.LeftTrigger)))
             {
-                ShootGhost(Keys.A);
-                A.Play();
+                keyPressed = Keys.A;
+            }
+            else if (acceptKeys && (currentKeyboardState.IsKeyDown(Keys.F) || currentGamepadState.IsButtonDown(Buttons.LeftShoulder)))
+            {
+                keyPressed = Keys.B;
+            }
+            else if (acceptKeys && (currentKeyboardState.IsKeyDown(Keys.J) || currentGamepadState.IsButtonDown(Buttons.RightShoulder)))
+            {
+                keyPressed = Keys.X;
+            }
+            else if (acceptKeys && (currentKeyboardState.IsKeyDown(Keys.K) || currentGamepadState.IsButtonDown(Buttons.RightTrigger)))
+            {
+                keyPressed = Keys.Y;
             }
 
-            if (acceptKeys && (currentKeyboardState.IsKeyDown(Keys.F) || currentGamepadState.IsButtonDown(Buttons.LeftShoulder)))
+            // only forward the event if the game is not paused
+            if (!isPaused && keyPressed != Keys.None)
             {
-                ShootGhost(Keys.B);
-                C.Play();
-            }
-
-            if (acceptKeys && (currentKeyboardState.IsKeyDown(Keys.J) || currentGamepadState.IsButtonDown(Buttons.RightShoulder)))
-            {
-                ShootGhost(Keys.X);
-                E.Play();
-            }
-
-            if (acceptKeys && (currentKeyboardState.IsKeyDown(Keys.K) || currentGamepadState.IsButtonDown(Buttons.RightTrigger)))
-            {
-                ShootGhost(Keys.Y);
-                highA.Play();
+                ShootGhost(keyPressed);
             }
 
             if (!acceptKeys)
             {
-                acceptKeys = (currentKeyboardState.IsKeyUp(Keys.D) && currentGamepadState.IsButtonUp(Buttons.LeftTrigger) &&
+                acceptKeys = (currentKeyboardState.IsKeyUp(Keys.Escape) && currentGamepadState.IsButtonUp(Buttons.Back) && 
+                    currentKeyboardState.IsKeyUp(Keys.D) && currentGamepadState.IsButtonUp(Buttons.LeftTrigger) &&
                     currentKeyboardState.IsKeyUp(Keys.F) && currentGamepadState.IsButtonUp(Buttons.LeftShoulder) &&
                     currentKeyboardState.IsKeyUp(Keys.J) && currentGamepadState.IsButtonUp(Buttons.RightShoulder) &&
                     currentKeyboardState.IsKeyUp(Keys.K) && currentGamepadState.IsButtonUp(Buttons.RightTrigger));
@@ -360,15 +372,19 @@ namespace GhostVibe
             {
                 case Keys.A:
                     laneNumber = 0;
+                    A.Play();
                     break;
                 case Keys.B:
                     laneNumber = 1;
+                    C.Play();
                     break;
                 case Keys.X:
                     laneNumber = 2;
+                    E.Play();
                     break;
                 case Keys.Y:
                     laneNumber = 3;
+                    highA.Play();
                     break;
             }
 
