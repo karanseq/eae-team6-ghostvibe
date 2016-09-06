@@ -292,6 +292,11 @@ namespace GhostVibe
             get { return laneNumber; }
             set { laneNumber = value; }
         }
+
+        public Vector2 GetCurrentPosition()
+        {
+            return currentPos;
+        }
         
     }
 }

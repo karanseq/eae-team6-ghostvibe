@@ -21,9 +21,15 @@ namespace GhostVibe
         protected bool isGameOver;
         protected string gameoverText;
         protected string pausedText;
+        protected string restartText;
+
+        protected Random rand;
+
+        protected int bgmIndicator;
 
         protected Texture2D animationTexture, spriteTexture;
         protected Texture2D hallway;
+        protected Texture2D lifeBar, streakBar;
         //protected Texture2D blueGun, greenGun, redGun, yellowGun;
         protected SpriteFont UIFont;
 
@@ -61,12 +67,19 @@ namespace GhostVibe
         protected SoundEffect bgm;
         protected SoundEffectInstance bgmInst;
 
+        protected SoundEffect bgm2;
+        protected SoundEffectInstance bgmInst2;
+
+        protected List<SoundEffectInstance> bgmList;
+
         protected SoundEffect A;
         protected SoundEffect C;
         protected SoundEffect E;
         protected SoundEffect highA;
         protected SoundEffect positive;
         protected SoundEffect negative;
+
+        protected SoundEffectInstance positiveInst;
 
         // rhythms
         int seconds, currentDifficultyIndex;
@@ -94,10 +107,13 @@ namespace GhostVibe
 
             delegateTickClock = new UpdateDelegate(TickClock);
             delegateTickGhosts = new UpdateDelegate(TickGhosts);
+            SoundEffect.MasterVolume = 1.0f;
+            rand = new Random();
 
             isPaused = true;
             isGameOver = false;
-            gameoverText = "      Game Over!\nPlay Again? Y/N";
+            gameoverText = "Game Over!";
+            restartText = "Play Again? Y/N";
             pausedText = "Paused";
 
             base.Initialize();
@@ -109,18 +125,27 @@ namespace GhostVibe
             spriteBatch = new SpriteBatch(GraphicsDevice);
             UIFont = Content.Load<SpriteFont>("interface");
             bgm = Content.Load<SoundEffect>("newbgmsize");
+            bgm2 = Content.Load<SoundEffect>("final-battle");
+            bgmList = new List<SoundEffectInstance>();
             bgmInst = bgm.CreateInstance();
+            bgmInst2 = bgm2.CreateInstance();
+            bgmList.Add(bgmInst);
+            bgmList.Add(bgmInst2);
             A = Content.Load<SoundEffect>("A2");
             C = Content.Load<SoundEffect>("C2");
             E = Content.Load<SoundEffect>("E2");
             highA = Content.Load<SoundEffect>("highA2");
             positive = Content.Load<SoundEffect>("happysound");
             negative = Content.Load<SoundEffect>("badsound");
-            hallway = Content.Load<Texture2D>("betterhallway");
+            hallway = Content.Load<Texture2D>("hallway_bar");
+            positiveInst = positive.CreateInstance();
             //blueGun = Content.Load<Texture2D>("blue");
             //yellowGun = Content.Load<Texture2D>("yellow");
             //greenGun = Content.Load<Texture2D>("green");
             //redGun = Content.Load<Texture2D>("red");
+
+            lifeBar = Content.Load<Texture2D>("life_bar");
+            streakBar = Content.Load<Texture2D>("streak_bar");
 
             ghostTextures = new Dictionary<string, Texture2D>();
             ghostTextures.Add("plain", Content.Load<Texture2D>("ghost_01"));
@@ -173,10 +198,14 @@ namespace GhostVibe
             // start scheduled functions
             HapticFeedback.startBeats(beatFrequency, 0.1f, 0.1f);
             scheduler.scheduleDelegate(delegateTickGhosts, beatFrequency);
-
-            bgmInst.Volume = 1.0f;
-            bgmInst.IsLooped = true;
-            bgmInst.Play();
+            foreach (SoundEffectInstance inst in bgmList)
+            {
+                inst.Pitch = 0.0f;
+                inst.Volume = 1.0f;
+                inst.IsLooped = true;
+            }
+            bgmIndicator = rand.Next(0, 2);
+            bgmList[bgmIndicator].Play();
 
             ghostList = new List<Ghost>();
 
@@ -223,11 +252,11 @@ namespace GhostVibe
 
                 if (isPaused)
                 {
-                    bgmInst.Pause();
+                    bgmList[bgmIndicator].Pause();
                 }
                 else
                 {
-                    bgmInst.Resume();
+                    bgmList[bgmIndicator].Resume();
                 }
             }
 
@@ -328,6 +357,7 @@ namespace GhostVibe
                         scheduler.unscheduleDelegate(delegateTickGhosts);
                         HapticFeedback.stopBeats();
                         isGameOver = true;
+                        bgmList[bgmIndicator].Stop();
                     }
 
                     // reset streak and multiplier
@@ -359,6 +389,11 @@ namespace GhostVibe
             //spriteBatch.Draw(redGun, new Vector2(GraphicsDevice.Viewport.Width * 0.35f, GraphicsDevice.Viewport.Height), null, Color.White, Helper.Helper.DegreesToRadians(25.0f), new Vector2(blueGun.Width / 2, blueGun.Height / 2), 0.65f, SpriteEffects.None, 0.0f);
             //spriteBatch.Draw(greenGun, new Vector2(GraphicsDevice.Viewport.Width * 0.65f, GraphicsDevice.Viewport.Height), null, Color.White, Helper.Helper.DegreesToRadians(-25.0f), new Vector2(blueGun.Width / 2, blueGun.Height / 2), 0.65f, SpriteEffects.None, 0.0f);
 
+            spriteBatch.Draw(lifeBar, new Vector2(GraphicsDevice.Viewport.Width / 4 - 203, GraphicsDevice.Viewport.Height / 4 + 7), null, Color.White, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.0f);
+            spriteBatch.Draw(streakBar, new Vector2(GraphicsDevice.Viewport.Width / 2 + 431, GraphicsDevice.Viewport.Height / 4 + 21), null, Color.White, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.0f);
+
+            spriteBatch.DrawString(UIFont, "X" + multiplier, new Vector2(GraphicsDevice.Viewport.Width / 2 + 472, GraphicsDevice.Viewport.Height / 4 + 285), Color.BlueViolet, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 1.0f);
+
             if (ghostList.Count != 0)
             {
                 //foreach (Ghost ghost in ghostList)
@@ -373,7 +408,8 @@ namespace GhostVibe
 
             if (isGameOver)
             {
-                spriteBatch.DrawString(UIFont, gameoverText, new Vector2(GraphicsDevice.Viewport.Width / 2 - 200, GraphicsDevice.Viewport.Height / 2 - 30), Color.Red, 0.0f, Vector2.Zero, 5.0f, SpriteEffects.None, 0.0f);
+                spriteBatch.DrawString(UIFont, gameoverText, new Vector2(GraphicsDevice.Viewport.Width / 2 - 220, GraphicsDevice.Viewport.Height / 2 - 100), Color.Red, 0.0f, Vector2.Zero, 5.0f, SpriteEffects.None, 0.0f);
+                spriteBatch.DrawString(UIFont, restartText, new Vector2(GraphicsDevice.Viewport.Width / 2 - 350, GraphicsDevice.Viewport.Height / 2), Color.Red, 0.0f, Vector2.Zero, 5.0f, SpriteEffects.None, 0.0f);
             }
             else if (isPaused)
             {
@@ -391,6 +427,7 @@ namespace GhostVibe
             if (seconds >= Helper.Helper.difficultyTimeMatrix[currentDifficultyIndex])
             {
                 ++currentDifficultyIndex;
+                bgmList[bgmIndicator].Pitch += 0.1f;
                 currentDifficultyIndex = currentDifficultyIndex > Helper.Helper.maxDifficulty ? currentDifficultyIndex - 1 : currentDifficultyIndex;
                 rhythm.Clear();
                 rhythm = Helper.Helper.GenerateRhythm(currentDifficultyIndex, beatFrequency, random);
@@ -436,19 +473,19 @@ namespace GhostVibe
             {
                 case Keys.A:
                     laneNumber = 0;
-                    A.Play();
+                    //A.Play();
                     break;
                 case Keys.B:
                     laneNumber = 1;
-                    C.Play();
+                    //C.Play();
                     break;
                 case Keys.X:
                     laneNumber = 2;
-                    E.Play();
+                    //E.Play();
                     break;
                 case Keys.Y:
                     laneNumber = 3;
-                    highA.Play();
+                    //highA.Play();
                     break;
             }
 
@@ -462,6 +499,9 @@ namespace GhostVibe
                 {
                     // kill the ghost
                     ghost.Die(true);
+
+                    positiveInst.Volume = 0.8f;
+                    positiveInst.Play();
                     // update streak
                     ++streak;
 
@@ -487,16 +527,16 @@ namespace GhostVibe
                     switch(keyPressed)
                     {
                         case Keys.A:
-                            A.Play();
+                            //A.Play();
                             break;
                         case Keys.B:
-                            C.Play();
+                            //C.Play();
                             break;
                         case Keys.X:
-                            E.Play();
+                            //E.Play();
                             break;
                         case Keys.Y:
-                            highA.Play();
+                            //highA.Play();
                             break;
                     }
                     return;
