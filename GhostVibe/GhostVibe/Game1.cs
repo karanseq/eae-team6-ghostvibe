@@ -78,7 +78,7 @@ namespace GhostVibe
             graphics.PreferredBackBufferWidth = 1280;
             graphics.PreferredBackBufferHeight = 720;
 
-            //graphics.IsFullScreen = true;
+            graphics.IsFullScreen = true;
             IsMouseVisible = true;
 
             Content.RootDirectory = "Content";
@@ -351,9 +351,13 @@ namespace GhostVibe
                 spriteBatch.DrawString(UIFont, gameoverText, new Vector2(GraphicsDevice.Viewport.Width / 2 - 200, GraphicsDevice.Viewport.Height / 2 - 30), Color.Red, 0.0f, Vector2.Zero, 5.0f, SpriteEffects.None, 0.0f);
             }
 
-            if (isPaused)
+            else if (isPaused)
             {
                 spriteBatch.DrawString(UIFont, pausedText, new Vector2(GraphicsDevice.Viewport.Width / 2 - 125, GraphicsDevice.Viewport.Height / 2 - 30), Color.Red, 0.0f, Vector2.Zero, 5.0f, SpriteEffects.None, 0.0f);
+            }
+            else
+            {
+                ;
             }
 
             spriteBatch.End();
