@@ -33,6 +33,7 @@ namespace GhostVibe
             { "yellow", Keys.Y } };
 
         protected Dictionary<string, Texture2D> ghostTextures;
+        protected Dictionary<string, Texture2D> ghostTextureAnim;
         protected List<Ghost> ghostList;
         protected UpdateDelegate delegateTickGhosts, delegateTickClock;
         protected static float beatFrequency;
@@ -116,10 +117,22 @@ namespace GhostVibe
 
             ghostTextures = new Dictionary<string, Texture2D>();
             ghostTextures.Add("plain", Content.Load<Texture2D>("ghost_01"));
-            ghostTextures.Add("blue", Content.Load<Texture2D>("ghost_blue"));
-            ghostTextures.Add("green", Content.Load<Texture2D>("ghost_green"));
-            ghostTextures.Add("red", Content.Load<Texture2D>("ghost_red"));
-            ghostTextures.Add("yellow", Content.Load<Texture2D>("ghost_yellow"));
+
+            //ghostTextures.Add("blue", Content.Load<Texture2D>("ghost_blue"));
+            //ghostTextures.Add("green", Content.Load<Texture2D>("ghost_green"));
+            //ghostTextures.Add("red", Content.Load<Texture2D>("ghost_red"));
+            //ghostTextures.Add("yellow", Content.Load<Texture2D>("ghost_yellow"));
+
+            ghostTextures.Add("blue", Content.Load<Texture2D>("ghost_green_animation_01"));
+            ghostTextures.Add("green", Content.Load<Texture2D>("ghost_green_animation_01"));
+            ghostTextures.Add("red", Content.Load<Texture2D>("ghost_green_animation_01"));
+            ghostTextures.Add("yellow", Content.Load<Texture2D>("ghost_green_animation_01"));
+
+            ghostTextureAnim = new Dictionary<string, Texture2D>();
+            ghostTextureAnim.Add("green", Content.Load<Texture2D>("ghost_green_animation_02"));
+            ghostTextureAnim.Add("red", Content.Load<Texture2D>("ghost_green_animation_02"));
+            ghostTextureAnim.Add("blue", Content.Load<Texture2D>("ghost_green_animation_02"));
+            ghostTextureAnim.Add("yellow", Content.Load<Texture2D>("ghost_green_animation_02"));
 
             StartGame();
         }
@@ -356,7 +369,8 @@ namespace GhostVibe
 
         private void SpawnGhost(int laneNumber)
         {
-            Ghost ghost = new Ghost(ghostTextures[GetGhostColor(laneNumber)], laneNumber, 0.3f, "");
+            Ghost ghost = new Ghost(ghostTextureAnim[GetGhostColor(laneNumber)], laneNumber, 1000, 720, 15, 0.3f, "");
+            //Ghost ghost = new Ghost(ghostTextures[GetGhostColor(laneNumber)], ghostTextureAnim[GetGhostColor(laneNumber)], laneNumber, 1000, 720, 8, 1000, 720, 15, 0.3f, "");
             ghostList.Add(ghost);
             ghost.MoveForward(beatFrequency * 2.5f);
         }

@@ -15,9 +15,13 @@ namespace GhostVibe
     {
         private Sprite ghostImg;
         private Sprite ghostAnim;
+        private Sprite ghostAnim2;
         private int frameWidth;
         private int frameHeight;
         private int frameCount;
+        private int frameWidth2;
+        private int frameHeight2;
+        private int frameCount2;
         public bool isActive;
         public bool isAnimated;
         public bool isInvincible;
@@ -55,6 +59,38 @@ namespace GhostVibe
             isDying = false;
             hasFinishedDying = false;
         }
+
+        public Ghost(Texture2D dynamicTexture, Texture2D dynamicTexture2, int positionIndex, int frameW1, int frameH1, int numFrame1, int frameW2, int frameH2, int numFrame2, float scaleF, string gColor)
+        {
+            laneNumber = positionIndex; //GhostPosition.GetIndex();
+            StageOnePosition = GhostPosition.GetInitialPosition(laneNumber);
+            StageTwoPosition = GhostPosition.GetSecondPosition(laneNumber);
+            StageThreePosition = GhostPosition.GetThirdPosition(laneNumber);
+            currentPos = StageOnePosition;
+            ghostAnim = Sprite.Create(dynamicTexture, frameW1, frameH1, numFrame1);
+            ghostAnim2 = Sprite.Create(dynamicTexture2, frameW2, frameH2, numFrame2);
+            ghostAnim.Position = currentPos;
+            ghostAnim2.Position = currentPos;
+            frameWidth = frameW1;
+            frameHeight = frameH1;
+            frameCount = numFrame1;
+            frameWidth2 = frameW2;
+            frameHeight2 = frameH2;
+            frameCount2 = numFrame2;
+            scale = scaleF;
+            ghostAnim.Scale = scaleF;
+            ghostAnim2.Scale = scaleF;
+            color = gColor;
+            isAnimated = true;
+            stage = 1;
+            isInvincible = true;
+            isActive = false;
+            isInShootingRange = false;
+            wasKilledByPlayer = false;
+            isDying = false;
+            hasFinishedDying = false;
+        }
+
 
         public Ghost(Texture2D dynamicTexture, int positionIndex, int frameW, int frameH, int numFrame, float scaleF, string gColor)
         {
@@ -124,7 +160,10 @@ namespace GhostVibe
             // if not killed by player, play the slicing animation
             if (!killedByPlayer)
             {
-                sprite.Color = Microsoft.Xna.Framework.Color.RosyBrown;
+                //sprite.Color = Microsoft.Xna.Framework.Color.RosyBrown;
+                // play the second animation here
+                // TODO
+                sprite.Color = Microsoft.Xna.Framework.Color.Red;
             }
             else
             {
