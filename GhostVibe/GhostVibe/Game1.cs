@@ -162,10 +162,10 @@ namespace GhostVibe
             ghostTextureAnim.Add("blue", Content.Load<Texture2D>("ghost_blue_animation_02"));
             ghostTextureAnim.Add("yellow", Content.Load<Texture2D>("ghost_yellow_animation_02"));
 
-            lifeBar = ProgressBar.Create(Content.Load<Texture2D>("life_bar"), true, new Vector2(175, 340));
+            lifeBar = ProgressBar.Create(Content.Load<Texture2D>("life_bar"), true, new Vector2(GraphicsDevice.Viewport.Width / 4 - 147, GraphicsDevice.Viewport.Width / 2 - 305));
             lifeBar.IsUpToDown = false;
             lifeBar.Progress = 1.0f;
-            streakBar = ProgressBar.Create(Content.Load<Texture2D>("streak_bar"), true, new Vector2(1112, 218));
+            streakBar = ProgressBar.Create(Content.Load<Texture2D>("streak_bar"), true, new Vector2(GraphicsDevice.Viewport.Width / 2 + 486, GraphicsDevice.Viewport.Width / 2 - 303));
             streakBar.IsUpToDown = false;
             streakBar.Progress = 1.0f;
 
