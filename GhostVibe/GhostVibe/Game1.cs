@@ -116,10 +116,10 @@ namespace GhostVibe
 
             ghostTextures = new Dictionary<string, Texture2D>();
             ghostTextures.Add("plain", Content.Load<Texture2D>("ghost_01"));
-            ghostTextures.Add("blue", Content.Load<Texture2D>("ghost_02"));
-            ghostTextures.Add("green", Content.Load<Texture2D>("ghost_03"));
-            ghostTextures.Add("red", Content.Load<Texture2D>("ghost_04"));
-            ghostTextures.Add("yellow", Content.Load<Texture2D>("ghost_05"));
+            ghostTextures.Add("blue", Content.Load<Texture2D>("ghost_blue"));
+            ghostTextures.Add("green", Content.Load<Texture2D>("ghost_green"));
+            ghostTextures.Add("red", Content.Load<Texture2D>("ghost_red"));
+            ghostTextures.Add("yellow", Content.Load<Texture2D>("ghost_yellow"));
 
             StartGame();
         }
@@ -356,7 +356,7 @@ namespace GhostVibe
 
         private void SpawnGhost(int laneNumber)
         {
-            Ghost ghost = new Ghost(ghostTextures["plain"], laneNumber, 0.3f, "");
+            Ghost ghost = new Ghost(ghostTextures[GetGhostColor(laneNumber)], laneNumber, 0.3f, "");
             ghostList.Add(ghost);
             ghost.MoveForward(beatFrequency * 2.5f);
         }
@@ -450,6 +450,28 @@ namespace GhostVibe
         public static float BeatFrequency
         {
             get { return Game1.beatFrequency; }
+        }
+
+        public string GetGhostColor(int laneNumber)
+        {
+            if (laneNumber == 0)
+            {
+                return "green";
+            }
+            else if (laneNumber == 1)
+            {
+                return "red";
+            }
+            else if (laneNumber == 2)
+            {
+                return "blue";
+            }
+            else if (laneNumber == 3)
+            {
+                return "yellow";
+            }
+            else
+                return "plain";
         }
 
     }
