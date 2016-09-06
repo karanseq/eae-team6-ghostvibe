@@ -5,7 +5,6 @@ using Helper;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System;
-using Helper;
 
 namespace GhostVibe
 {

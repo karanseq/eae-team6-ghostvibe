@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Collections.Generic;
 using System;
 using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework.Media;
 
 namespace GhostVibe
 {
@@ -14,14 +15,14 @@ namespace GhostVibe
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
-        ActionManager actionManager;
-        Scheduler scheduler;
-        ParticleEngine particleEngine;
+        protected ActionManager actionManager;
+        protected Scheduler scheduler;
+        protected bool isPaused;
 
         protected Texture2D animationTexture, spriteTexture;
         protected Texture2D hallway;
-        protected Texture2D blueGun, greenGun, redGun, yellowGun;
-        protected SpriteFont arialFont;
+        //protected Texture2D blueGun, greenGun, redGun, yellowGun;
+        protected SpriteFont UIFont;
 
         protected readonly int maxColors = 4;
         protected string[] colorNames = { "plain", "blue", "green", "red", "yellow" };
@@ -33,7 +34,7 @@ namespace GhostVibe
 
         protected Dictionary<string, Texture2D> ghostTextures;
         protected List<Ghost> ghostList;
-        protected UpdateDelegate delegateTickGhosts;
+        protected UpdateDelegate delegateTickGhosts, delegateTickClock;
         protected static float beatFrequency;
 
         // mouse states
@@ -47,32 +48,25 @@ namespace GhostVibe
         // gamepad states
         private GamePadState currentGamepadState, previousGamepadState;
 
-        protected int score;
+        protected int score, streak, multiplier;
         protected int lifeRemaining;
-        protected Random random;
+        public Random random;
 
         // audio objects
-        protected SoundEffect ghostPoof;
-        protected SoundEffect ghostSpawn;
-        protected SoundEffect whistle;
         protected SoundEffect bgm;
         protected SoundEffectInstance bgmInst;
 
-        protected SoundEffect bass;
-        protected SoundEffect tom;
-        protected SoundEffect cymbal;
-        protected SoundEffect snare;
-        protected SoundEffect hihat;
+        protected SoundEffect A;
+        protected SoundEffect C;
+        protected SoundEffect E;
+        protected SoundEffect highA;
+        protected SoundEffect positive;
+        protected SoundEffect negative;
 
         // rhythms
+        int seconds, currentDifficultyIndex;
         protected int index = -1;
-        protected int rhythm01Count = 20;
-        protected int[] rhythm01 = { 2, 2, 2, 2,
-            2, 2, 2, 2,
-            2, 2, 2, 2,
-            2, 2, 2, 2,
-            2, 2, 2, 2 };
-
+        protected List<int> rhythm;
 
         public Game1()
         {
@@ -81,7 +75,7 @@ namespace GhostVibe
             graphics.PreferredBackBufferHeight = 720;
 
             //graphics.IsFullScreen = true;
-            //IsMouseVisible = true;
+            IsMouseVisible = true;
 
             Content.RootDirectory = "Content";
         }
@@ -93,14 +87,10 @@ namespace GhostVibe
             Helper.Helper.ViewportWidth = GraphicsDevice.Viewport.Width;
             Helper.Helper.ViewportHeight = GraphicsDevice.Viewport.Height;
 
+            delegateTickClock = new UpdateDelegate(TickClock);
             delegateTickGhosts = new UpdateDelegate(TickGhosts);
-            beatFrequency = 0.5f;
 
-            isLeftMouseDown = acceptKeys = false;
-            
-            score = 0;
-            lifeRemaining = 3;
-            random = new Random();
+            isPaused = true;
 
             base.Initialize();
         }
@@ -109,38 +99,28 @@ namespace GhostVibe
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            arialFont = Content.Load<SpriteFont>("Arial");
-            ghostPoof = Content.Load<SoundEffect>("ghostpoof");
-            ghostSpawn = Content.Load<SoundEffect>("newghostspawn");
-            whistle = Content.Load<SoundEffect>("trainwhistle");
+            UIFont = Content.Load<SpriteFont>("interface");
             bgm = Content.Load<SoundEffect>("newbgmsize");
             bgmInst = bgm.CreateInstance();
-            bass = Content.Load<SoundEffect>("Bass");
-            tom = Content.Load<SoundEffect>("tom");
-            cymbal = Content.Load<SoundEffect>("cymbal");
-            snare = Content.Load<SoundEffect>("snaredrum");
-            hihat = Content.Load<SoundEffect>("hi-hat_2");
+            A = Content.Load<SoundEffect>("A2");
+            C = Content.Load<SoundEffect>("C2");
+            E = Content.Load<SoundEffect>("E2");
+            highA = Content.Load<SoundEffect>("highA2");
+            positive = Content.Load<SoundEffect>("happysound");
+            negative = Content.Load<SoundEffect>("badsound");
             hallway = Content.Load<Texture2D>("newhallway");
-            blueGun = Content.Load<Texture2D>("blue");
-            yellowGun = Content.Load<Texture2D>("yellow");
-            greenGun = Content.Load<Texture2D>("green");
-            redGun = Content.Load<Texture2D>("red");
+            //blueGun = Content.Load<Texture2D>("blue");
+            //yellowGun = Content.Load<Texture2D>("yellow");
+            //greenGun = Content.Load<Texture2D>("green");
+            //redGun = Content.Load<Texture2D>("red");
 
             ghostTextures = new Dictionary<string, Texture2D>();
             ghostTextures.Add("plain", Content.Load<Texture2D>("ghost_01"));
-            ghostTextures.Add("blue", Content.Load<Texture2D>("ghost_02"));
-            ghostTextures.Add("green", Content.Load<Texture2D>("ghost_03"));
-            ghostTextures.Add("red", Content.Load<Texture2D>("ghost_04"));
-            ghostTextures.Add("yellow", Content.Load<Texture2D>("ghost_05"));
-            List<Texture2D> notetextures = new List<Texture2D>();
-            notetextures.Add(Content.Load<Texture2D>("red_note1"));
-            notetextures.Add(Content.Load<Texture2D>("blue_note1"));
-            notetextures.Add(Content.Load<Texture2D>("green_note1"));
 
-            notetextures.Add(Content.Load<Texture2D>("orange_note1"));
-            Texture2D CloudTexture;
-            CloudTexture = this.Content.Load<Texture2D>("cloud");
-            particleEngine = new ParticleEngine(notetextures, CloudTexture, new Vector2(400, 240));
+            ghostTextures.Add("blue", Content.Load<Texture2D>("ghost_blue"));
+            ghostTextures.Add("green", Content.Load<Texture2D>("ghost_green"));
+            ghostTextures.Add("red", Content.Load<Texture2D>("ghost_red"));
+            ghostTextures.Add("yellow", Content.Load<Texture2D>("ghost_yellow"));
 
             StartGame();
         }
@@ -152,30 +132,51 @@ namespace GhostVibe
 
         protected void StartGame()
         {
+            random = new Random();
+
+            // start the clock
+            seconds = 0;
+            scheduler.scheduleDelegate(delegateTickClock, 1.0f);
+
+            // generate first rhythm
+            currentDifficultyIndex = 0;
+            beatFrequency = 0.3f;
+            rhythm = Helper.Helper.GenerateRhythm(currentDifficultyIndex, beatFrequency, random);
+
+            // initialize score and health
+            score = 0;
+            streak = 0;
+            multiplier = 1;
+            lifeRemaining = 10;
+
+            isLeftMouseDown = acceptKeys = false;
+
             // start scheduled functions
             HapticFeedback.startBeats(beatFrequency, 0.1f, 0.1f);
             scheduler.scheduleDelegate(delegateTickGhosts, beatFrequency);
 
-            bgmInst.Volume = 0.3f;
+            bgmInst.Volume = 1.0f;
             bgmInst.IsLooped = true;
             bgmInst.Play();
 
             ghostList = new List<Ghost>();
-        }
+
+            isPaused = false;
+    }
 
         protected override void Update(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-            {
-                Exit();
-            }
-
+            // always listen for events
             UpdateKeyboardGamepad();
-            UpdateMouse();
-            UpdateGhosts(gameTime);
 
-            actionManager.update(gameTime.ElapsedGameTime.Milliseconds * 0.001f);
-            scheduler.update(gameTime.ElapsedGameTime.Milliseconds * 0.001f);
+            if (!isPaused)
+            {
+                UpdateMouse();
+                UpdateGhosts(gameTime);
+
+                actionManager.update(gameTime.ElapsedGameTime.Milliseconds * 0.001f);
+                scheduler.update(gameTime.ElapsedGameTime.Milliseconds * 0.001f);
+            }
 
             base.Update(gameTime);
         }
@@ -188,28 +189,43 @@ namespace GhostVibe
             previousGamepadState = currentGamepadState;
             currentGamepadState = GamePad.GetState(PlayerIndex.One);
 
-            if (acceptKeys && (currentKeyboardState.IsKeyDown(Keys.D) || currentGamepadState.IsButtonDown(Buttons.A)))
+            if (acceptKeys && (currentKeyboardState.IsKeyDown(Keys.Escape) || currentGamepadState.IsButtonDown(Buttons.Back)))
             {
-                ShootGhost(Keys.A);
-                snare.Play();
+                acceptKeys = false;
+                isPaused = !isPaused;
             }
 
-            if (acceptKeys && (currentKeyboardState.IsKeyDown(Keys.F) || currentGamepadState.IsButtonDown(Buttons.B)))
+            Keys keyPressed = Keys.None;
+            if (acceptKeys && (currentKeyboardState.IsKeyDown(Keys.D) || currentGamepadState.IsButtonDown(Buttons.LeftTrigger)))
             {
-                ShootGhost(Keys.B);
-                hihat.Play();
+                keyPressed = Keys.A;
+            }
+            else if (acceptKeys && (currentKeyboardState.IsKeyDown(Keys.F) || currentGamepadState.IsButtonDown(Buttons.LeftShoulder)))
+            {
+                keyPressed = Keys.B;
+            }
+            else if (acceptKeys && (currentKeyboardState.IsKeyDown(Keys.J) || currentGamepadState.IsButtonDown(Buttons.RightShoulder)))
+            {
+                keyPressed = Keys.X;
+            }
+            else if (acceptKeys && (currentKeyboardState.IsKeyDown(Keys.K) || currentGamepadState.IsButtonDown(Buttons.RightTrigger)))
+            {
+                keyPressed = Keys.Y;
             }
 
-            if (acceptKeys && (currentKeyboardState.IsKeyDown(Keys.J) || currentGamepadState.IsButtonDown(Buttons.X)))
+            // only forward the event if the game is not paused
+            if (!isPaused && keyPressed != Keys.None)
             {
-                ShootGhost(Keys.X);
-                tom.Play();
+                ShootGhost(keyPressed);
             }
 
-            if (acceptKeys && (currentKeyboardState.IsKeyDown(Keys.K) || currentGamepadState.IsButtonDown(Buttons.Y)))
+            if (!acceptKeys)
             {
-                ShootGhost(Keys.Y);
-                cymbal.Play();
+                acceptKeys = (currentKeyboardState.IsKeyUp(Keys.Escape) && currentGamepadState.IsButtonUp(Buttons.Back) && 
+                    currentKeyboardState.IsKeyUp(Keys.D) && currentGamepadState.IsButtonUp(Buttons.LeftTrigger) &&
+                    currentKeyboardState.IsKeyUp(Keys.F) && currentGamepadState.IsButtonUp(Buttons.LeftShoulder) &&
+                    currentKeyboardState.IsKeyUp(Keys.J) && currentGamepadState.IsButtonUp(Buttons.RightShoulder) &&
+                    currentKeyboardState.IsKeyUp(Keys.K) && currentGamepadState.IsButtonUp(Buttons.RightTrigger));
             }
         }
 
@@ -244,16 +260,38 @@ namespace GhostVibe
             }
 
             foreach (Ghost ghost in ghostsToBeDeleted)
-            {                
+            {
+                // if ghost was not killed by the player, reset the streak and multiplier
+                if (!ghost.WasKilledByPlayer)
+                {
+                    // deduct life
+                    --lifeRemaining;
+                    // TODO: remove the '<=' from below condition
+                    if (lifeRemaining <= 0)
+                    {
+                        // TODO: remove the following statement
+                        lifeRemaining = 0;
+
+                        // stop everything!
+                        scheduler.unscheduleDelegate(delegateTickClock);
+                        scheduler.unscheduleDelegate(delegateTickGhosts);
+                        HapticFeedback.stopBeats();
+                    }
+
+                    // reset streak and multiplier
+                    streak = 0;
+                    multiplier = 1;
+                }
+
                 ghostList.Remove(ghost);
             }
         }
 
         private void DrawUI()
         {
-            spriteBatch.DrawString(arialFont, "Score: " + score, new Vector2(GraphicsDevice.Viewport.Width / 2 - 400, 27), Color.Black, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 1.0f);
-            //spriteBatch.DrawString(arialFont, "Life: " + lifeRemaining, new Vector2(20, GraphicsDevice.Viewport.Height - 50), Color.Black, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 1.0f);
-            spriteBatch.DrawString(arialFont, "Green: D, Red: F, Blue: J, Yellow: K", new Vector2(GraphicsDevice.Viewport.Width / 2 - 100, 27), Color.Black, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 1.0f);
+            spriteBatch.DrawString(UIFont, "Score: " + score, new Vector2(GraphicsDevice.Viewport.Width / 2 - 400, 30), Color.Blue, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 1.0f);
+            spriteBatch.DrawString(UIFont, "Life: " + lifeRemaining, new Vector2(20, GraphicsDevice.Viewport.Height - 50), Color.Purple, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 1.0f);
+            spriteBatch.DrawString(UIFont, "Green: D, Red: F, Blue: J, Yellow: K", new Vector2(GraphicsDevice.Viewport.Width / 2 - 100, 30), Color.ForestGreen, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 1.0f);
         }
 
         protected override void Draw(GameTime gameTime)
@@ -285,43 +323,69 @@ namespace GhostVibe
             base.Draw(gameTime);
         }
 
+        private void TickClock(float deltaTime)
+        {
+            ++seconds;
+            if (seconds >= Helper.Helper.difficultyTimeMatrix[currentDifficultyIndex])
+            {
+                ++currentDifficultyIndex;
+                currentDifficultyIndex = currentDifficultyIndex > Helper.Helper.maxDifficulty ? currentDifficultyIndex - 1 : currentDifficultyIndex;
+                rhythm.Clear();
+                rhythm = Helper.Helper.GenerateRhythm(currentDifficultyIndex, beatFrequency, random);
+                Trace.WriteLine("Difficulty upgraded to " + currentDifficultyIndex + "...");
+            }
+        }
+
         private void TickGhosts(float deltaTime)
         {
+            // move to the next note in the rhythm
             ++index;
-            index = (index >= rhythm01Count) ? 0 : index;
 
-            if (rhythm01[index] != 0)
+            // check if its time to get a new rhythm
+            if (index >= rhythm.Count)
             {
-                SpawnGhost(rhythm01[index] - 1);
+                index = 0;
+                rhythm = Helper.Helper.GenerateRhythm(currentDifficultyIndex, beatFrequency, random);
             }            
 
-            acceptKeys = true;
+            // check if there is indeed a note on this beat
+            if (rhythm[index] != 0)
+            {
+                SpawnGhost(rhythm[index] - 1);
+            }
         }
 
         private void SpawnGhost(int laneNumber)
         {
-            Ghost ghost = new Ghost(ghostTextures["plain"], laneNumber, 0.3f, "");
+            Ghost ghost = new Ghost(ghostTextures[GetGhostColor(laneNumber)], laneNumber, 0.3f, "");
             ghostList.Add(ghost);
-            ghost.MoveForward(beatFrequency * 2);
+            ghost.MoveForward(beatFrequency * 2.5f);
         }
 
         private void ShootGhost(Keys keyPressed)
         {
+            // stop listening for keys
+            acceptKeys = false;
+
             // first get the lane number based on the key pressed
             int laneNumber = 0;
             switch (keyPressed)
             {
                 case Keys.A:
                     laneNumber = 0;
+                    A.Play();
                     break;
                 case Keys.B:
                     laneNumber = 1;
+                    C.Play();
                     break;
                 case Keys.X:
                     laneNumber = 2;
+                    E.Play();
                     break;
                 case Keys.Y:
                     laneNumber = 3;
+                    highA.Play();
                     break;
             }
 
@@ -330,18 +394,85 @@ namespace GhostVibe
             {
                 Ghost ghost = ghostList[i];
 
-                // the ghost needs to be in the right lane AND in the shooting range
-                if (ghost.LaneNumber == laneNumber && ghost.IsInShootingRange)
+                // the ghost needs to be in the right lane AND in the shooting range AND not already killed
+                if (ghost.LaneNumber == laneNumber && ghost.IsInShootingRange && !ghost.IsDying)
                 {
                     // kill the ghost
                     ghost.Die(true);
+                    // update streak
+                    ++streak;
+
+                    // check if the multiplier needs to be upgraded
+                    for (int j = Helper.Helper.numMultipliers - 1; j >= multiplier - 1; --j)
+                    {
+                        // check if streak has exceeded the required value
+                        if (streak >= Helper.Helper.multiplier[j])
+                        {
+                            // increase multiplier
+                            multiplier = j + 2;
+                            // reset streak
+                            streak = 0;
+                            Trace.WriteLine("Multiplier upgraded to " + multiplier + "...");
+                            break;
+                        }
+                    }
+
+                    // update score
+                    score += 10 * multiplier;
+
+                    // play positive sound here
+                    switch(keyPressed)
+                    {
+                        case Keys.A:
+                            A.Play();
+                            break;
+                        case Keys.B:
+                            C.Play();
+                            break;
+                        case Keys.X:
+                            E.Play();
+                            break;
+                        case Keys.Y:
+                            highA.Play();
+                            break;
+                    }
+                    return;
                 }
             }
+            
+            // reset the streak and multiplier
+            streak = 0;
+            multiplier = 1;
+
+            // play sound when player misses ghost
+            negative.Play();
         }
 
         public static float BeatFrequency
         {
             get { return Game1.beatFrequency; }
+        }
+
+        public string GetGhostColor(int laneNumber)
+        {
+            if (laneNumber == 0)
+            {
+                return "green";
+            }
+            else if (laneNumber == 1)
+            {
+                return "red";
+            }
+            else if (laneNumber == 2)
+            {
+                return "blue";
+            }
+            else if (laneNumber == 3)
+            {
+                return "yellow";
+            }
+            else
+                return "plain";
         }
 
     }
