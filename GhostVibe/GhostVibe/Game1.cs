@@ -351,10 +351,11 @@ namespace GhostVibe
                 {
                     // deduct life
                     --lifeRemaining;
-                    // TODO: remove the '<=' from below condition
+                    UpdateLifeBar();
+
+                    // are there any lives left?
                     if (lifeRemaining <= 0)
                     {
-                        // TODO: remove the following statement
                         lifeRemaining = 0;
 
                         // stop everything!
@@ -368,6 +369,7 @@ namespace GhostVibe
                     // reset streak and multiplier
                     streak = 0;
                     multiplier = 1;
+                    UpdateStreakBar();
                 }
 
                 ghostList.Remove(ghost);
@@ -376,14 +378,18 @@ namespace GhostVibe
 
         private void UpdateProgressBars(GameTime gameTime)
         {
-            lifeBar.Progress = lifeRemaining / 10.0f;
-            lifeBar.Update(gameTime);
+            //lifeBar.Progress = lifeRemaining / 10.0f;
+            //lifeBar.Update(gameTime);
 
-            if (multiplier < 5)
-            {
-                streakBar.Progress = (float)streak / (float)Helper.Helper.multiplier[multiplier - 1];
-            }
-            streakBar.Update(gameTime);
+            //if (multiplier < 5)
+            //{
+            //    if (streakBar.ActionSet.Count != 0)
+            //    {
+            //        float newProgress = (float)streak / (float)Helper.Helper.multiplier[multiplier - 1];
+            //        actionManager.addAction(ProgressTo.create(0.2f, newProgress), streakBar);
+            //    }
+            //}
+            //streakBar.Update(gameTime);
         }
 
         private void DrawUI()
@@ -518,8 +524,10 @@ namespace GhostVibe
 
                     positiveInst.Volume = 0.8f;
                     positiveInst.Play();
+                    
                     // update streak
                     ++streak;
+                    UpdateStreakBar();
 
                     // check if the multiplier needs to be upgraded
                     for (int j = Helper.Helper.numMultipliers - 1; j >= multiplier - 1; --j)
@@ -562,9 +570,27 @@ namespace GhostVibe
             // reset the streak and multiplier
             streak = 0;
             multiplier = 1;
+            UpdateStreakBar();
 
             // play sound when player misses ghost
             negative.Play();
+        }
+
+        private void UpdateLifeBar()
+        {
+            actionManager.removeAllActionsFromTarget(lifeBar);
+            actionManager.addAction(ProgressTo.create(0.2f, lifeRemaining / 10.0f), lifeBar);
+        }
+
+        private void UpdateStreakBar()
+        {
+            if (multiplier < 5)
+            {
+                float newProgress = (float)streak / (float)Helper.Helper.multiplier[multiplier - 1];
+
+                actionManager.removeAllActionsFromTarget(streakBar);
+                actionManager.addAction(ProgressTo.create(0.2f, newProgress), streakBar);
+            }
         }
 
         public static float BeatFrequency
