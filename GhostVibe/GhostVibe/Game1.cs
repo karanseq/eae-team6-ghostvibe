@@ -18,6 +18,8 @@ namespace GhostVibe
         protected ActionManager actionManager;
         protected Scheduler scheduler;
         protected bool isPaused;
+        protected bool isGameOver;
+        protected string gameoverText;
 
         protected Texture2D animationTexture, spriteTexture;
         protected Texture2D hallway;
@@ -92,6 +94,8 @@ namespace GhostVibe
             delegateTickGhosts = new UpdateDelegate(TickGhosts);
 
             isPaused = true;
+            isGameOver = false;
+            gameoverText = "Game Over!";
 
             base.Initialize();
         }
@@ -109,7 +113,7 @@ namespace GhostVibe
             highA = Content.Load<SoundEffect>("highA2");
             positive = Content.Load<SoundEffect>("happysound");
             negative = Content.Load<SoundEffect>("badsound");
-            hallway = Content.Load<Texture2D>("newhallway");
+            hallway = Content.Load<Texture2D>("hallway");
             //blueGun = Content.Load<Texture2D>("blue");
             //yellowGun = Content.Load<Texture2D>("yellow");
             //greenGun = Content.Load<Texture2D>("green");
@@ -288,6 +292,7 @@ namespace GhostVibe
                         scheduler.unscheduleDelegate(delegateTickClock);
                         scheduler.unscheduleDelegate(delegateTickGhosts);
                         HapticFeedback.stopBeats();
+                        isGameOver = true;
                     }
 
                     // reset streak and multiplier
@@ -329,6 +334,11 @@ namespace GhostVibe
             }
 
             DrawUI();
+
+            if (isGameOver)
+            {
+                spriteBatch.DrawString(UIFont, gameoverText, new Vector2(GraphicsDevice.Viewport.Width / 2 - 200, GraphicsDevice.Viewport.Height / 2 - 30), Color.Red, 0.0f, Vector2.Zero, 5.0f, SpriteEffects.None, 0.0f);
+            }
 
             spriteBatch.End();
 
