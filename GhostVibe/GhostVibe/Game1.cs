@@ -16,6 +16,7 @@ namespace GhostVibe
 
         ActionManager actionManager;
         Scheduler scheduler;
+        ParticleEngine particleEngine;
 
         protected Texture2D animationTexture, spriteTexture;
         protected Texture2D hallway;
@@ -131,6 +132,15 @@ namespace GhostVibe
             ghostTextures.Add("green", Content.Load<Texture2D>("ghost_03"));
             ghostTextures.Add("red", Content.Load<Texture2D>("ghost_04"));
             ghostTextures.Add("yellow", Content.Load<Texture2D>("ghost_05"));
+            List<Texture2D> notetextures = new List<Texture2D>();
+            notetextures.Add(Content.Load<Texture2D>("red_note1"));
+            notetextures.Add(Content.Load<Texture2D>("blue_note1"));
+            notetextures.Add(Content.Load<Texture2D>("green_note1"));
+
+            notetextures.Add(Content.Load<Texture2D>("orange_note1"));
+            Texture2D CloudTexture;
+            CloudTexture = this.Content.Load<Texture2D>("cloud");
+            particleEngine = new ParticleEngine(notetextures, CloudTexture, new Vector2(400, 240));
 
             StartGame();
         }
