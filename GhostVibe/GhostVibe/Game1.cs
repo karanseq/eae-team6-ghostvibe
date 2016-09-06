@@ -113,7 +113,7 @@ namespace GhostVibe
             highA = Content.Load<SoundEffect>("highA2");
             positive = Content.Load<SoundEffect>("happysound");
             negative = Content.Load<SoundEffect>("badsound");
-            hallway = Content.Load<Texture2D>("hallway");
+            hallway = Content.Load<Texture2D>("betterhallway");
             //blueGun = Content.Load<Texture2D>("blue");
             //yellowGun = Content.Load<Texture2D>("yellow");
             //greenGun = Content.Load<Texture2D>("green");
@@ -379,10 +379,10 @@ namespace GhostVibe
 
         private void SpawnGhost(int laneNumber)
         {
-            Ghost ghost = new Ghost(ghostTextureAnim[GetGhostColor(laneNumber)], laneNumber, 1000, 720, 15, 0.3f, "");
+            Ghost ghost = new Ghost(ghostTextureAnim[GetGhostColor(laneNumber)], laneNumber, 1000, 720, 15, 0.1f, "");
             //Ghost ghost = new Ghost(ghostTextures[GetGhostColor(laneNumber)], ghostTextureAnim[GetGhostColor(laneNumber)], laneNumber, 1000, 720, 8, 1000, 720, 15, 0.3f, "");
             ghostList.Add(ghost);
-            ghost.MoveForward(beatFrequency * 2.5f);
+            ghost.MoveForward(beatFrequency * 4.0f);
         }
 
         private void ShootGhost(Keys keyPressed)

@@ -397,18 +397,6 @@
 /processorParam:TextureFormat=Color
 /build:ghost_yellow_animation_02.png
 
-#begin ghost_green_animation_whole.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:ghost_green_animation_whole.png
-
 #begin hallway.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -420,4 +408,16 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:hallway.png
+
+#begin betterhallway.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:betterhallway.png
 

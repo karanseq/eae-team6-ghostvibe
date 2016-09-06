@@ -126,7 +126,7 @@ namespace GhostVibe
             
             // animate the movement and scaling
             ActionManager.Instance.addAction(MoveTo.create(duration, currentPos), sprite);
-            ActionManager.Instance.addAction(ScaleTo.create(duration, scale * 1.4f), sprite);
+            ActionManager.Instance.addAction(ScaleTo.create(duration, scale * 4.2f), sprite);
 
             // callback to notify that the ghost has reached the shooting range
             Scheduler.Instance.scheduleDelegateOnce(new UpdateDelegate(EnableInShootingRange), duration * 0.5f);
