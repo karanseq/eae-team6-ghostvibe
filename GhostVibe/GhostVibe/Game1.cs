@@ -18,6 +18,8 @@ namespace GhostVibe
         protected ActionManager actionManager;
         protected Scheduler scheduler;
         protected bool isPaused;
+        protected bool isGameOver;
+        protected string gameoverText;
 
         protected Texture2D animationTexture, spriteTexture;
         protected Texture2D hallway;
@@ -33,6 +35,7 @@ namespace GhostVibe
             { "yellow", Keys.Y } };
 
         protected Dictionary<string, Texture2D> ghostTextures;
+        protected Dictionary<string, Texture2D> ghostTextureAnim;
         protected List<Ghost> ghostList;
         protected UpdateDelegate delegateTickGhosts, delegateTickClock;
         protected static float beatFrequency;
@@ -91,6 +94,8 @@ namespace GhostVibe
             delegateTickGhosts = new UpdateDelegate(TickGhosts);
 
             isPaused = true;
+            isGameOver = false;
+            gameoverText = "Game Over!";
 
             base.Initialize();
         }
@@ -108,7 +113,7 @@ namespace GhostVibe
             highA = Content.Load<SoundEffect>("highA2");
             positive = Content.Load<SoundEffect>("happysound");
             negative = Content.Load<SoundEffect>("badsound");
-            hallway = Content.Load<Texture2D>("newhallway");
+            hallway = Content.Load<Texture2D>("betterhallway");
             //blueGun = Content.Load<Texture2D>("blue");
             //yellowGun = Content.Load<Texture2D>("yellow");
             //greenGun = Content.Load<Texture2D>("green");
@@ -116,10 +121,22 @@ namespace GhostVibe
 
             ghostTextures = new Dictionary<string, Texture2D>();
             ghostTextures.Add("plain", Content.Load<Texture2D>("ghost_01"));
-            ghostTextures.Add("blue", Content.Load<Texture2D>("ghost_02"));
-            ghostTextures.Add("green", Content.Load<Texture2D>("ghost_03"));
-            ghostTextures.Add("red", Content.Load<Texture2D>("ghost_04"));
-            ghostTextures.Add("yellow", Content.Load<Texture2D>("ghost_05"));
+
+            //ghostTextures.Add("blue", Content.Load<Texture2D>("ghost_blue"));
+            //ghostTextures.Add("green", Content.Load<Texture2D>("ghost_green"));
+            //ghostTextures.Add("red", Content.Load<Texture2D>("ghost_red"));
+            //ghostTextures.Add("yellow", Content.Load<Texture2D>("ghost_yellow"));
+
+            ghostTextures.Add("blue", Content.Load<Texture2D>("ghost_blue_animation_01"));
+            ghostTextures.Add("green", Content.Load<Texture2D>("ghost_green_animation_01"));
+            ghostTextures.Add("red", Content.Load<Texture2D>("ghost_red_animation_01"));
+            ghostTextures.Add("yellow", Content.Load<Texture2D>("ghost_yellow_animation_01"));
+
+            ghostTextureAnim = new Dictionary<string, Texture2D>();
+            ghostTextureAnim.Add("green", Content.Load<Texture2D>("ghost_green_animation_02"));
+            ghostTextureAnim.Add("red", Content.Load<Texture2D>("ghost_red_animation_02"));
+            ghostTextureAnim.Add("blue", Content.Load<Texture2D>("ghost_blue_animation_02"));
+            ghostTextureAnim.Add("yellow", Content.Load<Texture2D>("ghost_yellow_animation_02"));
 
             StartGame();
         }
@@ -275,6 +292,7 @@ namespace GhostVibe
                         scheduler.unscheduleDelegate(delegateTickClock);
                         scheduler.unscheduleDelegate(delegateTickGhosts);
                         HapticFeedback.stopBeats();
+                        isGameOver = true;
                     }
 
                     // reset streak and multiplier
@@ -317,6 +335,11 @@ namespace GhostVibe
 
             DrawUI();
 
+            if (isGameOver)
+            {
+                spriteBatch.DrawString(UIFont, gameoverText, new Vector2(GraphicsDevice.Viewport.Width / 2 - 200, GraphicsDevice.Viewport.Height / 2 - 30), Color.Red, 0.0f, Vector2.Zero, 5.0f, SpriteEffects.None, 0.0f);
+            }
+
             spriteBatch.End();
 
             base.Draw(gameTime);
@@ -356,9 +379,10 @@ namespace GhostVibe
 
         private void SpawnGhost(int laneNumber)
         {
-            Ghost ghost = new Ghost(ghostTextures["plain"], laneNumber, 0.3f, "");
+            Ghost ghost = new Ghost(ghostTextureAnim[GetGhostColor(laneNumber)], laneNumber, 1000, 720, 15, 0.1f, "");
+            //Ghost ghost = new Ghost(ghostTextures[GetGhostColor(laneNumber)], ghostTextureAnim[GetGhostColor(laneNumber)], laneNumber, 1000, 720, 8, 1000, 720, 15, 0.3f, "");
             ghostList.Add(ghost);
-            ghost.MoveForward(beatFrequency * 2.5f);
+            ghost.MoveForward(beatFrequency * 4.0f);
         }
 
         private void ShootGhost(Keys keyPressed)
@@ -450,6 +474,28 @@ namespace GhostVibe
         public static float BeatFrequency
         {
             get { return Game1.beatFrequency; }
+        }
+
+        public string GetGhostColor(int laneNumber)
+        {
+            if (laneNumber == 0)
+            {
+                return "green";
+            }
+            else if (laneNumber == 1)
+            {
+                return "red";
+            }
+            else if (laneNumber == 2)
+            {
+                return "blue";
+            }
+            else if (laneNumber == 3)
+            {
+                return "yellow";
+            }
+            else
+                return "plain";
         }
 
     }

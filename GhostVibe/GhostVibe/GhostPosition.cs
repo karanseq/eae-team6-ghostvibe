@@ -54,13 +54,13 @@ namespace GhostVibe
         public static Vector2 GetInitialPosition(int ind)
         {
             if (ind == 0)
-                return new Vector2(Helper.Helper.ViewportWidth * 0.35f, Helper.Helper.ViewportHeight * 0.5f);
+                return new Vector2(Helper.Helper.ViewportWidth * 0.475f, Helper.Helper.ViewportHeight * 0.5f);
             else if (ind == 1)
-                return new Vector2(Helper.Helper.ViewportWidth * 0.45f, Helper.Helper.ViewportHeight * 0.5f);
+                return new Vector2(Helper.Helper.ViewportWidth * 0.485f, Helper.Helper.ViewportHeight * 0.5f);
             else if (ind == 2)
-                return new Vector2(Helper.Helper.ViewportWidth * 0.55f, Helper.Helper.ViewportHeight * 0.5f);
+                return new Vector2(Helper.Helper.ViewportWidth * 0.515f, Helper.Helper.ViewportHeight * 0.5f);
             else
-                return new Vector2(Helper.Helper.ViewportWidth * 0.65f, Helper.Helper.ViewportHeight * 0.5f);
+                return new Vector2(Helper.Helper.ViewportWidth * 0.525f, Helper.Helper.ViewportHeight * 0.5f);
         }
 
         public static Vector2 GetSecondPosition(int ind)
@@ -78,13 +78,13 @@ namespace GhostVibe
         public static Vector2 GetThirdPosition(int ind)
         {
             if (ind == 0)
-                return new Vector2(Helper.Helper.ViewportWidth * 0.2f, Helper.Helper.ViewportHeight * 0.8f);
+                return new Vector2(Helper.Helper.ViewportWidth * 0.175f, Helper.Helper.ViewportHeight * 0.8f);
             else if (ind == 1)
                 return new Vector2(Helper.Helper.ViewportWidth * 0.4f, Helper.Helper.ViewportHeight * 0.8f);
             else if (ind == 2)
-                return new Vector2(Helper.Helper.ViewportWidth * 0.6f, Helper.Helper.ViewportHeight * 0.8f);
+                return new Vector2(Helper.Helper.ViewportWidth * 0.625f, Helper.Helper.ViewportHeight * 0.8f);
             else
-                return new Vector2(Helper.Helper.ViewportWidth * 0.8f, Helper.Helper.ViewportHeight * 0.8f);
+                return new Vector2(Helper.Helper.ViewportWidth * 0.85f, Helper.Helper.ViewportHeight * 0.8f);
         }
     }
 }
