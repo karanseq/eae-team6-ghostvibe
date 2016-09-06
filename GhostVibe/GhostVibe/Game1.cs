@@ -340,9 +340,10 @@ namespace GhostVibe
 
         private void DrawUI()
         {
-            spriteBatch.DrawString(UIFont, "Score: " + score, new Vector2(GraphicsDevice.Viewport.Width / 2 - 400, 30), Color.Blue, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 1.0f);
-            spriteBatch.DrawString(UIFont, "Life: " + lifeRemaining, new Vector2(20, GraphicsDevice.Viewport.Height - 50), Color.Purple, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 1.0f);
-            spriteBatch.DrawString(UIFont, "Green: D, Red: F, Blue: J, Yellow: K", new Vector2(GraphicsDevice.Viewport.Width / 2 - 100, 30), Color.ForestGreen, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 1.0f);
+            spriteBatch.DrawString(UIFont, "Score: " + score, new Vector2(GraphicsDevice.Viewport.Width / 2 - 350, 30), Color.Blue, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 1.0f);
+            //spriteBatch.DrawString(UIFont, "Life: " + lifeRemaining, new Vector2(20, GraphicsDevice.Viewport.Height - 50), Color.Purple, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 1.0f);
+            spriteBatch.DrawString(UIFont, "Life: " + lifeRemaining, new Vector2(GraphicsDevice.Viewport.Width / 2 + 200, 30), Color.ForestGreen, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 1.0f);
+            //spriteBatch.DrawString(UIFont, "Green: D, Red: F, Blue: J, Yellow: K", new Vector2(GraphicsDevice.Viewport.Width / 2 - 220, 30), Color.ForestGreen, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 1.0f);
         }
 
         protected override void Draw(GameTime gameTime)
