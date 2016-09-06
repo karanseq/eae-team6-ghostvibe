@@ -236,7 +236,9 @@ namespace GhostVibe
                 actionManager.update(gameTime.ElapsedGameTime.Milliseconds * 0.001f);
                 scheduler.update(gameTime.ElapsedGameTime.Milliseconds * 0.001f);
 
-                UpdateProgressBars(gameTime);
+                //UpdateProgressBars(gameTime);
+                lifeBar.Update(gameTime);
+                streakBar.Update(gameTime);
             }
 
             base.Update(gameTime);
@@ -374,22 +376,6 @@ namespace GhostVibe
 
                 ghostList.Remove(ghost);
             }
-        }
-
-        private void UpdateProgressBars(GameTime gameTime)
-        {
-            //lifeBar.Progress = lifeRemaining / 10.0f;
-            //lifeBar.Update(gameTime);
-
-            //if (multiplier < 5)
-            //{
-            //    if (streakBar.ActionSet.Count != 0)
-            //    {
-            //        float newProgress = (float)streak / (float)Helper.Helper.multiplier[multiplier - 1];
-            //        actionManager.addAction(ProgressTo.create(0.2f, newProgress), streakBar);
-            //    }
-            //}
-            //streakBar.Update(gameTime);
         }
 
         private void DrawUI()
