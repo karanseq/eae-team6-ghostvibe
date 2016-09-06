@@ -209,6 +209,15 @@ namespace GhostVibe
             {
                 acceptKeys = false;
                 isPaused = !isPaused;
+
+                if (isPaused)
+                {
+                    bgmInst.Pause();
+                }
+                else
+                {
+                    bgmInst.Resume();
+                }
             }
 
             Keys keyPressed = Keys.None;

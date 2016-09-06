@@ -129,7 +129,7 @@ namespace GhostVibe
             ActionManager.Instance.addAction(ScaleTo.create(duration, scale * 4.2f), sprite);
 
             // callback to notify that the ghost has reached the shooting range
-            Scheduler.Instance.scheduleDelegateOnce(new UpdateDelegate(EnableInShootingRange), duration * 0.5f);
+            Scheduler.Instance.scheduleDelegateOnce(new UpdateDelegate(EnableInShootingRange), duration * 0.6f);
             // callback to notify that the ghost has finished moving
             Scheduler.Instance.scheduleDelegateOnce(new UpdateDelegate(FinishedMoving), duration);
 
