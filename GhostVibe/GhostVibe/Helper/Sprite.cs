@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
@@ -137,7 +136,7 @@ namespace Helper
             return true;
         }
 
-        public void Update(GameTime gameTime)
+        public virtual void Update(GameTime gameTime)
         {
             // don't update if inactive
             if (isAnimation == false || active == false)
@@ -172,7 +171,7 @@ namespace Helper
             sourceRect.X = currentFrame * frameWidth;
         }
 
-        public void Draw(SpriteBatch spriteBatch)
+        public virtual void Draw(SpriteBatch spriteBatch)
         {
             // check if this sprite is an animation
             if (isAnimation)

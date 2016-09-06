@@ -55,6 +55,7 @@ namespace GhostVibe
         protected int score, streak, multiplier;
         protected int lifeRemaining;
         public Random random;
+        protected ProgressBar lifeBar, streakBar;
 
         // audio objects
         protected SoundEffect bgm;
@@ -78,7 +79,7 @@ namespace GhostVibe
             graphics.PreferredBackBufferWidth = 1280;
             graphics.PreferredBackBufferHeight = 720;
 
-            graphics.IsFullScreen = true;
+            //graphics.IsFullScreen = true;
             IsMouseVisible = true;
 
             Content.RootDirectory = "Content";
@@ -348,7 +349,7 @@ namespace GhostVibe
 
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Color.Transparent);
 
             spriteBatch.Begin();
 
@@ -374,14 +375,9 @@ namespace GhostVibe
             {
                 spriteBatch.DrawString(UIFont, gameoverText, new Vector2(GraphicsDevice.Viewport.Width / 2 - 200, GraphicsDevice.Viewport.Height / 2 - 30), Color.Red, 0.0f, Vector2.Zero, 5.0f, SpriteEffects.None, 0.0f);
             }
-
             else if (isPaused)
             {
                 spriteBatch.DrawString(UIFont, pausedText, new Vector2(GraphicsDevice.Viewport.Width / 2 - 125, GraphicsDevice.Viewport.Height / 2 - 30), Color.Red, 0.0f, Vector2.Zero, 5.0f, SpriteEffects.None, 0.0f);
-            }
-            else
-            {
-                ;
             }
 
             spriteBatch.End();
