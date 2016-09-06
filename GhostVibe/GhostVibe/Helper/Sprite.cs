@@ -267,6 +267,12 @@ namespace Helper
             set { frameCount = value; }
         }
 
+        public int FrameTime
+        {
+            get { return frameTime; }
+            set { frameTime = value; }
+        }
+
         public int CurrentFrame
         {
             get { return currentFrame; }

@@ -100,6 +100,7 @@ namespace GhostVibe
             StageThreePosition = GhostPosition.GetThirdPosition(laneNumber);
             currentPos = StageOnePosition;
             ghostAnim = Sprite.Create(dynamicTexture, frameW, frameH, numFrame);
+            ghostAnim.FrameTime = 90;
             ghostAnim.Position = currentPos;
             frameWidth = frameW;
             frameHeight = frameH;
