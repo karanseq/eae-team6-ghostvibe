@@ -23,6 +23,10 @@ namespace GhostVibe
         protected string pausedText;
         protected string restartText;
 
+        protected Random rand;
+
+        protected int bgmIndicator;
+
         protected Texture2D animationTexture, spriteTexture;
         protected Texture2D hallway;
         protected Texture2D lifeBar, streakBar;
@@ -62,6 +66,11 @@ namespace GhostVibe
         protected SoundEffect bgm;
         protected SoundEffectInstance bgmInst;
 
+        protected SoundEffect bgm2;
+        protected SoundEffectInstance bgmInst2;
+
+        protected List<SoundEffectInstance> bgmList;
+
         protected SoundEffect A;
         protected SoundEffect C;
         protected SoundEffect E;
@@ -98,6 +107,7 @@ namespace GhostVibe
             delegateTickClock = new UpdateDelegate(TickClock);
             delegateTickGhosts = new UpdateDelegate(TickGhosts);
             SoundEffect.MasterVolume = 1.0f;
+            rand = new Random();
 
             isPaused = true;
             isGameOver = false;
@@ -113,9 +123,13 @@ namespace GhostVibe
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
             UIFont = Content.Load<SpriteFont>("interface");
-            //bgm = Content.Load<SoundEffect>("newbgmsize");
-            bgm = Content.Load<SoundEffect>("final-battle");
+            bgm = Content.Load<SoundEffect>("newbgmsize");
+            bgm2 = Content.Load<SoundEffect>("final-battle");
+            bgmList = new List<SoundEffectInstance>();
             bgmInst = bgm.CreateInstance();
+            bgmInst2 = bgm2.CreateInstance();
+            bgmList.Add(bgmInst);
+            bgmList.Add(bgmInst2);
             A = Content.Load<SoundEffect>("A2");
             C = Content.Load<SoundEffect>("C2");
             E = Content.Load<SoundEffect>("E2");
@@ -183,10 +197,14 @@ namespace GhostVibe
             // start scheduled functions
             HapticFeedback.startBeats(beatFrequency, 0.1f, 0.1f);
             scheduler.scheduleDelegate(delegateTickGhosts, beatFrequency);
-            bgmInst.Pitch = 0.0f;
-            bgmInst.Volume = 1.0f;
-            bgmInst.IsLooped = true;
-            bgmInst.Play();
+            foreach (SoundEffectInstance inst in bgmList)
+            {
+                inst.Pitch = 0.0f;
+                inst.Volume = 1.0f;
+                inst.IsLooped = true;
+            }
+            bgmIndicator = rand.Next(0, 2);
+            bgmList[bgmIndicator].Play();
 
             ghostList = new List<Ghost>();
 
@@ -233,11 +251,11 @@ namespace GhostVibe
 
                 if (isPaused)
                 {
-                    bgmInst.Pause();
+                    bgmList[bgmIndicator].Pause();
                 }
                 else
                 {
-                    bgmInst.Resume();
+                    bgmList[bgmIndicator].Resume();
                 }
             }
 
@@ -338,7 +356,7 @@ namespace GhostVibe
                         scheduler.unscheduleDelegate(delegateTickGhosts);
                         HapticFeedback.stopBeats();
                         isGameOver = true;
-                        bgmInst.Stop();
+                        bgmList[bgmIndicator].Stop();
                     }
 
                     // reset streak and multiplier
@@ -409,7 +427,7 @@ namespace GhostVibe
             if (seconds >= Helper.Helper.difficultyTimeMatrix[currentDifficultyIndex])
             {
                 ++currentDifficultyIndex;
-                bgmInst.Pitch += 0.1f;
+                bgmList[bgmIndicator].Pitch += 0.1f;
                 currentDifficultyIndex = currentDifficultyIndex > Helper.Helper.maxDifficulty ? currentDifficultyIndex - 1 : currentDifficultyIndex;
                 rhythm.Clear();
                 rhythm = Helper.Helper.GenerateRhythm(currentDifficultyIndex, beatFrequency, random);
