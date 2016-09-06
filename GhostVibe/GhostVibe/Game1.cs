@@ -29,7 +29,6 @@ namespace GhostVibe
 
         protected Texture2D animationTexture, spriteTexture;
         protected Texture2D hallway;
-        protected Texture2D lifeBar, streakBar;
         //protected Texture2D blueGun, greenGun, redGun, yellowGun;
         protected SpriteFont UIFont;
 
@@ -144,9 +143,6 @@ namespace GhostVibe
             //greenGun = Content.Load<Texture2D>("green");
             //redGun = Content.Load<Texture2D>("red");
 
-            lifeBar = Content.Load<Texture2D>("life_bar");
-            streakBar = Content.Load<Texture2D>("streak_bar");
-
             ghostTextures = new Dictionary<string, Texture2D>();
             ghostTextures.Add("plain", Content.Load<Texture2D>("ghost_01"));
 
@@ -165,6 +161,13 @@ namespace GhostVibe
             ghostTextureAnim.Add("red", Content.Load<Texture2D>("ghost_red_animation_02"));
             ghostTextureAnim.Add("blue", Content.Load<Texture2D>("ghost_blue_animation_02"));
             ghostTextureAnim.Add("yellow", Content.Load<Texture2D>("ghost_yellow_animation_02"));
+
+            lifeBar = ProgressBar.Create(Content.Load<Texture2D>("life_bar"), true, new Vector2(175, 340));
+            lifeBar.IsUpToDown = false;
+            lifeBar.Progress = 1.0f;
+            streakBar = ProgressBar.Create(Content.Load<Texture2D>("streak_bar"), true, new Vector2(1112, 218));
+            streakBar.IsUpToDown = false;
+            streakBar.Progress = 1.0f;
 
             StartGame();
         }
@@ -232,6 +235,8 @@ namespace GhostVibe
 
                 actionManager.update(gameTime.ElapsedGameTime.Milliseconds * 0.001f);
                 scheduler.update(gameTime.ElapsedGameTime.Milliseconds * 0.001f);
+
+                UpdateProgressBars(gameTime);
             }
 
             base.Update(gameTime);
@@ -369,6 +374,18 @@ namespace GhostVibe
             }
         }
 
+        private void UpdateProgressBars(GameTime gameTime)
+        {
+            lifeBar.Progress = lifeRemaining / 10.0f;
+            lifeBar.Update(gameTime);
+
+            if (multiplier < 5)
+            {
+                streakBar.Progress = (float)streak / (float)Helper.Helper.multiplier[multiplier - 1];
+            }
+            streakBar.Update(gameTime);
+        }
+
         private void DrawUI()
         {
             spriteBatch.DrawString(UIFont, "Score: " + score, new Vector2(GraphicsDevice.Viewport.Width / 2 - 350, 30), Color.Blue, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 1.0f);
@@ -389,10 +406,9 @@ namespace GhostVibe
             //spriteBatch.Draw(redGun, new Vector2(GraphicsDevice.Viewport.Width * 0.35f, GraphicsDevice.Viewport.Height), null, Color.White, Helper.Helper.DegreesToRadians(25.0f), new Vector2(blueGun.Width / 2, blueGun.Height / 2), 0.65f, SpriteEffects.None, 0.0f);
             //spriteBatch.Draw(greenGun, new Vector2(GraphicsDevice.Viewport.Width * 0.65f, GraphicsDevice.Viewport.Height), null, Color.White, Helper.Helper.DegreesToRadians(-25.0f), new Vector2(blueGun.Width / 2, blueGun.Height / 2), 0.65f, SpriteEffects.None, 0.0f);
 
-            spriteBatch.Draw(lifeBar, new Vector2(GraphicsDevice.Viewport.Width / 4 - 203, GraphicsDevice.Viewport.Height / 4 + 7), null, Color.White, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.0f);
-            spriteBatch.Draw(streakBar, new Vector2(GraphicsDevice.Viewport.Width / 2 + 431, GraphicsDevice.Viewport.Height / 4 + 21), null, Color.White, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.0f);
-
             spriteBatch.DrawString(UIFont, "X" + multiplier, new Vector2(GraphicsDevice.Viewport.Width / 2 + 472, GraphicsDevice.Viewport.Height / 4 + 285), Color.BlueViolet, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 1.0f);
+            lifeBar.Draw(spriteBatch);
+            streakBar.Draw(spriteBatch);
 
             if (ghostList.Count != 0)
             {
