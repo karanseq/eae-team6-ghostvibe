@@ -20,6 +20,7 @@ namespace GhostVibe
         protected bool isPaused;
         protected bool isGameOver;
         protected string gameoverText;
+        protected string pausedText;
 
         protected Texture2D animationTexture, spriteTexture;
         protected Texture2D hallway;
@@ -96,6 +97,7 @@ namespace GhostVibe
             isPaused = true;
             isGameOver = false;
             gameoverText = "Game Over!";
+            pausedText = "Paused";
 
             base.Initialize();
         }
@@ -338,6 +340,11 @@ namespace GhostVibe
             if (isGameOver)
             {
                 spriteBatch.DrawString(UIFont, gameoverText, new Vector2(GraphicsDevice.Viewport.Width / 2 - 200, GraphicsDevice.Viewport.Height / 2 - 30), Color.Red, 0.0f, Vector2.Zero, 5.0f, SpriteEffects.None, 0.0f);
+            }
+
+            if (isPaused)
+            {
+                spriteBatch.DrawString(UIFont, pausedText, new Vector2(GraphicsDevice.Viewport.Width / 2 - 125, GraphicsDevice.Viewport.Height / 2 - 30), Color.Red, 0.0f, Vector2.Zero, 5.0f, SpriteEffects.None, 0.0f);
             }
 
             spriteBatch.End();
