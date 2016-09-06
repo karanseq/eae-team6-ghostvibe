@@ -25,6 +25,7 @@ namespace GhostVibe
 
         protected Texture2D animationTexture, spriteTexture;
         protected Texture2D hallway;
+        protected Texture2D lifeBar, streakBar;
         //protected Texture2D blueGun, greenGun, redGun, yellowGun;
         protected SpriteFont UIFont;
 
@@ -68,6 +69,8 @@ namespace GhostVibe
         protected SoundEffect positive;
         protected SoundEffect negative;
 
+        protected SoundEffectInstance positiveInst;
+
         // rhythms
         int seconds, currentDifficultyIndex;
         protected int index = -1;
@@ -79,7 +82,7 @@ namespace GhostVibe
             graphics.PreferredBackBufferWidth = 1280;
             graphics.PreferredBackBufferHeight = 720;
 
-            graphics.IsFullScreen = true;
+            //graphics.IsFullScreen = true;
             IsMouseVisible = true;
 
             Content.RootDirectory = "Content";
@@ -94,6 +97,7 @@ namespace GhostVibe
 
             delegateTickClock = new UpdateDelegate(TickClock);
             delegateTickGhosts = new UpdateDelegate(TickGhosts);
+            SoundEffect.MasterVolume = 1.0f;
 
             isPaused = true;
             isGameOver = false;
@@ -109,7 +113,8 @@ namespace GhostVibe
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
             UIFont = Content.Load<SpriteFont>("interface");
-            bgm = Content.Load<SoundEffect>("newbgmsize");
+            //bgm = Content.Load<SoundEffect>("newbgmsize");
+            bgm = Content.Load<SoundEffect>("final-battle");
             bgmInst = bgm.CreateInstance();
             A = Content.Load<SoundEffect>("A2");
             C = Content.Load<SoundEffect>("C2");
@@ -117,11 +122,15 @@ namespace GhostVibe
             highA = Content.Load<SoundEffect>("highA2");
             positive = Content.Load<SoundEffect>("happysound");
             negative = Content.Load<SoundEffect>("badsound");
-            hallway = Content.Load<Texture2D>("betterhallway");
+            hallway = Content.Load<Texture2D>("hallway_bar");
+            positiveInst = positive.CreateInstance();
             //blueGun = Content.Load<Texture2D>("blue");
             //yellowGun = Content.Load<Texture2D>("yellow");
             //greenGun = Content.Load<Texture2D>("green");
             //redGun = Content.Load<Texture2D>("red");
+
+            lifeBar = Content.Load<Texture2D>("life_bar");
+            streakBar = Content.Load<Texture2D>("streak_bar");
 
             ghostTextures = new Dictionary<string, Texture2D>();
             ghostTextures.Add("plain", Content.Load<Texture2D>("ghost_01"));
@@ -174,7 +183,7 @@ namespace GhostVibe
             // start scheduled functions
             HapticFeedback.startBeats(beatFrequency, 0.1f, 0.1f);
             scheduler.scheduleDelegate(delegateTickGhosts, beatFrequency);
-
+            bgmInst.Pitch = 0.0f;
             bgmInst.Volume = 1.0f;
             bgmInst.IsLooped = true;
             bgmInst.Play();
@@ -329,6 +338,7 @@ namespace GhostVibe
                         scheduler.unscheduleDelegate(delegateTickGhosts);
                         HapticFeedback.stopBeats();
                         isGameOver = true;
+                        bgmInst.Stop();
                     }
 
                     // reset streak and multiplier
@@ -359,6 +369,11 @@ namespace GhostVibe
             //spriteBatch.Draw(yellowGun, new Vector2(GraphicsDevice.Viewport.Width * 0.9f, GraphicsDevice.Viewport.Height * 0.97f), null, Color.White, Helper.Helper.DegreesToRadians(-45.0f), new Vector2(blueGun.Width / 2, blueGun.Height / 2), 0.65f, SpriteEffects.None, 0.0f);
             //spriteBatch.Draw(redGun, new Vector2(GraphicsDevice.Viewport.Width * 0.35f, GraphicsDevice.Viewport.Height), null, Color.White, Helper.Helper.DegreesToRadians(25.0f), new Vector2(blueGun.Width / 2, blueGun.Height / 2), 0.65f, SpriteEffects.None, 0.0f);
             //spriteBatch.Draw(greenGun, new Vector2(GraphicsDevice.Viewport.Width * 0.65f, GraphicsDevice.Viewport.Height), null, Color.White, Helper.Helper.DegreesToRadians(-25.0f), new Vector2(blueGun.Width / 2, blueGun.Height / 2), 0.65f, SpriteEffects.None, 0.0f);
+
+            spriteBatch.Draw(lifeBar, new Vector2(GraphicsDevice.Viewport.Width / 4 - 203, GraphicsDevice.Viewport.Height / 4 + 7), null, Color.White, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.0f);
+            spriteBatch.Draw(streakBar, new Vector2(GraphicsDevice.Viewport.Width / 2 + 431, GraphicsDevice.Viewport.Height / 4 + 21), null, Color.White, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.0f);
+
+            spriteBatch.DrawString(UIFont, "X" + multiplier, new Vector2(GraphicsDevice.Viewport.Width / 2 + 472, GraphicsDevice.Viewport.Height / 4 + 285), Color.BlueViolet, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 1.0f);
 
             if (ghostList.Count != 0)
             {
@@ -394,6 +409,7 @@ namespace GhostVibe
             if (seconds >= Helper.Helper.difficultyTimeMatrix[currentDifficultyIndex])
             {
                 ++currentDifficultyIndex;
+                bgmInst.Pitch += 0.1f;
                 currentDifficultyIndex = currentDifficultyIndex > Helper.Helper.maxDifficulty ? currentDifficultyIndex - 1 : currentDifficultyIndex;
                 rhythm.Clear();
                 rhythm = Helper.Helper.GenerateRhythm(currentDifficultyIndex, beatFrequency, random);
@@ -439,19 +455,19 @@ namespace GhostVibe
             {
                 case Keys.A:
                     laneNumber = 0;
-                    A.Play();
+                    //A.Play();
                     break;
                 case Keys.B:
                     laneNumber = 1;
-                    C.Play();
+                    //C.Play();
                     break;
                 case Keys.X:
                     laneNumber = 2;
-                    E.Play();
+                    //E.Play();
                     break;
                 case Keys.Y:
                     laneNumber = 3;
-                    highA.Play();
+                    //highA.Play();
                     break;
             }
 
@@ -465,6 +481,9 @@ namespace GhostVibe
                 {
                     // kill the ghost
                     ghost.Die(true);
+
+                    positiveInst.Volume = 0.8f;
+                    positiveInst.Play();
                     // update streak
                     ++streak;
 
@@ -490,16 +509,16 @@ namespace GhostVibe
                     switch(keyPressed)
                     {
                         case Keys.A:
-                            A.Play();
+                            //A.Play();
                             break;
                         case Keys.B:
-                            C.Play();
+                            //C.Play();
                             break;
                         case Keys.X:
-                            E.Play();
+                            //E.Play();
                             break;
                         case Keys.Y:
-                            highA.Play();
+                            //highA.Play();
                             break;
                     }
                     return;
