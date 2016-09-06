@@ -96,7 +96,7 @@ namespace GhostVibe
 
             isPaused = true;
             isGameOver = false;
-            gameoverText = "Game Over!";
+            gameoverText = "      Game Over!\nPlay Again? Y/N";
             pausedText = "Paused";
 
             base.Initialize();
@@ -180,7 +180,15 @@ namespace GhostVibe
             ghostList = new List<Ghost>();
 
             isPaused = false;
-    }
+            isGameOver = false;
+        }
+
+        protected void PlayAgain()
+        {
+            scheduler.unscheduleDelegate(delegateTickClock);
+            HapticFeedback.stopBeats();
+            scheduler.unscheduleDelegate(delegateTickGhosts);
+        }
 
         protected override void Update(GameTime gameTime)
         {
@@ -207,7 +215,7 @@ namespace GhostVibe
             previousGamepadState = currentGamepadState;
             currentGamepadState = GamePad.GetState(PlayerIndex.One);
 
-            if (acceptKeys && (currentKeyboardState.IsKeyDown(Keys.Escape) || currentGamepadState.IsButtonDown(Buttons.Back)))
+            if (acceptKeys && !isGameOver && (currentKeyboardState.IsKeyDown(Keys.Escape) || currentGamepadState.IsButtonDown(Buttons.Back)))
             {
                 acceptKeys = false;
                 isPaused = !isPaused;
@@ -219,6 +227,21 @@ namespace GhostVibe
                 else
                 {
                     bgmInst.Resume();
+                }
+            }
+
+            if (acceptKeys && isGameOver)
+            {
+                if (currentKeyboardState.IsKeyDown(Keys.N) || currentGamepadState.IsButtonDown(Buttons.Back))
+                {
+                    acceptKeys = false;
+                    Exit();
+                }
+                else if (currentKeyboardState.IsKeyDown(Keys.Y) || currentGamepadState.IsButtonDown(Buttons.Back))
+                {
+                    acceptKeys = false;
+                    PlayAgain();
+                    StartGame();
                 }
             }
 
@@ -241,7 +264,7 @@ namespace GhostVibe
             }
 
             // only forward the event if the game is not paused
-            if (!isPaused && keyPressed != Keys.None)
+            if (!isPaused && !isGameOver && keyPressed != Keys.None)
             {
                 ShootGhost(keyPressed);
             }
