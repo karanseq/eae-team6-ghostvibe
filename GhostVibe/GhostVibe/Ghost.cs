@@ -238,7 +238,7 @@ namespace GhostVibe
         {
             if (isAnimated)
             {
-                if(isActive)
+                if (isActive)
                     ghostAnim.Draw(spriteBatch);
             }
             else

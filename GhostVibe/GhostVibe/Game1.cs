@@ -123,16 +123,16 @@ namespace GhostVibe
             //ghostTextures.Add("red", Content.Load<Texture2D>("ghost_red"));
             //ghostTextures.Add("yellow", Content.Load<Texture2D>("ghost_yellow"));
 
-            ghostTextures.Add("blue", Content.Load<Texture2D>("ghost_green_animation_01"));
+            ghostTextures.Add("blue", Content.Load<Texture2D>("ghost_blue_animation_01"));
             ghostTextures.Add("green", Content.Load<Texture2D>("ghost_green_animation_01"));
-            ghostTextures.Add("red", Content.Load<Texture2D>("ghost_green_animation_01"));
-            ghostTextures.Add("yellow", Content.Load<Texture2D>("ghost_green_animation_01"));
+            ghostTextures.Add("red", Content.Load<Texture2D>("ghost_red_animation_01"));
+            ghostTextures.Add("yellow", Content.Load<Texture2D>("ghost_yellow_animation_01"));
 
             ghostTextureAnim = new Dictionary<string, Texture2D>();
             ghostTextureAnim.Add("green", Content.Load<Texture2D>("ghost_green_animation_02"));
-            ghostTextureAnim.Add("red", Content.Load<Texture2D>("ghost_green_animation_02"));
-            ghostTextureAnim.Add("blue", Content.Load<Texture2D>("ghost_green_animation_02"));
-            ghostTextureAnim.Add("yellow", Content.Load<Texture2D>("ghost_green_animation_02"));
+            ghostTextureAnim.Add("red", Content.Load<Texture2D>("ghost_red_animation_02"));
+            ghostTextureAnim.Add("blue", Content.Load<Texture2D>("ghost_blue_animation_02"));
+            ghostTextureAnim.Add("yellow", Content.Load<Texture2D>("ghost_yellow_animation_02"));
 
             StartGame();
         }

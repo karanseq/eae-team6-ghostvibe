@@ -10,9 +10,9 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Storage;
 using Microsoft.Xna.Framework.Content;
 
-namespace gameUI
+namespace GhostVibe
 {
-    class button
+    public class Button
     {
         public int buttonX, buttonY;
         private Texture2D mTexture;
@@ -30,7 +30,6 @@ namespace gameUI
             {
                 return buttonX;
             }
-            set { }
         }
 
         public int ButtonY
@@ -39,7 +38,6 @@ namespace gameUI
             {
                 return buttonY;
             }
-            set { }
         }
 
         public void Create(string name, int buttonX, int buttonY)
@@ -48,6 +46,7 @@ namespace gameUI
             this.buttonX = buttonX;
             this.buttonY = buttonY;
         }
+
         public void LoadContent(ContentManager theContentManager, string theAssetName, string theAssetNameTwo)
         {
             mTexture1 = theContentManager.Load<Texture2D>(theAssetName);
@@ -59,7 +58,7 @@ namespace gameUI
         /**
          * @return true: If a player enters the button with mouse
          */
-        public bool enterButton()
+        public bool EnterButton()
         {
             if (CurrentMouseState.X < buttonX + mTexture.Width * scale &&
                     CurrentMouseState.X > buttonX &&
@@ -73,13 +72,11 @@ namespace gameUI
             return false;
         }
 
-
-
         public void Update(GameTime gameTime)
         {
             CurrentMouseState = Mouse.GetState();
             //       KeyboardState aCurrentKeyboardState = Keyboard.GetState();
-            if (enterButton() && CurrentMouseState.LeftButton == ButtonState.Pressed)
+            if (EnterButton() && CurrentMouseState.LeftButton == ButtonState.Pressed)
             {
                 switch (Name)
                 {
@@ -92,7 +89,6 @@ namespace gameUI
                         {
                             break;
                         }
-
                     default:
                         break;
                 }
@@ -102,7 +98,6 @@ namespace gameUI
         {
             theSpriteBatch.Draw(mTexture, new Vector2((int)buttonX, (int)buttonY), null, Color.White, 0, Vector2.Zero, scale, SpriteEffects.None, 0);
             theSpriteBatch.DrawString(font1, Name, new Vector2(buttonX + mTexture.Width / 2 * scale, buttonY + mTexture.Height / 2 * scale) - font1.MeasureString(Name) / 2, Color.Green, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
-
         }
     }
 }
