@@ -91,6 +91,7 @@ namespace GhostVibe
         protected SoundEffect highA;
         protected SoundEffect positive;
         protected SoundEffect negative;
+        protected SoundEffectInstance negaInst;
 
         protected SoundEffect gameoverSound;
 
@@ -156,6 +157,7 @@ namespace GhostVibe
             highA = Content.Load<SoundEffect>("highA2");
             positive = Content.Load<SoundEffect>("happysound");
             negative = Content.Load<SoundEffect>("badsound");
+            negaInst = negative.CreateInstance();
             gameoverSound = Content.Load<SoundEffect>("Evil_Laugh");
             hallway = Content.Load<Texture2D>("hallway_bar");
             positiveInst = positive.CreateInstance();
@@ -231,6 +233,8 @@ namespace GhostVibe
         protected void StartGame()
         {
             random = new Random();
+
+            negaInst.Pitch = 0.2f;
 
             // start the clock
             seconds = 0;
@@ -638,7 +642,8 @@ namespace GhostVibe
             UpdateStreakBar();
 
             // play sound when player misses ghost
-            negative.Play();
+            //negative.Play();
+            negaInst.Play();
 
             // generate haptic feedback
             HapticFeedback.playBeat(1.0f, 0.25f);
