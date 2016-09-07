@@ -246,6 +246,7 @@ namespace Helper
         public bool Active
         {
             get { return active; }
+            set { active = value; }
         }
 
         public int FrameWidth
