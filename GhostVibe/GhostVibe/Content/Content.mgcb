@@ -421,7 +421,6 @@
 /processorParam:TextureFormat=Color
 /build:betterhallway.png
 
-
 #begin life_bar.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -470,4 +469,15 @@
 /processorParam:Quality=Best
 /build:ghost_of_john.wav
 
+#begin boss-battle.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:boss-battle.wav
+
+#begin superstar-saga.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:superstar-saga.wav
 
