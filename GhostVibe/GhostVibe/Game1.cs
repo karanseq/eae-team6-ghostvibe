@@ -164,10 +164,8 @@ namespace GhostVibe
 
             lifeBar = ProgressBar.Create(Content.Load<Texture2D>("life_bar"), true, new Vector2(GraphicsDevice.Viewport.Width / 4 - 147, GraphicsDevice.Viewport.Width / 2 - 305));
             lifeBar.IsUpToDown = false;
-            lifeBar.Progress = 1.0f;
             streakBar = ProgressBar.Create(Content.Load<Texture2D>("streak_bar"), true, new Vector2(GraphicsDevice.Viewport.Width / 2 + 486, GraphicsDevice.Viewport.Width / 2 - 303));
             streakBar.IsUpToDown = false;
-            streakBar.Progress = 1.0f;
 
             StartGame();
         }
@@ -183,7 +181,7 @@ namespace GhostVibe
 
             // start the clock
             seconds = 0;
-            scheduler.scheduleDelegate(delegateTickClock, 1.0f);
+            scheduler.scheduleDelegate(delegateTickClock, 0.25f);
 
             // generate first rhythm
             currentDifficultyIndex = 0;
@@ -195,6 +193,7 @@ namespace GhostVibe
             streak = 0;
             multiplier = 1;
             lifeRemaining = 10;
+            lifeBar.Progress = 1.0f;
 
             isLeftMouseDown = acceptKeys = false;
 
@@ -435,7 +434,7 @@ namespace GhostVibe
             if (seconds >= Helper.Helper.difficultyTimeMatrix[currentDifficultyIndex])
             {
                 ++currentDifficultyIndex;
-                bgmList[bgmIndicator].Pitch += 0.1f;
+                bgmList[bgmIndicator].Pitch += bgmList[bgmIndicator].Pitch <= 0.9f ? 0.1f : 0.0f;
                 currentDifficultyIndex = currentDifficultyIndex > Helper.Helper.maxDifficulty ? currentDifficultyIndex - 1 : currentDifficultyIndex;
                 rhythm.Clear();
                 rhythm = Helper.Helper.GenerateRhythm(currentDifficultyIndex, beatFrequency, random);
@@ -552,8 +551,11 @@ namespace GhostVibe
                     return;
                 }
             }
-            
+
             // reset the streak and multiplier
+            score -= 10;
+            score = score < 0 ? 0 : score;
+
             streak = 0;
             multiplier = 1;
             UpdateStreakBar();
