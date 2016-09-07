@@ -44,7 +44,15 @@ namespace GhostVibe
         protected Dictionary<string, Texture2D> ghostTextureAnim;
         protected List<Ghost> ghostList;
         protected UpdateDelegate delegateTickGhosts, delegateTickClock;
+
+        // rhythms
         protected static float beatFrequency;
+        int seconds, currentDifficultyIndex;
+        protected int index = -1;
+        protected List<int> rhythm;
+
+        // feedback sprites
+        protected List<Sprite> positiveSprites, negativeSprites;
 
         // mouse states
         protected MouseState currentMouseState, previousMouseState;
@@ -85,11 +93,6 @@ namespace GhostVibe
         protected SoundEffect negative;
 
         protected SoundEffectInstance positiveInst;
-
-        // rhythms
-        int seconds, currentDifficultyIndex;
-        protected int index = -1;
-        protected List<int> rhythm;
 
         public Game1()
         {
@@ -150,18 +153,9 @@ namespace GhostVibe
             negative = Content.Load<SoundEffect>("badsound");
             hallway = Content.Load<Texture2D>("hallway_bar");
             positiveInst = positive.CreateInstance();
-            //blueGun = Content.Load<Texture2D>("blue");
-            //yellowGun = Content.Load<Texture2D>("yellow");
-            //greenGun = Content.Load<Texture2D>("green");
-            //redGun = Content.Load<Texture2D>("red");
 
             ghostTextures = new Dictionary<string, Texture2D>();
             ghostTextures.Add("plain", Content.Load<Texture2D>("ghost_01"));
-
-            //ghostTextures.Add("blue", Content.Load<Texture2D>("ghost_blue"));
-            //ghostTextures.Add("green", Content.Load<Texture2D>("ghost_green"));
-            //ghostTextures.Add("red", Content.Load<Texture2D>("ghost_red"));
-            //ghostTextures.Add("yellow", Content.Load<Texture2D>("ghost_yellow"));
 
             ghostTextures.Add("blue", Content.Load<Texture2D>("ghost_blue_animation_01"));
             ghostTextures.Add("green", Content.Load<Texture2D>("ghost_green_animation_01"));
@@ -179,7 +173,35 @@ namespace GhostVibe
             streakBar = ProgressBar.Create(Content.Load<Texture2D>("streak_bar"), true, new Vector2(GraphicsDevice.Viewport.Width / 2 + 486, GraphicsDevice.Viewport.Width / 2 - 303));
             streakBar.IsUpToDown = false;
 
+            positiveSprites = new List<Sprite>();
+            LoadPositiveFeedback(Sprite.Create(Content.Load<Texture2D>("Great")), Color.Orange);
+            LoadPositiveFeedback(Sprite.Create(Content.Load<Texture2D>("awesome!")), Color.Orange);
+            LoadPositiveFeedback(Sprite.Create(Content.Load<Texture2D>("Fantastic!")), Color.Orange);
+            LoadPositiveFeedback(Sprite.Create(Content.Load<Texture2D>("Amazing!")), Color.Orange);
+
+            negativeSprites = new List<Sprite>();
+            LoadNegativeFeedback(Sprite.Create(Content.Load<Texture2D>("-10")));
+            LoadNegativeFeedback(Sprite.Create(Content.Load<Texture2D>("-20")));
+            LoadNegativeFeedback(Sprite.Create(Content.Load<Texture2D>("-30")));
+            LoadNegativeFeedback(Sprite.Create(Content.Load<Texture2D>("-40")));
+            LoadNegativeFeedback(Sprite.Create(Content.Load<Texture2D>("-50")));
+
             StartGame();
+        }
+
+        private void LoadPositiveFeedback(Sprite sprite, Color color)
+        {
+
+            sprite.IsVisible = false;
+            sprite.Color = color;
+            positiveSprites.Add(sprite);
+        }
+
+        private void LoadNegativeFeedback(Sprite sprite)
+        {
+            sprite.IsVisible = false;
+            sprite.Color = Color.OrangeRed;
+            negativeSprites.Add(sprite);
         }
 
         protected override void UnloadContent()
@@ -193,7 +215,7 @@ namespace GhostVibe
 
             // start the clock
             seconds = 0;
-            scheduler.scheduleDelegate(delegateTickClock, 0.1f);
+            scheduler.scheduleDelegate(delegateTickClock, 1.0f);
 
             // generate first rhythm
             currentDifficultyIndex = 0;
@@ -211,7 +233,6 @@ namespace GhostVibe
             isLeftMouseDown = acceptKeys = false;
 
             // start scheduled functions
-            //HapticFeedback.startBeats(beatFrequency, 0.1f, 0.1f);
             scheduler.scheduleDelegate(delegateTickGhosts, beatFrequency);
             foreach (SoundEffectInstance inst in bgmList)
             {
@@ -231,7 +252,6 @@ namespace GhostVibe
         protected void PlayAgain()
         {
             scheduler.unscheduleDelegate(delegateTickClock);
-            //HapticFeedback.stopBeats();
             scheduler.unscheduleDelegate(delegateTickGhosts);
         }
 
@@ -248,7 +268,6 @@ namespace GhostVibe
                 actionManager.update(gameTime.ElapsedGameTime.Milliseconds * 0.001f);
                 scheduler.update(gameTime.ElapsedGameTime.Milliseconds * 0.001f);
 
-                //UpdateProgressBars(gameTime);
                 lifeBar.Update(gameTime);
                 streakBar.Update(gameTime);
             }
@@ -401,14 +420,6 @@ namespace GhostVibe
             }
         }
 
-        private void DrawUI()
-        {
-            spriteBatch.DrawString(UIFont, "Score: " + score, new Vector2(GraphicsDevice.Viewport.Width / 2 - 60, 30), Color.Blue, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 1.0f);
-            //spriteBatch.DrawString(UIFont, "Life: " + lifeRemaining, new Vector2(20, GraphicsDevice.Viewport.Height - 50), Color.Purple, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 1.0f);
-            //spriteBatch.DrawString(UIFont, "Life: " + lifeRemaining, new Vector2(GraphicsDevice.Viewport.Width / 2 + 200, 30), Color.ForestGreen, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 1.0f);
-            //spriteBatch.DrawString(UIFont, "Green: D, Red: F, Blue: J, Yellow: K", new Vector2(GraphicsDevice.Viewport.Width / 2 - 220, 30), Color.ForestGreen, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 1.0f);
-        }
-
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.Transparent);
@@ -416,11 +427,7 @@ namespace GhostVibe
             spriteBatch.Begin();
 
             spriteBatch.Draw(hallway, Vector2.Zero, null, Color.White, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.0f);
-            //spriteBatch.Draw(blueGun, new Vector2(GraphicsDevice.Viewport.Width * 0.1f, GraphicsDevice.Viewport.Height * 0.97f), null, Color.White, Helper.Helper.DegreesToRadians(45.0f), new Vector2(blueGun.Width / 2, blueGun.Height / 2), 0.65f, SpriteEffects.None, 0.0f);
-            //spriteBatch.Draw(yellowGun, new Vector2(GraphicsDevice.Viewport.Width * 0.9f, GraphicsDevice.Viewport.Height * 0.97f), null, Color.White, Helper.Helper.DegreesToRadians(-45.0f), new Vector2(blueGun.Width / 2, blueGun.Height / 2), 0.65f, SpriteEffects.None, 0.0f);
-            //spriteBatch.Draw(redGun, new Vector2(GraphicsDevice.Viewport.Width * 0.35f, GraphicsDevice.Viewport.Height), null, Color.White, Helper.Helper.DegreesToRadians(25.0f), new Vector2(blueGun.Width / 2, blueGun.Height / 2), 0.65f, SpriteEffects.None, 0.0f);
-            //spriteBatch.Draw(greenGun, new Vector2(GraphicsDevice.Viewport.Width * 0.65f, GraphicsDevice.Viewport.Height), null, Color.White, Helper.Helper.DegreesToRadians(-25.0f), new Vector2(blueGun.Width / 2, blueGun.Height / 2), 0.65f, SpriteEffects.None, 0.0f);
-
+            
             spriteBatch.DrawString(UIFont, "X" + multiplier, new Vector2(GraphicsDevice.Viewport.Width / 2 + 472, GraphicsDevice.Viewport.Height / 4 + 285), Color.BlueViolet, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 1.0f);
             lifeBar.Draw(spriteBatch);
             streakBar.Draw(spriteBatch);
@@ -450,6 +457,21 @@ namespace GhostVibe
             spriteBatch.End();
 
             base.Draw(gameTime);
+        }
+
+        private void DrawUI()
+        {
+            spriteBatch.DrawString(UIFont, "Score: " + score, new Vector2(GraphicsDevice.Viewport.Width / 2 - 60, 30), Color.Blue, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 1.0f);
+            
+            for (int i = 0; i < positiveSprites.Count; ++i)
+            {
+                positiveSprites[i].Draw(spriteBatch);
+            }
+
+            for (int i = 0; i < negativeSprites.Count; ++i)
+            {
+                negativeSprites[i].Draw(spriteBatch);
+            }
         }
 
         private void TickClock(float deltaTime)
@@ -553,6 +575,10 @@ namespace GhostVibe
                             // reset streak
                             streak = 0;
                             UpdateStreakBar();
+
+                            // animate the feedback sprite
+                            AnimateFeedbackSprite(positiveSprites[j], false);
+
                             Trace.WriteLine("Multiplier upgraded to " + multiplier + "...");
                             break;
                         }
@@ -562,28 +588,13 @@ namespace GhostVibe
                     score += 10 * multiplier;
                     negativeMultiplier = 1;
 
-                    // play positive sound here
-                    switch (keyPressed)
-                    {
-                        case Keys.A:
-                            //A.Play();
-                            break;
-                        case Keys.B:
-                            //C.Play();
-                            break;
-                        case Keys.X:
-                            //E.Play();
-                            break;
-                        case Keys.Y:
-                            //highA.Play();
-                            break;
-                    }
                     return;
                 }
             }
 
             // reset the streak and multiplier
             score -= negativeMultiplier++ * 10;
+            AnimateFeedbackSprite(negativeSprites[negativeMultiplier - 2], true);
             negativeMultiplier = negativeMultiplier > 5 ? 5 : negativeMultiplier;
             score = score < 0 ? 0 : score;
 
@@ -618,6 +629,36 @@ namespace GhostVibe
         public static float BeatFrequency
         {
             get { return Game1.beatFrequency; }
+        }
+
+        public void AnimateFeedbackSprite(Sprite sprite, bool mustRandomizePosition)
+        {
+            if (sprite != null)
+            {
+                actionManager.removeAllActionsFromTarget(sprite);
+                sprite.IsVisible = true;
+                sprite.Scale = 0.0f;
+                sprite.Opacity = 1.0f;
+                if (mustRandomizePosition)
+                {
+                    float randomMultiplier = MathHelper.Clamp(random.Next(10) * 0.1f, 0.25f, 0.75f);
+                    sprite.Position = new Vector2(GraphicsDevice.Viewport.Width * randomMultiplier, GraphicsDevice.Viewport.Height * 0.3f);
+                }
+                else
+                {
+                    sprite.Position = new Vector2(GraphicsDevice.Viewport.Width * 0.5f, GraphicsDevice.Viewport.Height * 0.3f);
+                }
+
+                List<FiniteTimeAction> actionList = new List<FiniteTimeAction>()
+                {
+                    ScaleTo.create(0.2f, 1.0f),
+                    DelayTime.create(0.5f),
+                    MoveBy.create(0.5f, new Vector2(0, GraphicsDevice.Viewport.Height * -0.3f)),
+                    Hide.create()
+                };
+                actionManager.addAction(Sequence.create(actionList), sprite);
+                actionManager.addAction(Sequence.createWithTwoActions(DelayTime.create(0.7f), FadeOut.create(0.5f)), sprite);
+            }
         }
 
         public string GetGhostColor(int laneNumber)

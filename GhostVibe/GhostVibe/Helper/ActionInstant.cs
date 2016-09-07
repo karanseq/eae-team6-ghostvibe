@@ -36,6 +36,60 @@ namespace Helper
 
     } // class ActionInstant
 
+    public class Show : ActionInstant
+    {
+        protected Show() { }
+
+        public static Show create()
+        {
+            Show show = new Show();
+            return show;
+        }
+
+        public override void update(float time)
+        {
+            target.IsVisible = true;
+        }
+
+        public new Show clone()
+        {
+            return Show.create();
+        }
+
+        public new Hide reverse()
+        {
+            return Hide.create();
+        } 
+
+    } // class Show
+
+    public class Hide : ActionInstant
+    {
+        protected Hide() { }
+
+        public static Hide create()
+        {
+            Hide hide = new Hide();
+            return hide;
+        }
+
+        public override void update(float time)
+        {
+            target.IsVisible = false;
+        }
+
+        public new Hide clone()
+        {
+            return Hide.create();
+        }
+
+        public new Show reverse()
+        {
+            return Show.create();
+        }
+
+    } // class Hide
+
     public class CallFunc : ActionInstant
     {
         protected CallbackDelegate callbackDelegate;
