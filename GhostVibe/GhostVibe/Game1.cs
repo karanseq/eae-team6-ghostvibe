@@ -444,12 +444,12 @@ namespace GhostVibe
             particleEngine.Draw(spriteBatch);
             if (isGameOver)
             {
-                spriteBatch.DrawString(UIFont, gameoverText, new Vector2(GraphicsDevice.Viewport.Width / 2 - 220, GraphicsDevice.Viewport.Height / 2 - 100), Color.Red, 0.0f, Vector2.Zero, 5.0f, SpriteEffects.None, 0.0f);
-                spriteBatch.DrawString(UIFont, restartText, new Vector2(GraphicsDevice.Viewport.Width / 2 - 350, GraphicsDevice.Viewport.Height / 2), Color.Red, 0.0f, Vector2.Zero, 5.0f, SpriteEffects.None, 0.0f);
+                spriteBatch.DrawString(UIFont, gameoverText, new Vector2(GraphicsDevice.Viewport.Width / 2 - 180, GraphicsDevice.Viewport.Height / 2 - 100), Color.Red, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 0.0f);
+                spriteBatch.DrawString(UIFont, restartText, new Vector2(GraphicsDevice.Viewport.Width / 2 - 260, GraphicsDevice.Viewport.Height / 2), Color.Red, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 0.0f);
             }
             else if (isPaused)
             {
-                spriteBatch.DrawString(UIFont, pausedText, new Vector2(GraphicsDevice.Viewport.Width / 2 - 125, GraphicsDevice.Viewport.Height / 2 - 30), Color.Red, 0.0f, Vector2.Zero, 5.0f, SpriteEffects.None, 0.0f);
+                spriteBatch.DrawString(UIFont, pausedText, new Vector2(GraphicsDevice.Viewport.Width / 2 - 125, GraphicsDevice.Viewport.Height / 2 - 30), Color.Red, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 0.0f);
             }
 
             spriteBatch.End();
