@@ -565,3 +565,15 @@
 /processorParam:TextureFormat=Color
 /build:cloud04.png
 
+#begin boss-battle.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:boss-battle.wav
+
+#begin superstar-saga.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:superstar-saga.wav
+

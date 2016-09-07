@@ -69,6 +69,12 @@ namespace GhostVibe
         protected SoundEffect bgm2;
         protected SoundEffectInstance bgmInst2;
 
+        protected SoundEffect bgm3;
+        protected SoundEffectInstance bgmInst3;
+
+        protected SoundEffect bgm4;
+        protected SoundEffectInstance bgmInst4;
+
         protected List<SoundEffectInstance> bgmList;
 
         protected SoundEffect A;
@@ -128,11 +134,17 @@ namespace GhostVibe
             UIFont = Content.Load<SpriteFont>("interface");
             bgm = Content.Load<SoundEffect>("newbgmsize");
             bgm2 = Content.Load<SoundEffect>("final-battle");
+            bgm3 = Content.Load<SoundEffect>("boss-battle");
+            bgm4 = Content.Load<SoundEffect>("superstar-saga");
             bgmList = new List<SoundEffectInstance>();
             bgmInst = bgm.CreateInstance();
             bgmInst2 = bgm2.CreateInstance();
+            bgmInst3 = bgm3.CreateInstance();
+            bgmInst4 = bgm4.CreateInstance();
             bgmList.Add(bgmInst);
             bgmList.Add(bgmInst2);
+            bgmList.Add(bgmInst3);
+            bgmList.Add(bgmInst4);
             A = Content.Load<SoundEffect>("A2");
             C = Content.Load<SoundEffect>("C2");
             E = Content.Load<SoundEffect>("E2");
@@ -165,10 +177,9 @@ namespace GhostVibe
             ghostTextureAnim.Add("blue", Content.Load<Texture2D>("ghost_blue_animation_02"));
             ghostTextureAnim.Add("yellow", Content.Load<Texture2D>("ghost_yellow_animation_02"));
 
-            lifeBar = ProgressBar.Create(Content.Load<Texture2D>("life_bar"), true, new Vector2(175, 340));
+            lifeBar = ProgressBar.Create(Content.Load<Texture2D>("life_bar"), true, new Vector2(GraphicsDevice.Viewport.Width / 4 - 147, GraphicsDevice.Viewport.Width / 2 - 305));
             lifeBar.IsUpToDown = false;
-            lifeBar.Progress = 1.0f;
-            streakBar = ProgressBar.Create(Content.Load<Texture2D>("streak_bar"), true, new Vector2(1112, 218));
+            streakBar = ProgressBar.Create(Content.Load<Texture2D>("streak_bar"), true, new Vector2(GraphicsDevice.Viewport.Width / 2 + 486, GraphicsDevice.Viewport.Width / 2 - 303));
             streakBar.IsUpToDown = false;
             streakBar.Progress = 1.0f;
             List<Texture2D> notetextures = new List<Texture2D>();
@@ -198,7 +209,8 @@ namespace GhostVibe
 
             // start the clock
             seconds = 0;
-            scheduler.scheduleDelegate(delegateTickClock, 0.1f);
+
+            scheduler.scheduleDelegate(delegateTickClock, 0.25f);
 
             // generate first rhythm
             currentDifficultyIndex = 0;
@@ -210,11 +222,12 @@ namespace GhostVibe
             streak = 0;
             multiplier = 1;
             lifeRemaining = 10;
+            lifeBar.Progress = 1.0f;
 
             isLeftMouseDown = acceptKeys = false;
 
             // start scheduled functions
-            HapticFeedback.startBeats(beatFrequency, 0.1f, 0.1f);
+            //HapticFeedback.startBeats(beatFrequency, 0.1f, 0.1f);
             scheduler.scheduleDelegate(delegateTickGhosts, beatFrequency);
             foreach (SoundEffectInstance inst in bgmList)
             {
@@ -222,7 +235,7 @@ namespace GhostVibe
                 inst.Volume = 1.0f;
                 inst.IsLooped = true;
             }
-            bgmIndicator = rand.Next(0, 2);
+            bgmIndicator = rand.Next(0, 4);
             bgmList[bgmIndicator].Play();
 
             ghostList = new List<Ghost>();
@@ -234,7 +247,7 @@ namespace GhostVibe
         protected void PlayAgain()
         {
             scheduler.unscheduleDelegate(delegateTickClock);
-            HapticFeedback.stopBeats();
+            //HapticFeedback.stopBeats();
             scheduler.unscheduleDelegate(delegateTickGhosts);
         }
 
@@ -251,7 +264,9 @@ namespace GhostVibe
                 actionManager.update(gameTime.ElapsedGameTime.Milliseconds * 0.001f);
                 scheduler.update(gameTime.ElapsedGameTime.Milliseconds * 0.001f);
 
-                UpdateProgressBars(gameTime);
+                //UpdateProgressBars(gameTime);
+                lifeBar.Update(gameTime);
+                streakBar.Update(gameTime);
             }
             particleEngine.Update();
             base.Update(gameTime);
@@ -366,16 +381,17 @@ namespace GhostVibe
                 {
                     // deduct life
                     --lifeRemaining;
-                    // TODO: remove the '<=' from below condition
+                    UpdateLifeBar();
+
+                    // are there any lives left?
                     if (lifeRemaining <= 0)
                     {
-                        // TODO: remove the following statement
                         lifeRemaining = 0;
 
                         // stop everything!
                         scheduler.unscheduleDelegate(delegateTickClock);
                         scheduler.unscheduleDelegate(delegateTickGhosts);
-                        HapticFeedback.stopBeats();
+                        //HapticFeedback.stopBeats();
                         isGameOver = true;
                         bgmList[bgmIndicator].Stop();
                     }
@@ -383,29 +399,18 @@ namespace GhostVibe
                     // reset streak and multiplier
                     streak = 0;
                     multiplier = 1;
+                    UpdateStreakBar();
                 }
 
                 ghostList.Remove(ghost);
             }
         }
 
-        private void UpdateProgressBars(GameTime gameTime)
-        {
-            lifeBar.Progress = lifeRemaining / 10.0f;
-            lifeBar.Update(gameTime);
-
-            if (multiplier < 5)
-            {
-                streakBar.Progress = (float)streak / (float)Helper.Helper.multiplier[multiplier - 1];
-            }
-            streakBar.Update(gameTime);
-        }
-
         private void DrawUI()
         {
-            spriteBatch.DrawString(UIFont, "Score: " + score, new Vector2(GraphicsDevice.Viewport.Width / 2 - 350, 30), Color.Blue, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 1.0f);
+            spriteBatch.DrawString(UIFont, "Score: " + score, new Vector2(GraphicsDevice.Viewport.Width / 2 - 60, 30), Color.Blue, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 1.0f);
             //spriteBatch.DrawString(UIFont, "Life: " + lifeRemaining, new Vector2(20, GraphicsDevice.Viewport.Height - 50), Color.Purple, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 1.0f);
-            spriteBatch.DrawString(UIFont, "Life: " + lifeRemaining, new Vector2(GraphicsDevice.Viewport.Width / 2 + 200, 30), Color.ForestGreen, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 1.0f);
+            //spriteBatch.DrawString(UIFont, "Life: " + lifeRemaining, new Vector2(GraphicsDevice.Viewport.Width / 2 + 200, 30), Color.ForestGreen, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 1.0f);
             //spriteBatch.DrawString(UIFont, "Green: D, Red: F, Blue: J, Yellow: K", new Vector2(GraphicsDevice.Viewport.Width / 2 - 220, 30), Color.ForestGreen, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 1.0f);
         }
 
@@ -458,7 +463,7 @@ namespace GhostVibe
             if (seconds >= Helper.Helper.difficultyTimeMatrix[currentDifficultyIndex])
             {
                 ++currentDifficultyIndex;
-                bgmList[bgmIndicator].Pitch += 0.001f;
+                bgmList[bgmIndicator].Pitch += bgmList[bgmIndicator].Pitch <= 0.9f ? 0.1f : 0.0f;
                 currentDifficultyIndex = currentDifficultyIndex > Helper.Helper.maxDifficulty ? currentDifficultyIndex - 1 : currentDifficultyIndex;
                 rhythm.Clear();
                 rhythm = Helper.Helper.GenerateRhythm(currentDifficultyIndex, beatFrequency, random);
@@ -531,8 +536,10 @@ namespace GhostVibe
                     // kill the ghost
                     ghost.Die(true);
 
+                    // play a sound
                     positiveInst.Volume = 0.8f;
                     positiveInst.Play();
+
                     //particle effect
                     particleEngine.EmitterLocation = ghost.GetCurrentPosition();
                     int totalParticle = 24;
@@ -547,8 +554,13 @@ namespace GhostVibe
                     {
                         particleEngine.particles.Add(particleEngine.GenerateNewCloud(j , ghost.LaneNumber));
                     }
+
+                    // generate haptic feedback
+                    HapticFeedback.playBeat(0.1f, 0.1f);
+
                     // update streak
                     ++streak;
+                    UpdateStreakBar();
 
                     // check if the multiplier needs to be upgraded
                     for (int j = Helper.Helper.numMultipliers - 1; j >= multiplier - 1; --j)
@@ -587,13 +599,37 @@ namespace GhostVibe
                     return;
                 }
             }
-            
+
             // reset the streak and multiplier
+            score -= 10;
+            score = score < 0 ? 0 : score;
+
             streak = 0;
             multiplier = 1;
+            UpdateStreakBar();
 
             // play sound when player misses ghost
             negative.Play();
+
+            // generate haptic feedback
+            HapticFeedback.playBeat(0.5f, 0.25f);
+        }
+
+        private void UpdateLifeBar()
+        {
+            actionManager.removeAllActionsFromTarget(lifeBar);
+            actionManager.addAction(ProgressTo.create(0.2f, lifeRemaining / 10.0f), lifeBar);
+        }
+
+        private void UpdateStreakBar()
+        {
+            if (multiplier < 5)
+            {
+                float newProgress = (float)streak / (float)Helper.Helper.multiplier[multiplier - 1];
+
+                actionManager.removeAllActionsFromTarget(streakBar);
+                actionManager.addAction(ProgressTo.create(0.2f, newProgress), streakBar);
+            }
         }
 
         public static float BeatFrequency
