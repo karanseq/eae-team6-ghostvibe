@@ -891,6 +891,56 @@ namespace Helper
             return null;
         }
 
-    }
+    } // class DelayTime
+
+    public class ProgressTo : ActionInterval
+    {
+        protected float to, from;
+
+        protected ProgressTo() { }
+
+        public static ProgressTo create(float duration, float percent)
+        {
+            ProgressTo progressTo = new ProgressTo();
+            if (progressTo.initWithDuration(duration, percent))
+            {
+                return progressTo;
+            }
+            progressTo = null;
+            return null;
+        }
+
+        protected bool initWithDuration(float duration, float percent)
+        {
+            if (base.initWithDuration(duration))
+            {
+                this.to = percent;
+                return true;
+            }
+            return false;
+        }
+
+        public override void startWithTarget(Sprite target)
+        {
+            base.startWithTarget(target);
+            from = ((ProgressBar)target).Progress;
+        }
+
+        public override void update(float deltaTime)
+        {
+            ((ProgressBar)target).Progress = (from + (to - from) * deltaTime);
+        }
+
+        public new ProgressTo clone()
+        {
+            return ProgressTo.create(duration, to);
+        }
+
+        public new ProgressTo reverse()
+        {
+            return null;
+        }
+
+    } // class ProgressTo
 
 } // namespace Helper
