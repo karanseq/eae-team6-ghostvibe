@@ -69,6 +69,12 @@ namespace GhostVibe
         protected SoundEffect bgm2;
         protected SoundEffectInstance bgmInst2;
 
+        protected SoundEffect bgm3;
+        protected SoundEffectInstance bgmInst3;
+
+        protected SoundEffect bgm4;
+        protected SoundEffectInstance bgmInst4;
+
         protected List<SoundEffectInstance> bgmList;
 
         protected SoundEffect A;
@@ -125,11 +131,17 @@ namespace GhostVibe
             UIFont = Content.Load<SpriteFont>("interface");
             bgm = Content.Load<SoundEffect>("newbgmsize");
             bgm2 = Content.Load<SoundEffect>("final-battle");
+            bgm3 = Content.Load<SoundEffect>("boss-battle");
+            bgm4 = Content.Load<SoundEffect>("superstar-saga");
             bgmList = new List<SoundEffectInstance>();
             bgmInst = bgm.CreateInstance();
             bgmInst2 = bgm2.CreateInstance();
+            bgmInst3 = bgm3.CreateInstance();
+            bgmInst4 = bgm4.CreateInstance();
             bgmList.Add(bgmInst);
             bgmList.Add(bgmInst2);
+            bgmList.Add(bgmInst3);
+            bgmList.Add(bgmInst4);
             A = Content.Load<SoundEffect>("A2");
             C = Content.Load<SoundEffect>("C2");
             E = Content.Load<SoundEffect>("E2");
@@ -206,7 +218,7 @@ namespace GhostVibe
                 inst.Volume = 1.0f;
                 inst.IsLooped = true;
             }
-            bgmIndicator = rand.Next(0, 2);
+            bgmIndicator = rand.Next(0, 4);
             bgmList[bgmIndicator].Play();
 
             ghostList = new List<Ghost>();
@@ -379,9 +391,9 @@ namespace GhostVibe
 
         private void DrawUI()
         {
-            spriteBatch.DrawString(UIFont, "Score: " + score, new Vector2(GraphicsDevice.Viewport.Width / 2 - 350, 30), Color.Blue, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 1.0f);
+            spriteBatch.DrawString(UIFont, "Score: " + score, new Vector2(GraphicsDevice.Viewport.Width / 2 - 60, 30), Color.Blue, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 1.0f);
             //spriteBatch.DrawString(UIFont, "Life: " + lifeRemaining, new Vector2(20, GraphicsDevice.Viewport.Height - 50), Color.Purple, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 1.0f);
-            spriteBatch.DrawString(UIFont, "Life: " + lifeRemaining, new Vector2(GraphicsDevice.Viewport.Width / 2 + 200, 30), Color.ForestGreen, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 1.0f);
+            //spriteBatch.DrawString(UIFont, "Life: " + lifeRemaining, new Vector2(GraphicsDevice.Viewport.Width / 2 + 200, 30), Color.ForestGreen, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 1.0f);
             //spriteBatch.DrawString(UIFont, "Green: D, Red: F, Blue: J, Yellow: K", new Vector2(GraphicsDevice.Viewport.Width / 2 - 220, 30), Color.ForestGreen, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 1.0f);
         }
 
