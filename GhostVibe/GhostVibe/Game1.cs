@@ -178,7 +178,7 @@ namespace GhostVibe
             lifeBar.IsUpToDown = false;
             streakBar = ProgressBar.Create(Content.Load<Texture2D>("streak_bar"), true, new Vector2(GraphicsDevice.Viewport.Width / 2 + 486, GraphicsDevice.Viewport.Width / 2 - 303));
             streakBar.IsUpToDown = false;
-            streakBar.Progress = 1.0f;
+
             List<Texture2D> notetextures = new List<Texture2D>();
             notetextures.Add(Content.Load<Texture2D>("red_note1"));
             notetextures.Add(Content.Load<Texture2D>("blue_note1"));
