@@ -84,6 +84,8 @@ namespace GhostVibe
         protected SoundEffect positive;
         protected SoundEffect negative;
 
+        protected SoundEffect gameoverSound;
+
         protected SoundEffectInstance positiveInst;
 
         // rhythms
@@ -151,6 +153,7 @@ namespace GhostVibe
             highA = Content.Load<SoundEffect>("highA2");
             positive = Content.Load<SoundEffect>("happysound");
             negative = Content.Load<SoundEffect>("badsound");
+            gameoverSound = Content.Load<SoundEffect>("Evil_Laugh");
             hallway = Content.Load<Texture2D>("hallway_bar");
             positiveInst = positive.CreateInstance();
             //blueGun = Content.Load<Texture2D>("blue");
@@ -394,6 +397,7 @@ namespace GhostVibe
                         //HapticFeedback.stopBeats();
                         isGameOver = true;
                         bgmList[bgmIndicator].Stop();
+                        gameoverSound.Play();
                     }
 
                     // reset streak and multiplier

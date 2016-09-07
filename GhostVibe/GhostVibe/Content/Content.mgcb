@@ -523,3 +523,9 @@
 /processorParam:Quality=Best
 /build:superstar-saga.wav
 
+#begin Evil_Laugh.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Evil_Laugh.wav
+
