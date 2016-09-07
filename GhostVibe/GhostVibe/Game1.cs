@@ -210,7 +210,7 @@ namespace GhostVibe
             // start the clock
             seconds = 0;
 
-            scheduler.scheduleDelegate(delegateTickClock, 0.25f);
+            scheduler.scheduleDelegate(delegateTickClock, 1.0f);
 
             // generate first rhythm
             currentDifficultyIndex = 0;
