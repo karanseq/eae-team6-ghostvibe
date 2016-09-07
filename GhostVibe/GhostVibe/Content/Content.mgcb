@@ -13,12 +13,6 @@
 
 #---------------------------------- Content ---------------------------------#
 
-#begin Arial.spritefont
-/importer:FontDescriptionImporter
-/processor:FontDescriptionProcessor
-/processorParam:TextureFormat=Compressed
-/build:Arial.spritefont
-
 #begin ghost_01.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -469,6 +463,54 @@
 /processorParam:Quality=Best
 /build:ghost_of_john.wav
 
+#begin cloud01.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:cloud01.png
+
+#begin cloud02.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:cloud02.png
+
+#begin cloud03.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:cloud03.png
+
+#begin cloud04.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:cloud04.png
+
 #begin boss-battle.wav
 /importer:WavImporter
 /processor:SoundEffectProcessor
@@ -588,4 +630,11 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Fantastic!.png
+
+#begin Evil_Laugh.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Evil_Laugh.wav
+
 

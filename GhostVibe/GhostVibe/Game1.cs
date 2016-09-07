@@ -92,7 +92,12 @@ namespace GhostVibe
         protected SoundEffect positive;
         protected SoundEffect negative;
 
+        protected SoundEffect gameoverSound;
+
         protected SoundEffectInstance positiveInst;
+
+        // particle Engine
+        ParticleEngine particleEngine;
 
         public Game1()
         {
@@ -151,6 +156,7 @@ namespace GhostVibe
             highA = Content.Load<SoundEffect>("highA2");
             positive = Content.Load<SoundEffect>("happysound");
             negative = Content.Load<SoundEffect>("badsound");
+            gameoverSound = Content.Load<SoundEffect>("Evil_Laugh");
             hallway = Content.Load<Texture2D>("hallway_bar");
             positiveInst = positive.CreateInstance();
 
@@ -172,6 +178,19 @@ namespace GhostVibe
             lifeBar.IsUpToDown = false;
             streakBar = ProgressBar.Create(Content.Load<Texture2D>("streak_bar"), true, new Vector2(GraphicsDevice.Viewport.Width / 2 + 486, GraphicsDevice.Viewport.Width / 2 - 303));
             streakBar.IsUpToDown = false;
+            streakBar.Progress = 1.0f;
+            List<Texture2D> notetextures = new List<Texture2D>();
+            notetextures.Add(Content.Load<Texture2D>("red_note1"));
+            notetextures.Add(Content.Load<Texture2D>("blue_note1"));
+            notetextures.Add(Content.Load<Texture2D>("green_note1"));
+
+            notetextures.Add(Content.Load<Texture2D>("orange_note1"));
+            List<Texture2D> CloudTexture = new List<Texture2D>();
+            CloudTexture.Add(Content.Load<Texture2D>("cloud01"));
+            CloudTexture.Add(Content.Load<Texture2D>("cloud02"));
+            CloudTexture.Add(Content.Load<Texture2D>("cloud03"));
+            CloudTexture.Add(Content.Load<Texture2D>("cloud04"));
+            particleEngine = new ParticleEngine(notetextures, CloudTexture, new Vector2(0, 0));
 
             positiveSprites = new List<Sprite>();
             LoadPositiveFeedback(Sprite.Create(Content.Load<Texture2D>("Great")), Color.Orange);
@@ -271,7 +290,7 @@ namespace GhostVibe
                 lifeBar.Update(gameTime);
                 streakBar.Update(gameTime);
             }
-
+            particleEngine.Update();
             base.Update(gameTime);
         }
 
@@ -399,6 +418,7 @@ namespace GhostVibe
 
                         isGameOver = true;
                         bgmList[bgmIndicator].Stop();
+                        gameoverSound.Play();
                     }
 
                     // reset streak and multiplier
@@ -427,8 +447,8 @@ namespace GhostVibe
             spriteBatch.Begin();
 
             spriteBatch.Draw(hallway, Vector2.Zero, null, Color.White, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.0f);
-            
-            spriteBatch.DrawString(UIFont, "X" + multiplier, new Vector2(GraphicsDevice.Viewport.Width / 2 + 472, GraphicsDevice.Viewport.Height / 4 + 285), Color.BlueViolet, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 1.0f);
+
+            spriteBatch.DrawString(UIFont, "X" + multiplier, new Vector2(GraphicsDevice.Viewport.Width / 2 + 472, GraphicsDevice.Viewport.Height / 4 + 285), Color.BlueViolet, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 1.0f);
             lifeBar.Draw(spriteBatch);
             streakBar.Draw(spriteBatch);
 
@@ -443,15 +463,15 @@ namespace GhostVibe
             }
 
             DrawUI();
-
+            particleEngine.Draw(spriteBatch);
             if (isGameOver)
             {
-                spriteBatch.DrawString(UIFont, gameoverText, new Vector2(GraphicsDevice.Viewport.Width / 2 - 220, GraphicsDevice.Viewport.Height / 2 - 100), Color.Red, 0.0f, Vector2.Zero, 5.0f, SpriteEffects.None, 0.0f);
-                spriteBatch.DrawString(UIFont, restartText, new Vector2(GraphicsDevice.Viewport.Width / 2 - 350, GraphicsDevice.Viewport.Height / 2), Color.Red, 0.0f, Vector2.Zero, 5.0f, SpriteEffects.None, 0.0f);
+                spriteBatch.DrawString(UIFont, gameoverText, new Vector2(GraphicsDevice.Viewport.Width / 2 - 180, GraphicsDevice.Viewport.Height / 2 - 100), Color.Red, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 0.0f);
+                spriteBatch.DrawString(UIFont, restartText, new Vector2(GraphicsDevice.Viewport.Width / 2 - 260, GraphicsDevice.Viewport.Height / 2), Color.Red, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 0.0f);
             }
             else if (isPaused)
             {
-                spriteBatch.DrawString(UIFont, pausedText, new Vector2(GraphicsDevice.Viewport.Width / 2 - 125, GraphicsDevice.Viewport.Height / 2 - 30), Color.Red, 0.0f, Vector2.Zero, 5.0f, SpriteEffects.None, 0.0f);
+                spriteBatch.DrawString(UIFont, pausedText, new Vector2(GraphicsDevice.Viewport.Width / 2 - 125, GraphicsDevice.Viewport.Height / 2 - 30), Color.Red, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 0.0f);
             }
 
             spriteBatch.End();
@@ -461,7 +481,7 @@ namespace GhostVibe
 
         private void DrawUI()
         {
-            spriteBatch.DrawString(UIFont, "Score: " + score, new Vector2(GraphicsDevice.Viewport.Width / 2 - 60, 30), Color.Blue, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 1.0f);
+            spriteBatch.DrawString(UIFont, "Score: " + score, new Vector2(GraphicsDevice.Viewport.Width / 2 - 60, 30), Color.Blue, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 1.0f);
             
             for (int i = 0; i < positiveSprites.Count; ++i)
             {
@@ -557,9 +577,24 @@ namespace GhostVibe
                     positiveInst.Volume = 0.8f;
                     positiveInst.Play();
 
+                    //particle effect
+                    particleEngine.EmitterLocation = ghost.GetCurrentPosition();
+                    int totalParticle = 24;
+                    int totalCloud = 4;
+
+                    for (int j = 0; j < totalParticle; j++)
+                    {
+                        particleEngine.particles.Add(particleEngine.GenerateNewParticle(j,ghost.LaneNumber));
+                    }
+
+                    for (int j = 0; j < totalCloud; j++)
+                    {
+                        particleEngine.particles.Add(particleEngine.GenerateNewCloud(j , ghost.LaneNumber));
+                    }
+
                     // generate haptic feedback
                     HapticFeedback.playBeat(0.1f, 0.1f);
-                    
+
                     // update streak
                     ++streak;
                     UpdateStreakBar();
