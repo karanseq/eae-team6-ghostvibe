@@ -57,7 +57,7 @@ namespace GhostVibe
         // gamepad states
         private GamePadState currentGamepadState, previousGamepadState;
 
-        protected int score, streak, multiplier;
+        protected int score, streak, multiplier, negativeMultiplier;
         protected int lifeRemaining;
         public Random random;
         protected ProgressBar lifeBar, streakBar;
@@ -193,7 +193,7 @@ namespace GhostVibe
 
             // start the clock
             seconds = 0;
-            scheduler.scheduleDelegate(delegateTickClock, 0.25f);
+            scheduler.scheduleDelegate(delegateTickClock, 0.1f);
 
             // generate first rhythm
             currentDifficultyIndex = 0;
@@ -204,6 +204,7 @@ namespace GhostVibe
             score = 0;
             streak = 0;
             multiplier = 1;
+            negativeMultiplier = 1;
             lifeRemaining = 10;
             lifeBar.Progress = 1.0f;
 
@@ -271,6 +272,7 @@ namespace GhostVibe
                 if (isPaused)
                 {
                     bgmList[bgmIndicator].Pause();
+                    HapticFeedback.stopVibration(0.0f);
                 }
                 else
                 {
@@ -374,7 +376,8 @@ namespace GhostVibe
                         // stop everything!
                         scheduler.unscheduleDelegate(delegateTickClock);
                         scheduler.unscheduleDelegate(delegateTickGhosts);
-                        //HapticFeedback.stopBeats();
+                        HapticFeedback.stopVibration(0.0f);
+
                         isGameOver = true;
                         bgmList[bgmIndicator].Stop();
                     }
@@ -383,6 +386,15 @@ namespace GhostVibe
                     streak = 0;
                     multiplier = 1;
                     UpdateStreakBar();
+
+                    // play sound when player misses ghost
+                    negative.Play();
+
+                    // generate haptic feedback
+                    if (!isGameOver)
+                    {
+                        HapticFeedback.playBeat(1.0f, 0.25f);
+                    }
                 }
 
                 ghostList.Remove(ghost);
@@ -540,6 +552,7 @@ namespace GhostVibe
                             multiplier = j + 2;
                             // reset streak
                             streak = 0;
+                            UpdateStreakBar();
                             Trace.WriteLine("Multiplier upgraded to " + multiplier + "...");
                             break;
                         }
@@ -547,9 +560,10 @@ namespace GhostVibe
 
                     // update score
                     score += 10 * multiplier;
+                    negativeMultiplier = 1;
 
                     // play positive sound here
-                    switch(keyPressed)
+                    switch (keyPressed)
                     {
                         case Keys.A:
                             //A.Play();
@@ -569,7 +583,8 @@ namespace GhostVibe
             }
 
             // reset the streak and multiplier
-            score -= 10;
+            score -= negativeMultiplier++ * 10;
+            negativeMultiplier = negativeMultiplier > 5 ? 5 : negativeMultiplier;
             score = score < 0 ? 0 : score;
 
             streak = 0;
@@ -580,7 +595,7 @@ namespace GhostVibe
             negative.Play();
 
             // generate haptic feedback
-            HapticFeedback.playBeat(0.5f, 0.25f);
+            HapticFeedback.playBeat(1.0f, 0.25f);
         }
 
         private void UpdateLifeBar()
