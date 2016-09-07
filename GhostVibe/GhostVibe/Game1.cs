@@ -198,7 +198,7 @@ namespace GhostVibe
             isLeftMouseDown = acceptKeys = false;
 
             // start scheduled functions
-            HapticFeedback.startBeats(beatFrequency, 0.1f, 0.1f);
+            //HapticFeedback.startBeats(beatFrequency, 0.1f, 0.1f);
             scheduler.scheduleDelegate(delegateTickGhosts, beatFrequency);
             foreach (SoundEffectInstance inst in bgmList)
             {
@@ -218,7 +218,7 @@ namespace GhostVibe
         protected void PlayAgain()
         {
             scheduler.unscheduleDelegate(delegateTickClock);
-            HapticFeedback.stopBeats();
+            //HapticFeedback.stopBeats();
             scheduler.unscheduleDelegate(delegateTickGhosts);
         }
 
@@ -362,7 +362,7 @@ namespace GhostVibe
                         // stop everything!
                         scheduler.unscheduleDelegate(delegateTickClock);
                         scheduler.unscheduleDelegate(delegateTickGhosts);
-                        HapticFeedback.stopBeats();
+                        //HapticFeedback.stopBeats();
                         isGameOver = true;
                         bgmList[bgmIndicator].Stop();
                     }
@@ -507,8 +507,12 @@ namespace GhostVibe
                     // kill the ghost
                     ghost.Die(true);
 
+                    // play a sound
                     positiveInst.Volume = 0.8f;
                     positiveInst.Play();
+
+                    // generate haptic feedback
+                    HapticFeedback.playBeat(0.1f, 0.1f);
                     
                     // update streak
                     ++streak;
@@ -562,6 +566,9 @@ namespace GhostVibe
 
             // play sound when player misses ghost
             negative.Play();
+
+            // generate haptic feedback
+            HapticFeedback.playBeat(0.5f, 0.25f);
         }
 
         private void UpdateLifeBar()
