@@ -9,23 +9,32 @@ namespace Helper
         protected static UpdateDelegate delegateStartVibration = new UpdateDelegate(HapticFeedback.startVibration);
         protected static UpdateDelegate delegateStopVibration = new UpdateDelegate(HapticFeedback.stopVibration);
         protected static float beatIntensity = 0.25f;
+        protected static bool isVibrating = false;
 
         private HapticFeedback() { }
 
-        protected static void startVibration(float deltaTime)
+        public static void startVibration(float deltaTime)
         {
-            GamePad.SetVibration(PlayerIndex.One, HapticFeedback.beatIntensity, HapticFeedback.beatIntensity);
+            if (!isVibrating)
+            {
+                isVibrating = true;
+                GamePad.SetVibration(PlayerIndex.One, HapticFeedback.beatIntensity, HapticFeedback.beatIntensity);
+            }
         }
 
-        protected static void stopVibration(float deltaTime)
+        public static void stopVibration(float deltaTime)
         {
+            isVibrating = false;
             GamePad.SetVibration(PlayerIndex.One, 0.0f, 0.0f);
         }
 
         public static void playBeat(float beatIntensity, float beatDuration)
         {
-            startVibration(0.0f);
-            Scheduler.Instance.scheduleDelegateOnce(delegateStopVibration, beatDuration);
+            if (!isVibrating)
+            {
+                startVibration(0.0f);
+                Scheduler.Instance.scheduleDelegateOnce(delegateStopVibration, beatDuration);                
+            }
         }
 
         public static void startBeats(float beatFrequency, float beatDuration, float beatIntensity)

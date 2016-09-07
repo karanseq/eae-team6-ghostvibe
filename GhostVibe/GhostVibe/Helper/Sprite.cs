@@ -17,6 +17,7 @@ namespace Helper
         protected float scale;
         protected SpriteEffects spriteEffects;
         protected float layerDepth;
+        protected bool isVisible;
 
         // animation attributes
         protected bool isAnimation;
@@ -40,6 +41,7 @@ namespace Helper
             scale = 1.0f;
             spriteEffects = SpriteEffects.None;
             layerDepth = 0;
+            isVisible = true;
 
             isAnimation = false;
             active = false;
@@ -139,7 +141,7 @@ namespace Helper
         public virtual void Update(GameTime gameTime)
         {
             // don't update if inactive
-            if (isAnimation == false || active == false)
+            if (isAnimation == false || active == false || isVisible == false)
             {
                 return;
             }
@@ -173,6 +175,12 @@ namespace Helper
 
         public virtual void Draw(SpriteBatch spriteBatch)
         {
+            // don't draw if not visible
+            if (isVisible == false)
+            {
+                return;
+            }
+
             // check if this sprite is an animation
             if (isAnimation)
             {
@@ -241,6 +249,12 @@ namespace Helper
         {
             get { return layerDepth; }
             set { layerDepth = value; }
+        }
+
+        public bool IsVisible
+        {
+            get { return isVisible; }
+            set { isVisible = value; }
         }
 
         public bool Active
