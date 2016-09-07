@@ -85,6 +85,9 @@ namespace GhostVibe
         protected int index = -1;
         protected List<int> rhythm;
 
+        // particle Engine
+        ParticleEngine particleEngine;
+
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -168,6 +171,18 @@ namespace GhostVibe
             streakBar = ProgressBar.Create(Content.Load<Texture2D>("streak_bar"), true, new Vector2(1112, 218));
             streakBar.IsUpToDown = false;
             streakBar.Progress = 1.0f;
+            List<Texture2D> notetextures = new List<Texture2D>();
+            notetextures.Add(Content.Load<Texture2D>("red_note1"));
+            notetextures.Add(Content.Load<Texture2D>("blue_note1"));
+            notetextures.Add(Content.Load<Texture2D>("green_note1"));
+
+            notetextures.Add(Content.Load<Texture2D>("orange_note1"));
+            List<Texture2D> CloudTexture = new List<Texture2D>();
+            CloudTexture.Add(Content.Load<Texture2D>("cloud01"));
+            CloudTexture.Add(Content.Load<Texture2D>("cloud02"));
+            CloudTexture.Add(Content.Load<Texture2D>("cloud03"));
+            CloudTexture.Add(Content.Load<Texture2D>("cloud04"));
+            particleEngine = new ParticleEngine(notetextures, CloudTexture, new Vector2(0, 0));
 
             StartGame();
         }
@@ -183,7 +198,7 @@ namespace GhostVibe
 
             // start the clock
             seconds = 0;
-            scheduler.scheduleDelegate(delegateTickClock, 1.0f);
+            scheduler.scheduleDelegate(delegateTickClock, 0.1f);
 
             // generate first rhythm
             currentDifficultyIndex = 0;
@@ -238,7 +253,7 @@ namespace GhostVibe
 
                 UpdateProgressBars(gameTime);
             }
-
+            particleEngine.Update();
             base.Update(gameTime);
         }
 
@@ -421,7 +436,7 @@ namespace GhostVibe
             }
 
             DrawUI();
-
+            particleEngine.Draw(spriteBatch);
             if (isGameOver)
             {
                 spriteBatch.DrawString(UIFont, gameoverText, new Vector2(GraphicsDevice.Viewport.Width / 2 - 220, GraphicsDevice.Viewport.Height / 2 - 100), Color.Red, 0.0f, Vector2.Zero, 5.0f, SpriteEffects.None, 0.0f);
@@ -443,7 +458,7 @@ namespace GhostVibe
             if (seconds >= Helper.Helper.difficultyTimeMatrix[currentDifficultyIndex])
             {
                 ++currentDifficultyIndex;
-                bgmList[bgmIndicator].Pitch += 0.1f;
+                bgmList[bgmIndicator].Pitch += 0.001f;
                 currentDifficultyIndex = currentDifficultyIndex > Helper.Helper.maxDifficulty ? currentDifficultyIndex - 1 : currentDifficultyIndex;
                 rhythm.Clear();
                 rhythm = Helper.Helper.GenerateRhythm(currentDifficultyIndex, beatFrequency, random);
@@ -518,6 +533,20 @@ namespace GhostVibe
 
                     positiveInst.Volume = 0.8f;
                     positiveInst.Play();
+                    //particle effect
+                    particleEngine.EmitterLocation = ghost.GetCurrentPosition();
+                    int totalParticle = 24;
+                    int totalCloud = 4;
+
+                    for (int j = 0; j < totalParticle; j++)
+                    {
+                        particleEngine.particles.Add(particleEngine.GenerateNewParticle(j,ghost.LaneNumber));
+                    }
+
+                    for (int j = 0; j < totalCloud; j++)
+                    {
+                        particleEngine.particles.Add(particleEngine.GenerateNewCloud(j , ghost.LaneNumber));
+                    }
                     // update streak
                     ++streak;
 

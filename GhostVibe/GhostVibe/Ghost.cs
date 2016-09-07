@@ -168,7 +168,8 @@ namespace GhostVibe
             }
             else
             {
-                sprite.Color = Microsoft.Xna.Framework.Color.Green;
+                sprite.Active = false;
+             //   sprite.Color = Microsoft.Xna.Framework.Color.Green;
             }
 
             // callback a function when the death animation is finished
