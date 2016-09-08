@@ -221,7 +221,7 @@ namespace GhostVibe
         private void LoadNegativeFeedback(Sprite sprite)
         {
             sprite.IsVisible = false;
-            sprite.Color = Color.OrangeRed;
+            sprite.Color = Color.DodgerBlue;
             negativeSprites.Add(sprite);
         }
 
@@ -463,7 +463,7 @@ namespace GhostVibe
 
             spriteBatch.Draw(hallway, Vector2.Zero, null, Color.White, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.0f);
 
-            spriteBatch.DrawString(UIFont, "X" + multiplier, new Vector2(GraphicsDevice.Viewport.Width / 2 + 472, GraphicsDevice.Viewport.Height / 4 + 285), Color.BlueViolet, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 1.0f);
+            spriteBatch.DrawString(UIFont, "X" + multiplier, new Vector2(GraphicsDevice.Viewport.Width / 2 + 472, GraphicsDevice.Viewport.Height / 4 + 285), Color.DodgerBlue, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 1.0f);
             lifeBar.Draw(spriteBatch);
             streakBar.Draw(spriteBatch);
 
