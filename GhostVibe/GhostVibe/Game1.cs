@@ -67,7 +67,7 @@ namespace GhostVibe
         // gamepad states
         private GamePadState currentGamepadState, previousGamepadState;
 
-        protected int score, streak, multiplier;
+        protected int score, streak, multiplier, negativeMultiplier;
         protected int lifeRemaining;
         public Random random;
         protected ProgressBar lifeBar, streakBar;
@@ -214,7 +214,6 @@ namespace GhostVibe
 
         private void LoadPositiveFeedback(Sprite sprite, Color color)
         {
-
             sprite.IsVisible = false;
             sprite.Color = color;
             positiveSprites.Add(sprite);
@@ -256,6 +255,7 @@ namespace GhostVibe
             score = 0;
             streak = 0;
             multiplier = 1;
+            negativeMultiplier = 1;
             lifeRemaining = 10;
             lifeBar.Progress = 1.0f;
 
@@ -277,7 +277,7 @@ namespace GhostVibe
             ghostList = new List<Ghost>();
 
             isPaused = false;
-            isGameOver = false;            
+            isGameOver = false;
         }
 
         protected void PlayAgain()
@@ -650,6 +650,10 @@ namespace GhostVibe
                             multiplier = j + 2;
                             // reset streak
                             streak = 0;
+
+                            // animate the feedback sprite
+                            AnimateFeedbackSprite(positiveSprites[j], false);
+
                             Trace.WriteLine("Multiplier upgraded to " + multiplier + "...");
                             break;
                         }
@@ -679,7 +683,9 @@ namespace GhostVibe
             }
 
             // reset the streak and multiplier
-            score -= 10;
+            score -= negativeMultiplier++ * 10;
+            AnimateFeedbackSprite(negativeSprites[negativeMultiplier - 2], true);
+            negativeMultiplier = negativeMultiplier > 5 ? 5 : negativeMultiplier; negativeMultiplier = negativeMultiplier > 5 ? 5 : negativeMultiplier;
             score = score < 0 ? 0 : score;
 
             streak = 0;
@@ -734,6 +740,36 @@ namespace GhostVibe
         public static float BeatFrequency
         {
             get { return Game1.beatFrequency; }
+        }
+
+        public void AnimateFeedbackSprite(Sprite sprite, bool mustRandomizePosition)
+        {
+            if (sprite != null)
+            {
+                actionManager.removeAllActionsFromTarget(sprite);
+                sprite.IsVisible = true;
+                sprite.Scale = 0.0f;
+                sprite.Opacity = 1.0f;
+                if (mustRandomizePosition)
+                {
+                    float randomMultiplier = MathHelper.Clamp(random.Next(10) * 0.1f, 0.25f, 0.75f);
+                    sprite.Position = new Vector2(GraphicsDevice.Viewport.Width* randomMultiplier, GraphicsDevice.Viewport.Height* 0.3f);
+                }
+                else
+                {
+                    sprite.Position = new Vector2(GraphicsDevice.Viewport.Width* 0.5f, GraphicsDevice.Viewport.Height* 0.3f);
+                }
+ 
+                List<FiniteTimeAction> actionList = new List<FiniteTimeAction>()
+                {
+                    ScaleTo.create(0.2f, 1.0f),
+                    DelayTime.create(0.5f),
+                    MoveBy.create(0.5f, new Vector2(0, GraphicsDevice.Viewport.Height* -0.3f)),
+                    Hide.create()
+                };
+                actionManager.addAction(Sequence.create(actionList), sprite);
+                actionManager.addAction(Sequence.createWithTwoActions(DelayTime.create(0.7f), FadeOut.create(0.5f)), sprite);
+            }
         }
 
         public string GetGhostColor(int laneNumber)
