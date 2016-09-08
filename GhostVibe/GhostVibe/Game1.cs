@@ -172,7 +172,7 @@ namespace GhostVibe
             gameoverSound = Content.Load<SoundEffect>("Evil_Laugh");
             gameoverInst = gameoverSound.CreateInstance();
             gameoverInst.Pitch = 0.5f;
-            hallway = Content.Load<Texture2D>("hallwaybar");
+            hallway = Content.Load<Texture2D>("hallway_color");
             positiveInst = positive.CreateInstance();
 
             ghostTextures = new Dictionary<string, Texture2D>();
