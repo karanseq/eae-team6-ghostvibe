@@ -470,12 +470,12 @@ namespace GhostVibe
             particleEngine.Draw(spriteBatch);
             if (isGameOver)
             {
-                spriteBatch.DrawString(UIFont, gameoverText, new Vector2(GraphicsDevice.Viewport.Width / 2 - 180, GraphicsDevice.Viewport.Height / 2 - 100), Color.Red, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 0.0f);
-                spriteBatch.DrawString(UIFont, restartText, new Vector2(GraphicsDevice.Viewport.Width / 2 - 260, GraphicsDevice.Viewport.Height / 2), Color.Red, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 0.0f);
+                spriteBatch.DrawString(UIFont, gameoverText, new Vector2(GraphicsDevice.Viewport.Width / 2 - 180, GraphicsDevice.Viewport.Height / 2 - 100), Color.Crimson, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 0.0f);
+                spriteBatch.DrawString(UIFont, restartText, new Vector2(GraphicsDevice.Viewport.Width / 2 - 260, GraphicsDevice.Viewport.Height / 2), Color.Crimson, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 0.0f);
             }
             else if (isPaused)
             {
-                spriteBatch.DrawString(UIFont, pausedText, new Vector2(GraphicsDevice.Viewport.Width / 2 - 125, GraphicsDevice.Viewport.Height / 2 - 30), Color.Red, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 0.0f);
+                spriteBatch.DrawString(UIFont, pausedText, new Vector2(GraphicsDevice.Viewport.Width / 2 - 125, GraphicsDevice.Viewport.Height / 2 - 30), Color.Crimson, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 0.0f);
             }
 
             spriteBatch.End();
@@ -485,7 +485,7 @@ namespace GhostVibe
 
         private void DrawUI()
         {
-            spriteBatch.DrawString(UIFont, "Score: " + score, new Vector2(GraphicsDevice.Viewport.Width / 2 - 60, 30), Color.Blue, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 1.0f);
+            spriteBatch.DrawString(UIFont, "Score: " + score, new Vector2(GraphicsDevice.Viewport.Width / 2 - 60, 30), Color.DodgerBlue, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 1.0f);
             
             for (int i = 0; i < positiveSprites.Count; ++i)
             {
@@ -588,12 +588,12 @@ namespace GhostVibe
 
                     for (int j = 0; j < totalParticle; j++)
                     {
-                        particleEngine.particles.Add(particleEngine.GenerateNewParticle(j,ghost.LaneNumber));
+                        particleEngine.particles.Add(particleEngine.GenerateNewParticle(j, ghost.LaneNumber));
                     }
 
                     for (int j = 0; j < totalCloud; j++)
                     {
-                        particleEngine.particles.Add(particleEngine.GenerateNewCloud(j , ghost.LaneNumber));
+                        particleEngine.particles.Add(particleEngine.GenerateNewCloud(j, ghost.LaneNumber));
                     }
 
                     // generate haptic feedback
