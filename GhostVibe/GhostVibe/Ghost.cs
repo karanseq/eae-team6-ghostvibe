@@ -181,6 +181,10 @@ namespace GhostVibe
                     sprite.Active = false;
                 }
             }
+            else
+            {
+                ActionManager.Instance.addAction(MoveBy.create(Game1.BeatFrequency, new Vector2(0, -75.0f)), sprite);
+            }
         }
 
         public void FinishedDying()

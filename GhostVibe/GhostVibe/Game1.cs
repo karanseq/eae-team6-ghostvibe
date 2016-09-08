@@ -53,6 +53,7 @@ namespace GhostVibe
 
         // feedback sprites
         protected List<Sprite> positiveSprites, negativeSprites;
+        protected Sprite gameOver;
 
         // mouse states
         protected MouseState currentMouseState, previousMouseState;
@@ -106,7 +107,7 @@ namespace GhostVibe
             graphics.PreferredBackBufferWidth = 1280;
             graphics.PreferredBackBufferHeight = 720;
 
-            //graphics.IsFullScreen = true;
+            graphics.IsFullScreen = false;
             IsMouseVisible = true;
 
             Content.RootDirectory = "Content";
@@ -207,6 +208,9 @@ namespace GhostVibe
             LoadNegativeFeedback(Sprite.Create(Content.Load<Texture2D>("-40")));
             LoadNegativeFeedback(Sprite.Create(Content.Load<Texture2D>("-50")));
 
+            gameOver = Sprite.Create(Content.Load<Texture2D>("hallway_gameover"), new Vector2(GraphicsDevice.Viewport.Width * 0.5f, GraphicsDevice.Viewport.Height * 0.5f));
+            gameOver.IsVisible = false;
+
             StartGame();
         }
 
@@ -276,6 +280,7 @@ namespace GhostVibe
         {
             scheduler.unscheduleDelegate(delegateTickClock);
             scheduler.unscheduleDelegate(delegateTickGhosts);
+            gameOver.IsVisible = false;
         }
 
         protected override void Update(GameTime gameTime)
@@ -329,7 +334,7 @@ namespace GhostVibe
                     acceptKeys = false;
                     Exit();
                 }
-                else if (currentKeyboardState.IsKeyDown(Keys.Y) || currentGamepadState.IsButtonDown(Buttons.Back))
+                else if (currentKeyboardState.IsKeyDown(Keys.Y) || currentGamepadState.IsButtonDown(Buttons.Start))
                 {
                     acceptKeys = false;
                     PlayAgain();
@@ -481,8 +486,9 @@ namespace GhostVibe
             particleEngine.Draw(spriteBatch);
             if (isGameOver)
             {
-                spriteBatch.DrawString(UIFont, gameoverText, new Vector2(GraphicsDevice.Viewport.Width / 2 - 180, GraphicsDevice.Viewport.Height / 2 - 100), Color.Crimson, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 0.0f);
-                spriteBatch.DrawString(UIFont, restartText, new Vector2(GraphicsDevice.Viewport.Width / 2 - 260, GraphicsDevice.Viewport.Height / 2), Color.Crimson, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 0.0f);
+                //spriteBatch.DrawString(UIFont, gameoverText, new Vector2(GraphicsDevice.Viewport.Width / 2 - 180, GraphicsDevice.Viewport.Height / 2 - 100), Color.Crimson, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 0.0f);
+                //spriteBatch.DrawString(UIFont, restartText, new Vector2(GraphicsDevice.Viewport.Width / 2 - 260, GraphicsDevice.Viewport.Height / 2), Color.Crimson, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 0.0f);
+                gameOver.Draw(spriteBatch);
             }
             else if (isPaused)
             {
@@ -671,6 +677,13 @@ namespace GhostVibe
                 ghost.MustNotDie = true;
                 ghost.MoveForward(beatFrequency * 4.0f);
             }
+
+            scheduler.scheduleDelegateOnce(new UpdateDelegate(ShowGameOver), beatFrequency * 5.0f);
+        }
+
+        private void ShowGameOver(float deltaTime)
+        {
+            gameOver.IsVisible = true;
         }
 
         private void UpdateLifeBar()
