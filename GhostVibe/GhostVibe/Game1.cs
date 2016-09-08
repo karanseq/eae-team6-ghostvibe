@@ -24,6 +24,8 @@ namespace GhostVibe
         protected string pausedText;
         protected string restartText;
         protected string startText;
+        protected string exitText;
+        protected string titleText;
 
         protected Random rand;
 
@@ -33,6 +35,8 @@ namespace GhostVibe
         protected Texture2D hallway;
         //protected Texture2D blueGun, greenGun, redGun, yellowGun;
         protected SpriteFont UIFont;
+        protected SpriteFont startFont;
+        protected SpriteFont titleFont;
 
         protected readonly int maxColors = 4;
         protected string[] colorNames = { "plain", "blue", "green", "red", "yellow" };
@@ -131,7 +135,9 @@ namespace GhostVibe
             gameoverText = "Game Over!";
             restartText = "Play Again? Y/N";
             pausedText = "Paused";
-            startText = "Start Playing? Y/N";
+            startText = "Start [Y]";
+            titleText = "SPACE REAPER";
+            exitText = "Exit [N]";
 
             base.Initialize();
         }
@@ -141,6 +147,8 @@ namespace GhostVibe
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
             UIFont = Content.Load<SpriteFont>("interface");
+            startFont = Content.Load<SpriteFont>("start");
+            titleFont = Content.Load<SpriteFont>("title");
             bgm = Content.Load<SoundEffect>("newbgmsize");
             bgm2 = Content.Load<SoundEffect>("final-battle");
             bgm3 = Content.Load<SoundEffect>("boss-battle");
@@ -487,7 +495,9 @@ namespace GhostVibe
 
             if (!isGameStarted)
             {
-                spriteBatch.DrawString(UIFont, startText, new Vector2(GraphicsDevice.Viewport.Width / 2 - 160, GraphicsDevice.Viewport.Height / 2), Color.DodgerBlue, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.0f);
+                spriteBatch.DrawString(titleFont, titleText, new Vector2(GraphicsDevice.Viewport.Width / 2 - 350, GraphicsDevice.Viewport.Height / 2 - 250), Color.GreenYellow, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.0f);
+                spriteBatch.DrawString(startFont, startText, new Vector2(GraphicsDevice.Viewport.Width / 2 - 140, GraphicsDevice.Viewport.Height / 2 + 40), Color.GreenYellow, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.0f);
+                spriteBatch.DrawString(startFont, exitText, new Vector2(GraphicsDevice.Viewport.Width / 2 - 100, GraphicsDevice.Viewport.Height / 2 + 180), Color.GreenYellow, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.0f);
             }
             else
             {
@@ -513,7 +523,7 @@ namespace GhostVibe
                 }
                 else if (isPaused)
                 {
-                    spriteBatch.DrawString(UIFont, pausedText, new Vector2(GraphicsDevice.Viewport.Width / 2 - 125, GraphicsDevice.Viewport.Height / 2 - 30), Color.Red, 0.0f, Vector2.Zero, 2.0f, SpriteEffects.None, 0.0f);
+                    spriteBatch.DrawString(startFont, pausedText, new Vector2(GraphicsDevice.Viewport.Width / 2 - 125, GraphicsDevice.Viewport.Height / 2 - 30), Color.GreenYellow, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.0f);
                 }
             }
             spriteBatch.End();
@@ -650,6 +660,7 @@ namespace GhostVibe
                             multiplier = j + 2;
                             // reset streak
                             streak = 0;
+                            UpdateStreakBar();
                             Trace.WriteLine("Multiplier upgraded to " + multiplier + "...");
                             break;
                         }
