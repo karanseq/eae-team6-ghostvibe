@@ -161,7 +161,7 @@ namespace GhostVibe
             positive = Content.Load<SoundEffect>("happysound");
             negative = Content.Load<SoundEffect>("badsound");
             gameoverSound = Content.Load<SoundEffect>("Evil_Laugh");
-            hallway = Content.Load<Texture2D>("hallway_bar");
+            hallway = Content.Load<Texture2D>("hallway_finished");
             positiveInst = positive.CreateInstance();
 
             ghostTextures = new Dictionary<string, Texture2D>();
@@ -282,6 +282,12 @@ namespace GhostVibe
 
         protected void PlayAgain()
         {
+            // only process these events if this is game over
+            if (!isGameOver)
+            {
+                return;
+            }
+
             scheduler.unscheduleDelegate(delegateTickClock);
             //HapticFeedback.stopBeats();
             scheduler.unscheduleDelegate(delegateTickGhosts);
