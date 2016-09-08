@@ -290,11 +290,11 @@ namespace GhostVibe
 
                 actionManager.update(gameTime.ElapsedGameTime.Milliseconds * 0.001f);
                 scheduler.update(gameTime.ElapsedGameTime.Milliseconds * 0.001f);
+                particleEngine.Update();
 
                 lifeBar.Update(gameTime);
                 streakBar.Update(gameTime);
             }
-            particleEngine.Update();
             base.Update(gameTime);
         }
 
@@ -390,57 +390,68 @@ namespace GhostVibe
         {
             if (ghostList.Count == 0) return;
 
-            List<Ghost> ghostsToBeDeleted = new List<Ghost>();
-            foreach (Ghost ghost in ghostList)
+            if (isGameOver)
             {
-                ghost.Update(gameTime);
-                if (ghost.HasFinishedDying)
+                foreach (Ghost ghost in ghostList)
                 {
-                    ghost.Destroy();
-                    ghostsToBeDeleted.Add(ghost);
+                    ghost.Update(gameTime);
                 }
             }
-
-            foreach (Ghost ghost in ghostsToBeDeleted)
+            else
             {
-                // if ghost was not killed by the player, reset the streak and multiplier
-                if (!ghost.WasKilledByPlayer)
+                List<Ghost> ghostsToBeDeleted = new List<Ghost>();
+                foreach (Ghost ghost in ghostList)
                 {
-                    // deduct life
-                    --lifeRemaining;
-                    UpdateLifeBar();
-
-                    // are there any lives left?
-                    if (lifeRemaining <= 0)
+                    ghost.Update(gameTime);
+                    if (ghost.HasFinishedDying)
                     {
-                        lifeRemaining = 0;
-
-                        // stop everything!
-                        scheduler.unscheduleDelegate(delegateTickClock);
-                        scheduler.unscheduleDelegate(delegateTickGhosts);
-                        HapticFeedback.stopVibration(0.0f);
-
-                        isGameOver = true;
-                        bgmList[bgmIndicator].Stop();
-                        gameoverSound.Play();
-                    }
-
-                    // reset streak and multiplier
-                    streak = 0;
-                    multiplier = 1;
-                    UpdateStreakBar();
-
-                    // play sound when player misses ghost
-                    negative.Play();
-
-                    // generate haptic feedback
-                    if (!isGameOver)
-                    {
-                        HapticFeedback.playBeat(1.0f, 0.25f);
+                        ghost.Destroy();
+                        ghostsToBeDeleted.Add(ghost);
                     }
                 }
 
-                ghostList.Remove(ghost);
+                foreach (Ghost ghost in ghostsToBeDeleted)
+                {
+                    // if ghost was not killed by the player, reset the streak and multiplier
+                    if (!ghost.WasKilledByPlayer)
+                    {
+                        // deduct life
+                        --lifeRemaining;
+                        UpdateLifeBar();
+
+                        // are there any lives left?
+                        if (lifeRemaining <= 0)
+                        {
+                            lifeRemaining = 0;
+
+                            // stop everything!
+                            scheduler.unscheduleDelegate(delegateTickClock);
+                            scheduler.unscheduleDelegate(delegateTickGhosts);
+                            HapticFeedback.stopVibration(0.0f);
+
+                            bgmList[bgmIndicator].Stop();
+                            gameoverSound.Play();
+
+                            GameOver();
+                        }
+
+                        // reset streak and multiplier
+                        streak = 0;
+                        multiplier = 1;
+                        UpdateStreakBar();
+
+                        // play sound when player misses ghost
+                        negative.Play();
+
+                        // generate haptic feedback
+                        if (!isGameOver)
+                        {
+                            HapticFeedback.playBeat(1.0f, 0.25f);
+                        }
+                    }
+
+                    ghostList.Remove(ghost);
+                }
             }
         }
 
@@ -534,7 +545,6 @@ namespace GhostVibe
         private void SpawnGhost(int laneNumber)
         {
             Ghost ghost = new Ghost(ghostTextureAnim[GetGhostColor(laneNumber)], laneNumber, 1000, 720, 15, 0.1f, "");
-            //Ghost ghost = new Ghost(ghostTextures[GetGhostColor(laneNumber)], ghostTextureAnim[GetGhostColor(laneNumber)], laneNumber, 1000, 720, 8, 1000, 720, 15, 0.3f, "");
             ghostList.Add(ghost);
             ghost.MoveForward(beatFrequency * 4.0f);
         }
@@ -647,6 +657,20 @@ namespace GhostVibe
 
             // generate haptic feedback
             HapticFeedback.playBeat(1.0f, 0.25f);
+        }
+
+        private void GameOver()
+        {
+            isGameOver = true;
+
+            // add four ghosts that will come and kill the player for the game over screen
+            for (int i = 0; i < 4; ++i)
+            {
+                Ghost ghost = new Ghost(ghostTextureAnim[GetGhostColor(i)], i, 1000, 720, 15, 0.1f, "");
+                ghostList.Add(ghost);
+                ghost.MustNotDie = true;
+                ghost.MoveForward(beatFrequency * 4.0f);
+            }
         }
 
         private void UpdateLifeBar()

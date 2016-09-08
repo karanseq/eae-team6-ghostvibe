@@ -38,6 +38,7 @@ namespace GhostVibe
         private bool wasKilledByPlayer;
         private bool isDying;
         private bool hasFinishedDying;
+        private bool mustNotDie;
 
         public Ghost(Texture2D staticTexture, int positionIndex, float scaleF, string gColor)
         {
@@ -158,24 +159,28 @@ namespace GhostVibe
             // find which sprite is being used
             Sprite sprite = isAnimated ? ghostAnim : ghostImg;
 
-            // if not killed by player, play the slicing animation
-            if (!killedByPlayer)
-            {
-                //sprite.Color = Microsoft.Xna.Framework.Color.RosyBrown;
-                // play the second animation here
-                // TODO
-                sprite.Color = Microsoft.Xna.Framework.Color.Red;
-            }
-            else
-            {
-                sprite.Active = false;
-             //   sprite.Color = Microsoft.Xna.Framework.Color.Green;
-            }
-
             // callback a function when the death animation is finished
             Sequence deathSequence = Sequence.createWithTwoActions(ScaleTo.create(Game1.BeatFrequency, 1.0f), CallFunc.create(new CallbackDelegate(FinishedDying)));
             ActionManager.Instance.addAction(deathSequence, sprite);
-            ActionManager.Instance.addAction(FadeOut.create(Game1.BeatFrequency), sprite);
+
+            // fade the ghosts out everywhere except game over screen
+            if (!mustNotDie)
+            {
+                ActionManager.Instance.addAction(FadeOut.create(Game1.BeatFrequency), sprite);
+
+                // if not killed by player, play the slicing animation
+                if (!killedByPlayer)
+                {
+                    //sprite.Color = Microsoft.Xna.Framework.Color.RosyBrown;
+                    // play the second animation here
+                    // TODO
+                    sprite.Color = Microsoft.Xna.Framework.Color.Red;
+                }
+                else
+                {
+                    sprite.Active = false;
+                }
+            }
         }
 
         public void FinishedDying()
@@ -286,6 +291,12 @@ namespace GhostVibe
         public bool HasFinishedDying
         {
             get { return hasFinishedDying; }
+        }
+
+        public bool MustNotDie
+        {
+            get { return mustNotDie; }
+            set { mustNotDie = value; }
         }
 
         public int LaneNumber
