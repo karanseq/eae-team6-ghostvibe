@@ -111,7 +111,7 @@ namespace GhostVibe
             graphics.PreferredBackBufferWidth = 1280;
             graphics.PreferredBackBufferHeight = 720;
 
-            //graphics.IsFullScreen = true;
+            graphics.IsFullScreen = true;
             IsMouseVisible = true;
 
             Content.RootDirectory = "Content";
