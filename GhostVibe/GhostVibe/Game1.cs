@@ -111,7 +111,7 @@ namespace GhostVibe
             graphics.PreferredBackBufferWidth = 1280;
             graphics.PreferredBackBufferHeight = 720;
 
-            graphics.IsFullScreen = false;
+            //graphics.IsFullScreen = true;
             IsMouseVisible = true;
 
             Content.RootDirectory = "Content";
@@ -496,8 +496,8 @@ namespace GhostVibe
             if (!isGameStarted)
             {
                 spriteBatch.DrawString(titleFont, titleText, new Vector2(GraphicsDevice.Viewport.Width / 2 - 350, GraphicsDevice.Viewport.Height / 2 - 250), Color.GreenYellow, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.0f);
-                spriteBatch.DrawString(startFont, startText, new Vector2(GraphicsDevice.Viewport.Width / 2 - 140, GraphicsDevice.Viewport.Height / 2 + 40), Color.GreenYellow, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.0f);
-                spriteBatch.DrawString(startFont, exitText, new Vector2(GraphicsDevice.Viewport.Width / 2 - 100, GraphicsDevice.Viewport.Height / 2 + 180), Color.GreenYellow, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.0f);
+                spriteBatch.DrawString(startFont, startText, new Vector2(GraphicsDevice.Viewport.Width / 2 - 140, GraphicsDevice.Viewport.Height / 2 + 40), Color.LightSkyBlue, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.0f);
+                spriteBatch.DrawString(startFont, exitText, new Vector2(GraphicsDevice.Viewport.Width / 2 - 100, GraphicsDevice.Viewport.Height / 2 + 180), Color.HotPink, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.0f);
             }
             else
             {
