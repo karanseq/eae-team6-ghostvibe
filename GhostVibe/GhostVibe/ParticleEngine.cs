@@ -130,22 +130,22 @@ namespace GhostVibe
             Color cloudcolor;
             if (lanenumber == 0)
             {
-                cloudcolor = Color.LightGreen;
+                cloudcolor = Color.GreenYellow;
                 position += new Vector2(80, -40);
             }
             else if (lanenumber == 1)
             {
-                cloudcolor = Color.Red;
+                cloudcolor = Color.Crimson;
                 position += new Vector2(30, -15);
             }
             else if (lanenumber == 2)
             {
-                cloudcolor = Color.LightBlue;
+                cloudcolor = Color.DodgerBlue;
                 position += new Vector2(-15, -15);
             }
             else
             {
-                cloudcolor = Color.Yellow;
+                cloudcolor = Color.Gold;
                 position += new Vector2(-60, -30);
             }
             return new Particle(cloudtexture, position,velocity, angle, 0 , cloudcolor, size,opacity, ttl);

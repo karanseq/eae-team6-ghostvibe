@@ -30,7 +30,7 @@ namespace Helper
 
         public static void playBeat(float beatIntensity, float beatDuration)
         {
-            if (!isVibrating)
+            if (!isVibrating && !Scheduler.Instance.IsDelegateBeingScheduled(delegateStopVibration))
             {
                 startVibration(0.0f);
                 Scheduler.Instance.scheduleDelegateOnce(delegateStopVibration, beatDuration);                

@@ -277,5 +277,11 @@ namespace Helper
                 }
             }
         }
+
+        public bool IsDelegateBeingScheduled(UpdateDelegate updateDelegate)
+        {
+            return delegateDictionary.ContainsKey(updateDelegate);
+        }
+
     }
 }
