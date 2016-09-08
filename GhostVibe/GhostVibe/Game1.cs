@@ -271,7 +271,7 @@ namespace GhostVibe
 
             // start scheduled functions
             //HapticFeedback.startBeats(beatFrequency, 0.1f, 0.1f);
-            scheduler.scheduleDelegate(delegateTickGhosts, beatFrequency);
+            scheduler.scheduleDelegate(delegateTickGhosts, beatFrequency, -1, 1.5f);
             foreach (SoundEffectInstance inst in bgmList)
             {
                 inst.Pitch = 0.0f;
