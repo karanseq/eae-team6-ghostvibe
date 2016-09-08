@@ -33,6 +33,7 @@ namespace GhostVibe
 
         protected Texture2D animationTexture, spriteTexture;
         protected Texture2D hallway;
+        protected Texture2D hallwayOpen;
         //protected Texture2D blueGun, greenGun, redGun, yellowGun;
         protected SpriteFont UIFont;
         protected SpriteFont startFont;
@@ -172,7 +173,8 @@ namespace GhostVibe
             gameoverSound = Content.Load<SoundEffect>("Evil_Laugh");
             gameoverInst = gameoverSound.CreateInstance();
             gameoverInst.Pitch = 0.5f;
-            hallway = Content.Load<Texture2D>("hallway_color");
+            hallway = Content.Load<Texture2D>("hallway_colorlight");
+            hallwayOpen = Content.Load<Texture2D>("hallway_opening");
             positiveInst = positive.CreateInstance();
 
             ghostTextures = new Dictionary<string, Texture2D>();
@@ -500,17 +502,16 @@ namespace GhostVibe
 
             spriteBatch.Begin();
 
-            spriteBatch.Draw(hallway, Vector2.Zero, null, Color.White, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.0f);
-
-
             if (!isGameStarted)
             {
+                spriteBatch.Draw(hallwayOpen, Vector2.Zero, null, Color.White, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.0f);
                 spriteBatch.DrawString(titleFont, titleText, new Vector2(GraphicsDevice.Viewport.Width / 2 - 350, GraphicsDevice.Viewport.Height / 2 - 250), Color.GreenYellow, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.0f);
                 spriteBatch.DrawString(startFont, startText, new Vector2(GraphicsDevice.Viewport.Width / 2 - 140, GraphicsDevice.Viewport.Height / 2 + 40), Color.Aqua, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.0f);
                 spriteBatch.DrawString(startFont, exitText, new Vector2(GraphicsDevice.Viewport.Width / 2 - 100, GraphicsDevice.Viewport.Height / 2 + 180), Color.Red, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.0f);
             }
             else
             {
+                spriteBatch.Draw(hallway, Vector2.Zero, null, Color.White, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.0f);
                 spriteBatch.DrawString(UIFont, "X" + multiplier, new Vector2(GraphicsDevice.Viewport.Width / 2 + 472, GraphicsDevice.Viewport.Height / 4 + 285), Color.Aqua, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 1.0f);
                 lifeBar.Draw(spriteBatch);
                 streakBar.Draw(spriteBatch);
@@ -543,7 +544,7 @@ namespace GhostVibe
 
         private void DrawUI()
         {
-            spriteBatch.DrawString(UIFont, "Score: " + score, new Vector2(GraphicsDevice.Viewport.Width / 2 - 60, 30), Color.BlueViolet, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 1.0f);
+            spriteBatch.DrawString(UIFont, "Score: " + score, new Vector2(GraphicsDevice.Viewport.Width / 2 - 60, 30), Color.Magenta, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 1.0f);
             
             for (int i = 0; i < positiveSprites.Count; ++i)
             {
