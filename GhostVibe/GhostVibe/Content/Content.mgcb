@@ -661,3 +661,15 @@
 /processorParam:TextureFormat=Color
 /build:hallway_finished.png
 
+#begin start.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:TextureFormat=Compressed
+/build:start.spritefont
+
+#begin title.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:TextureFormat=Compressed
+/build:title.spritefont
+
