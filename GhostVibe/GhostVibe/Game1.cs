@@ -99,6 +99,7 @@ namespace GhostVibe
         protected SoundEffect negative;
 
         protected SoundEffect gameoverSound;
+        protected SoundEffectInstance gameoverInst;
 
         protected SoundEffectInstance positiveInst;
 
@@ -112,7 +113,7 @@ namespace GhostVibe
             graphics.PreferredBackBufferHeight = 720;
 
             graphics.IsFullScreen = true;
-            IsMouseVisible = true;
+            //IsMouseVisible = true;
 
             Content.RootDirectory = "Content";
         }
@@ -169,7 +170,9 @@ namespace GhostVibe
             positive = Content.Load<SoundEffect>("happysound");
             negative = Content.Load<SoundEffect>("badsound");
             gameoverSound = Content.Load<SoundEffect>("Evil_Laugh");
-            hallway = Content.Load<Texture2D>("hallway_finished");
+            gameoverInst = gameoverSound.CreateInstance();
+            gameoverInst.Pitch = 0.5f;
+            hallway = Content.Load<Texture2D>("hallwaybar");
             positiveInst = positive.CreateInstance();
 
             ghostTextures = new Dictionary<string, Texture2D>();
@@ -204,10 +207,10 @@ namespace GhostVibe
             particleEngine = new ParticleEngine(notetextures, CloudTexture, new Vector2(0, 0));
 
             positiveSprites = new List<Sprite>();
-            LoadPositiveFeedback(Sprite.Create(Content.Load<Texture2D>("Great")), Color.Orange);
-            LoadPositiveFeedback(Sprite.Create(Content.Load<Texture2D>("awesome!")), Color.Orange);
-            LoadPositiveFeedback(Sprite.Create(Content.Load<Texture2D>("Fantastic!")), Color.Orange);
-            LoadPositiveFeedback(Sprite.Create(Content.Load<Texture2D>("Amazing!")), Color.Orange);
+            LoadPositiveFeedback(Sprite.Create(Content.Load<Texture2D>("Great")));
+            LoadPositiveFeedback(Sprite.Create(Content.Load<Texture2D>("awesome!")));
+            LoadPositiveFeedback(Sprite.Create(Content.Load<Texture2D>("Fantastic!")));
+            LoadPositiveFeedback(Sprite.Create(Content.Load<Texture2D>("Amazing!")));
 
             negativeSprites = new List<Sprite>();
             LoadNegativeFeedback(Sprite.Create(Content.Load<Texture2D>("-10")));
@@ -220,17 +223,16 @@ namespace GhostVibe
             gameOver.IsVisible = false;
         }
 
-        private void LoadPositiveFeedback(Sprite sprite, Color color)
+        private void LoadPositiveFeedback(Sprite sprite)
         {
             sprite.IsVisible = false;
-            sprite.Color = color;
             positiveSprites.Add(sprite);
         }
 
         private void LoadNegativeFeedback(Sprite sprite)
         {
             sprite.IsVisible = false;
-            sprite.Color = Color.DodgerBlue;
+            sprite.Color = Color.Aqua;
             negativeSprites.Add(sprite);
         }
 
@@ -252,7 +254,7 @@ namespace GhostVibe
             // start the clock
             seconds = 0;
 
-            scheduler.scheduleDelegate(delegateTickClock, 1.0f);
+            scheduler.scheduleDelegate(delegateTickClock, 0.5f);
 
             // generate first rhythm
             currentDifficultyIndex = 0;
@@ -272,6 +274,7 @@ namespace GhostVibe
             // start scheduled functions
             //HapticFeedback.startBeats(beatFrequency, 0.1f, 0.1f);
             scheduler.scheduleDelegate(delegateTickGhosts, beatFrequency, -1, 1.5f);
+            /*
             foreach (SoundEffectInstance inst in bgmList)
             {
                 inst.Pitch = 0.0f;
@@ -281,6 +284,12 @@ namespace GhostVibe
             //bgmIndicator = rand.Next(0, 4);
             bgmIndicator = rand.Next(0, 1);
             bgmList[bgmIndicator].Play();
+            */
+
+            bgmInst2.Pitch = 0.0f;
+            bgmInst2.Volume = 1.0f;
+            bgmInst2.IsLooped = true;
+            bgmInst2.Play();
 
             ghostList = new List<Ghost>();
 
@@ -459,7 +468,8 @@ namespace GhostVibe
                             HapticFeedback.stopVibration(0.0f);
 
                             bgmList[bgmIndicator].Stop();
-                            gameoverSound.Play();
+                            //gameoverSound.Play();
+                            gameoverInst.Play();
 
                             GameOver();
                         }
@@ -496,12 +506,12 @@ namespace GhostVibe
             if (!isGameStarted)
             {
                 spriteBatch.DrawString(titleFont, titleText, new Vector2(GraphicsDevice.Viewport.Width / 2 - 350, GraphicsDevice.Viewport.Height / 2 - 250), Color.GreenYellow, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.0f);
-                spriteBatch.DrawString(startFont, startText, new Vector2(GraphicsDevice.Viewport.Width / 2 - 140, GraphicsDevice.Viewport.Height / 2 + 40), Color.LightSkyBlue, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.0f);
-                spriteBatch.DrawString(startFont, exitText, new Vector2(GraphicsDevice.Viewport.Width / 2 - 100, GraphicsDevice.Viewport.Height / 2 + 180), Color.HotPink, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.0f);
+                spriteBatch.DrawString(startFont, startText, new Vector2(GraphicsDevice.Viewport.Width / 2 - 140, GraphicsDevice.Viewport.Height / 2 + 40), Color.Aqua, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.0f);
+                spriteBatch.DrawString(startFont, exitText, new Vector2(GraphicsDevice.Viewport.Width / 2 - 100, GraphicsDevice.Viewport.Height / 2 + 180), Color.Red, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.0f);
             }
             else
             {
-                spriteBatch.DrawString(UIFont, "X" + multiplier, new Vector2(GraphicsDevice.Viewport.Width / 2 + 472, GraphicsDevice.Viewport.Height / 4 + 285), Color.BlueViolet, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 1.0f);
+                spriteBatch.DrawString(UIFont, "X" + multiplier, new Vector2(GraphicsDevice.Viewport.Width / 2 + 472, GraphicsDevice.Viewport.Height / 4 + 285), Color.Aqua, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 1.0f);
                 lifeBar.Draw(spriteBatch);
                 streakBar.Draw(spriteBatch);
 
@@ -533,7 +543,7 @@ namespace GhostVibe
 
         private void DrawUI()
         {
-            spriteBatch.DrawString(UIFont, "Score: " + score, new Vector2(GraphicsDevice.Viewport.Width / 2 - 60, 30), Color.DodgerBlue, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 1.0f);
+            spriteBatch.DrawString(UIFont, "Score: " + score, new Vector2(GraphicsDevice.Viewport.Width / 2 - 60, 30), Color.BlueViolet, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 1.0f);
             
             for (int i = 0; i < positiveSprites.Count; ++i)
             {
@@ -649,6 +659,7 @@ namespace GhostVibe
                     // update streak
                     ++streak;
                     UpdateStreakBar();
+                    negativeMultiplier = 1;
 
                     // check if the multiplier needs to be upgraded
                     for (int j = Helper.Helper.numMultipliers - 1; j >= multiplier - 1; --j)
